@@ -1,4 +1,19 @@
-# ネタ候補
+# intrisic content size technique
 
-・DYLD_INSERT_LIBRARIES
-・interface builder関連
+# 自己紹介
+
+@noppefoxwolf のっぺ
+
+きつね好き
+
+# intrisic content sizeの説明
+
+# 高さを自動計算するUITableViewCell
+
+intrisicSizeでrootのStackViewを返す
+
+# pros cons
+
+# これを使ったライブラリを書きました
+
+以上
