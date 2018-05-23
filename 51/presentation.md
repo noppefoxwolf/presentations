@@ -3,17 +3,21 @@ slidenumbers: true
 
 # [fit] App Protection
 
+potatotips #51
+
 ---
 
 # noppe
 
 **@noppefoxwolf**
 
-iOSアプリ開発者 ８年目
+iOSアプリデベロッパー
 
 🦊 が好きです！
 
 potatotips初参戦です！
+
+
 
 ![right](IMG_0726.PNG)
 
