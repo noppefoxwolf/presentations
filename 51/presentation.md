@@ -19,6 +19,10 @@ potatotips初参戦です！
 
 ---
 
+![fit](Apple TV.png)
+
+---
+
 ![fit](charles-for-ios.jpg)
 
 ---
