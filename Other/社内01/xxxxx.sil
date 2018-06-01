@@ -1,0 +1,197 @@
+sil_stage raw
+
+import Builtin
+import Swift
+import SwiftShims
+
+// globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_token0
+sil_global private @globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_token0 : $Builtin.Word
+
+// static Class.xxxxx
+sil_global hidden @_T05xxxxx5ClassCAASivpZ : $Int
+
+// main
+sil @main : $@convention(c) (Int32, UnsafeMutablePointer<Optional<UnsafeMutablePointer<Int8>>>) -> Int32 {
+bb0(%0 : $Int32, %1 : $UnsafeMutablePointer<Optional<UnsafeMutablePointer<Int8>>>):
+  %2 = integer_literal $Builtin.Int32, 0          // user: %3
+  %3 = struct $Int32 (%2 : $Builtin.Int32)        // user: %4
+  return %3 : $Int32                              // id: %4
+} // end sil function 'main'
+
+// globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_func0
+sil private @globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_func0 : $@convention(c) () -> () {
+bb0:
+  alloc_global @_T05xxxxx5ClassCAASivpZ           // id: %0
+  %1 = global_addr @_T05xxxxx5ClassCAASivpZ : $*Int // user: %4
+  // function_ref closure #1 in variable initialization expression of static Class.xxxxx
+  %2 = function_ref @_T05xxxxx5ClassCAASivpZfiSiycfU_ : $@convention(thin) () -> Int // user: %3
+  %3 = apply %2() : $@convention(thin) () -> Int  // user: %4
+  store %3 to [trivial] %1 : $*Int                // id: %4
+  %5 = tuple ()                                   // user: %6
+  return %5 : $()                                 // id: %6
+} // end sil function 'globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_func0'
+
+// closure #1 in variable initialization expression of static Class.xxxxx
+sil private @_T05xxxxx5ClassCAASivpZfiSiycfU_ : $@convention(thin) () -> Int {
+bb0:
+  // function_ref default argument 0 of preconditionFailure(_:file:line:)
+  %0 = function_ref @_T0s19preconditionFailures5NeverOSSyXK_s12StaticStringV4fileSu4linetFfA_ : $@convention(thin) () -> @owned @noescape @callee_guaranteed () -> @owned String // user: %1
+  %1 = apply %0() : $@convention(thin) () -> @owned @noescape @callee_guaranteed () -> @owned String // user: %13
+  %2 = string_literal utf8 "xxxxx.swift"          // user: %7
+  %3 = integer_literal $Builtin.Word, 11          // user: %7
+  %4 = integer_literal $Builtin.Int1, -1          // user: %7
+  %5 = metatype $@thin StaticString.Type          // user: %7
+  // function_ref StaticString.init(_builtinStringLiteral:utf8CodeUnitCount:isASCII:)
+  %6 = function_ref @_T0s12StaticStringVABBp08_builtinB7Literal_Bw17utf8CodeUnitCountBi1_7isASCIItcfC : $@convention(method) (Builtin.RawPointer, Builtin.Word, Builtin.Int1, @thin StaticString.Type) -> StaticString // user: %7
+  %7 = apply %6(%2, %3, %4, %5) : $@convention(method) (Builtin.RawPointer, Builtin.Word, Builtin.Int1, @thin StaticString.Type) -> StaticString // user: %13
+  %8 = metatype $@thin UInt.Type                  // user: %11
+  %9 = integer_literal $Builtin.Int2048, 2        // user: %11
+  // function_ref UInt.init(_builtinIntegerLiteral:)
+  %10 = function_ref @_T0S2uBi2048_22_builtinIntegerLiteral_tcfC : $@convention(method) (Builtin.Int2048, @thin UInt.Type) -> UInt // user: %11
+  %11 = apply %10(%9, %8) : $@convention(method) (Builtin.Int2048, @thin UInt.Type) -> UInt // user: %13
+  // function_ref preconditionFailure(_:file:line:)
+  %12 = function_ref @_T0s19preconditionFailures5NeverOSSyXK_s12StaticStringV4fileSu4linetF : $@convention(thin) (@owned @noescape @callee_guaranteed () -> @owned String, StaticString, UInt) -> Never // user: %13
+  %13 = apply %12(%1, %7, %11) : $@convention(thin) (@owned @noescape @callee_guaranteed () -> @owned String, StaticString, UInt) -> Never
+  unreachable                                     // id: %14
+} // end sil function '_T05xxxxx5ClassCAASivpZfiSiycfU_'
+
+// default argument 0 of preconditionFailure(_:file:line:)
+sil [transparent] [serialized] @_T0s19preconditionFailures5NeverOSSyXK_s12StaticStringV4fileSu4linetFfA_ : $@convention(thin) () -> @owned @noescape @callee_guaranteed () -> @owned String
+
+// StaticString.init(_builtinStringLiteral:utf8CodeUnitCount:isASCII:)
+sil [transparent] [serialized] [readonly] @_T0s12StaticStringVABBp08_builtinB7Literal_Bw17utf8CodeUnitCountBi1_7isASCIItcfC : $@convention(method) (Builtin.RawPointer, Builtin.Word, Builtin.Int1, @thin StaticString.Type) -> StaticString
+
+// UInt.init(_builtinIntegerLiteral:)
+sil [transparent] [serialized] @_T0S2uBi2048_22_builtinIntegerLiteral_tcfC : $@convention(method) (Builtin.Int2048, @thin UInt.Type) -> UInt
+
+// preconditionFailure(_:file:line:)
+sil [transparent] [serialized] @_T0s19preconditionFailures5NeverOSSyXK_s12StaticStringV4fileSu4linetF : $@convention(thin) (@owned @noescape @callee_guaranteed () -> @owned String, StaticString, UInt) -> Never
+
+// Class.xxxxx.unsafeMutableAddressor
+sil hidden [global_init] @_T05xxxxx5ClassCAASivau : $@convention(thin) () -> Builtin.RawPointer {
+bb0:
+  %0 = global_addr @globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_token0 : $*Builtin.Word // user: %1
+  %1 = address_to_pointer %0 : $*Builtin.Word to $Builtin.RawPointer // user: %3
+  // function_ref globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_func0
+  %2 = function_ref @globalinit_33_8E8FACE4EE988D8A047B0274F5EDCB00_func0 : $@convention(c) () -> () // user: %3
+  %3 = builtin "once"(%1 : $Builtin.RawPointer, %2 : $@convention(c) () -> ()) : $()
+  %4 = global_addr @_T05xxxxx5ClassCAASivpZ : $*Int // user: %5
+  %5 = address_to_pointer %4 : $*Int to $Builtin.RawPointer // user: %6
+  return %5 : $Builtin.RawPointer                 // id: %6
+} // end sil function '_T05xxxxx5ClassCAASivau'
+
+// static Class.xxxxx.getter
+sil hidden [transparent] @_T05xxxxx5ClassCAASivgZ : $@convention(method) (@thick Class.Type) -> Int {
+// %0                                             // user: %1
+bb0(%0 : $@thick Class.Type):
+  debug_value %0 : $@thick Class.Type, let, name "self", argno 1 // id: %1
+  // function_ref Class.xxxxx.unsafeMutableAddressor
+  %2 = function_ref @_T05xxxxx5ClassCAASivau : $@convention(thin) () -> Builtin.RawPointer // user: %3
+  %3 = apply %2() : $@convention(thin) () -> Builtin.RawPointer // user: %4
+  %4 = pointer_to_address %3 : $Builtin.RawPointer to [strict] $*Int // user: %5
+  %5 = begin_access [read] [dynamic] %4 : $*Int   // users: %7, %6
+  %6 = load [trivial] %5 : $*Int                  // user: %8
+  end_access %5 : $*Int                           // id: %7
+  return %6 : $Int                                // id: %8
+} // end sil function '_T05xxxxx5ClassCAASivgZ'
+
+// static Class.xxxxx.setter
+sil hidden [transparent] @_T05xxxxx5ClassCAASivsZ : $@convention(method) (Int, @thick Class.Type) -> () {
+// %0                                             // users: %8, %2
+// %1                                             // user: %3
+bb0(%0 : $Int, %1 : $@thick Class.Type):
+  debug_value %0 : $Int, let, name "value", argno 1 // id: %2
+  debug_value %1 : $@thick Class.Type, let, name "self", argno 2 // id: %3
+  // function_ref Class.xxxxx.unsafeMutableAddressor
+  %4 = function_ref @_T05xxxxx5ClassCAASivau : $@convention(thin) () -> Builtin.RawPointer // user: %5
+  %5 = apply %4() : $@convention(thin) () -> Builtin.RawPointer // user: %6
+  %6 = pointer_to_address %5 : $Builtin.RawPointer to [strict] $*Int // user: %7
+  %7 = begin_access [modify] [dynamic] %6 : $*Int // users: %9, %8
+  assign %0 to %7 : $*Int                         // id: %8
+  end_access %7 : $*Int                           // id: %9
+  %10 = tuple ()                                  // user: %11
+  return %10 : $()                                // id: %11
+} // end sil function '_T05xxxxx5ClassCAASivsZ'
+
+// closure #1 in static Class.xxxxx.materializeForSet
+sil private [transparent] @_T05xxxxx5ClassCAASivmZytfU_ : $@convention(method) (Builtin.RawPointer, @inout Builtin.UnsafeValueBuffer, @inout @thick Class.Type, @thick Class.Type.Type) -> () {
+// %1                                             // user: %4
+bb0(%0 : $Builtin.RawPointer, %1 : $*Builtin.UnsafeValueBuffer, %2 : $*@thick Class.Type, %3 : $@thick Class.Type.Type):
+  end_unpaired_access [dynamic] %1 : $*Builtin.UnsafeValueBuffer // id: %4
+  %5 = tuple ()                                   // user: %6
+  return %5 : $()                                 // id: %6
+} // end sil function '_T05xxxxx5ClassCAASivmZytfU_'
+
+// static Class.xxxxx.materializeForSet
+sil hidden [transparent] @_T05xxxxx5ClassCAASivmZ : $@convention(method) (Builtin.RawPointer, @inout Builtin.UnsafeValueBuffer, @thick Class.Type) -> (Builtin.RawPointer, Optional<Builtin.RawPointer>) {
+// %1                                             // user: %6
+bb0(%0 : $Builtin.RawPointer, %1 : $*Builtin.UnsafeValueBuffer, %2 : $@thick Class.Type):
+  // function_ref Class.xxxxx.unsafeMutableAddressor
+  %3 = function_ref @_T05xxxxx5ClassCAASivau : $@convention(thin) () -> Builtin.RawPointer // user: %4
+  %4 = apply %3() : $@convention(thin) () -> Builtin.RawPointer // user: %5
+  %5 = pointer_to_address %4 : $Builtin.RawPointer to [strict] $*Int // users: %7, %6
+  begin_unpaired_access [modify] [dynamic] %5 : $*Int, %1 : $*Builtin.UnsafeValueBuffer // id: %6
+  %7 = address_to_pointer %5 : $*Int to $Builtin.RawPointer // user: %11
+  // function_ref closure #1 in static Class.xxxxx.materializeForSet
+  %8 = function_ref @_T05xxxxx5ClassCAASivmZytfU_ : $@convention(method) (Builtin.RawPointer, @inout Builtin.UnsafeValueBuffer, @inout @thick Class.Type, @thick Class.Type.Type) -> () // user: %9
+  %9 = thin_function_to_pointer %8 : $@convention(method) (Builtin.RawPointer, @inout Builtin.UnsafeValueBuffer, @inout @thick Class.Type, @thick Class.Type.Type) -> () to $Builtin.RawPointer // user: %10
+  %10 = enum $Optional<Builtin.RawPointer>, #Optional.some!enumelt.1, %9 : $Builtin.RawPointer // user: %11
+  %11 = tuple (%7 : $Builtin.RawPointer, %10 : $Optional<Builtin.RawPointer>) // user: %12
+  return %11 : $(Builtin.RawPointer, Optional<Builtin.RawPointer>) // id: %12
+} // end sil function '_T05xxxxx5ClassCAASivmZ'
+
+// Class.deinit
+sil hidden @_T05xxxxx5ClassCfd : $@convention(method) (@guaranteed Class) -> @owned Builtin.NativeObject {
+// %0                                             // users: %2, %1
+bb0(%0 : $Class):
+  debug_value %0 : $Class, let, name "self", argno 1 // id: %1
+  %2 = unchecked_ref_cast %0 : $Class to $Builtin.NativeObject // user: %3
+  %3 = unchecked_ownership_conversion %2 : $Builtin.NativeObject, @guaranteed to @owned // user: %4
+  return %3 : $Builtin.NativeObject               // id: %4
+} // end sil function '_T05xxxxx5ClassCfd'
+
+// Class.__deallocating_deinit
+sil hidden @_T05xxxxx5ClassCfD : $@convention(method) (@owned Class) -> () {
+// %0                                             // users: %6, %5, %3, %1
+bb0(%0 : $Class):
+  debug_value %0 : $Class, let, name "self", argno 1 // id: %1
+  // function_ref Class.deinit
+  %2 = function_ref @_T05xxxxx5ClassCfd : $@convention(method) (@guaranteed Class) -> @owned Builtin.NativeObject // user: %4
+  %3 = begin_borrow %0 : $Class                   // users: %5, %4
+  %4 = apply %2(%3) : $@convention(method) (@guaranteed Class) -> @owned Builtin.NativeObject // user: %7
+  end_borrow %3 from %0 : $Class, $Class          // id: %5
+  end_lifetime %0 : $Class                        // id: %6
+  %7 = unchecked_ref_cast %4 : $Builtin.NativeObject to $Class // user: %8
+  dealloc_ref %7 : $Class                         // id: %8
+  %9 = tuple ()                                   // user: %10
+  return %9 : $()                                 // id: %10
+} // end sil function '_T05xxxxx5ClassCfD'
+
+// Class.__allocating_init()
+sil hidden @_T05xxxxx5ClassCACycfC : $@convention(method) (@thick Class.Type) -> @owned Class {
+bb0(%0 : $@thick Class.Type):
+  %1 = alloc_ref $Class                           // user: %3
+  // function_ref Class.init()
+  %2 = function_ref @_T05xxxxx5ClassCACycfc : $@convention(method) (@owned Class) -> @owned Class // user: %3
+  %3 = apply %2(%1) : $@convention(method) (@owned Class) -> @owned Class // user: %4
+  return %3 : $Class                              // id: %4
+} // end sil function '_T05xxxxx5ClassCACycfC'
+
+// Class.init()
+sil hidden @_T05xxxxx5ClassCACycfc : $@convention(method) (@owned Class) -> @owned Class {
+// %0                                             // users: %2, %1
+bb0(%0 : $Class):
+  debug_value %0 : $Class, let, name "self"       // id: %1
+  %2 = mark_uninitialized [rootself] %0 : $Class  // users: %4, %3
+  %3 = copy_value %2 : $Class                     // user: %5
+  destroy_value %2 : $Class                       // id: %4
+  return %3 : $Class                              // id: %5
+} // end sil function '_T05xxxxx5ClassCACycfc'
+
+sil_vtable Class {
+  #Class.init!initializer.1: (Class.Type) -> () -> Class : _T05xxxxx5ClassCACycfc	// Class.init()
+  #Class.deinit!deallocator: _T05xxxxx5ClassCfD	// Class.__deallocating_deinit
+}
+
+
+
