@@ -3,18 +3,27 @@ slidenumbers: true
 
 # [fit] App Protection
 
+potatotips #51
+
 ---
 
 # noppe
-@noppefoxwolf
 
-iOSアプリ開発者 ８年目
+**@noppefoxwolf**
+
+iOSアプリデベロッパー
 
 🦊 が好きです！
 
 potatotips初参戦です！
 
+
+
 ![right](IMG_0726.PNG)
+
+---
+
+![fit](Apple TV.png)
 
 ---
 
@@ -104,144 +113,13 @@ Swift.Unmanaged<__ObjC.CFDictionary>(_value: {
 
 ---
 
-# さいごに
+![inline fit](スクリーンショット 2018-05-23 3.30.44.png)
+
+`VPNDetector`
+
+https://github.com/noppefoxwolf/VPNDetector
 
 ---
 
 # [fit]🦊 以上です！
 # [fit]ありがとうございました
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-VPN検知
-
-charlsがリリースされました
-
-色々なアプリの通信を覗いた人もいるのでは？
-
-偶然CharlesをつけっぱなしでTwitterのアプリを開いた所、通信が出来ませんでした。
-
-今日はこれを実装します。
-
-まずはCharlsの仕組みを簡単に解説
-try!Swift2017で登壇されていた資料
-http://niwatako.hatenablog.jp/entry/2018/03/02/122828
-NetworkExtensionFramework使ってる
-
-VPSの接続を検出出来れば良さそう
-
-
-4G c
-Optional(Swift.Unmanaged<__ObjC.CFDictionary>(_value: {
-    ExcludeSimpleHostnames = 0;
-    FTPEnable = 0;
-    FTPPassive = 1;
-    GopherEnable = 0;
-    HTTPEnable = 1;
-    HTTPPort = 8080;
-    HTTPProxy = "10.78.2.43";
-    HTTPSEnable = 1;
-    HTTPSPort = 8080;
-    HTTPSProxy = "10.78.2.43";
-    ProxyAutoConfigEnable = 0;
-    ProxyAutoDiscoveryEnable = 0;
-    RTSPEnable = 0;
-    SOCKSEnable = 0;
-    "__SCOPED__" =     {
-        utun4 =         {
-            ExcludeSimpleHostnames = 0;
-            FTPEnable = 0;
-            FTPPassive = 1;
-            GopherEnable = 0;
-            HTTPEnable = 1;
-            HTTPPort = 8080;
-            HTTPProxy = "10.78.2.43";
-            HTTPSEnable = 1;
-            HTTPSPort = 8080;
-            HTTPSProxy = "10.78.2.43";
-            ProxyAutoConfigEnable = 0;
-            ProxyAutoDiscoveryEnable = 0;
-            RTSPEnable = 0;
-            SOCKSEnable = 0;
-        };
-    };
-}))
-
-4G
-Optional(Swift.Unmanaged<__ObjC.CFDictionary>(_value: {
-}))
-
-Wifi
-Optional(Swift.Unmanaged<__ObjC.CFDictionary>(_value: {
-    ExceptionsList =     (
-        "*.local",
-        "169.254/16"
-    );
-    FTPPassive = 1;
-    "__SCOPED__" =     {
-        en0 =         {
-            ExceptionsList =             (
-                "*.local",
-                "169.254/16"
-            );
-            FTPPassive = 1;
-        };
-    };
-}))
-
-Wifi c
-
-Optional(Swift.Unmanaged<__ObjC.CFDictionary>(_value: {
-    ExcludeSimpleHostnames = 0;
-    FTPEnable = 0;
-    FTPPassive = 1;
-    GopherEnable = 0;
-    HTTPEnable = 1;
-    HTTPPort = 8080;
-    HTTPProxy = "10.78.2.43";
-    HTTPSEnable = 1;
-    HTTPSPort = 8080;
-    HTTPSProxy = "10.78.2.43";
-    ProxyAutoConfigEnable = 0;
-    ProxyAutoDiscoveryEnable = 0;
-    RTSPEnable = 0;
-    SOCKSEnable = 0;
-    "__SCOPED__" =     {
-        en0 =         {
-            ExceptionsList =             (
-                "*.local",
-                "169.254/16"
-            );
-            FTPPassive = 1;
-        };
-        utun4 =         {
-            ExcludeSimpleHostnames = 0;
-            FTPEnable = 0;
-            FTPPassive = 1;
-            GopherEnable = 0;
-            HTTPEnable = 1;
-            HTTPPort = 8080;
-            HTTPProxy = "10.78.2.43";
-            HTTPSEnable = 1;
-            HTTPSPort = 8080;
-            HTTPSProxy = "10.78.2.43";
-            ProxyAutoConfigEnable = 0;
-            ProxyAutoDiscoveryEnable = 0;
-            RTSPEnable = 0;
-            SOCKSEnable = 0;
-        };
-    };
-}))
-
-https://stackoverflow.com/questions/8131807/how-to-check-vpn-connectivity-in-iphone
