@@ -1,5 +1,5 @@
-# potatotips
-自分用のpotatotipsに登壇する時のmd
+# presentations
+自分用の登壇する時のmd
 decksetで実行
 
 # Links
