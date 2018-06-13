@@ -219,6 +219,9 @@ info.properties.compactMap { $0.name }
 
 Typeが保持されているメモリを直接参照してメタデータを取得している。
 これらを構造体に当て嵌めて使いやすいようにしたライブラリ
+メモリのレイアウト構造はドキュメントがある
+
+[^4]:https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst#nominal-type-descriptor
 
 ---
 
@@ -245,7 +248,7 @@ type自体のポインタから生ポインタを取得する
 
 ![inline](pointer.png)
 
-[^4]:https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst
+[^5]:https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst
 
 ---
 
@@ -317,18 +320,18 @@ CStringの参照をStringに変換すると、プロパティ名が取得でき�
 
 ## STEP 4
 
-あとはこのCStringの参照をプロパティ分ズラして取得していけば、全てのプロパティ名が取得できる。[^5]
+あとはこのCStringの参照をプロパティ分ズラして取得していけば、全てのプロパティ名が取得できる。[^6]
 
-[^5]:実際は他のポインタからプロパティの数を取得してその分を取得している
+[^6]:実際は他のポインタからプロパティの数を取得してその分を取得している
 
 ---
 
 # Warning
 
 この方法は当然Swiftの仕様変更でメモリのレイアウトが変わると使えなくなる。
-Swift ABI Stability Manifesto[^6]
+Swift ABI Stability Manifesto[^7]
 
-[^6]:https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md
+[^7]:https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md
 
 ---
 
