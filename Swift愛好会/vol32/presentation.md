@@ -1,96 +1,110 @@
 footer: 🦊 @noppefoxwolf, 2018
 slidenumbers: true
 
-# [fit] Runtime for Swift
+
+> Swiftとメタデータ
+-- 2018/06/20 - Swift愛好会vol32
 
 ---
 
-# noppe
+#[fit] noppe
 
-🦊 きつね好き
-iOSアプリエンジニア
+🦊 きつねが好き！！
+📱 iOSアプリ開発8年目
 
-//TODO
+Swift愛好会初参戦
 
 ![right](IMG_0726.PNG)
 
 ---
 
-# Runtimeとは
-
-**実行時**という意味
-
-コンパイル時に解決できない実装を実行時に実装する時に利用される。
-Ex:コンパイル時に存在しないプロパティをクラスに生やす/コンパイル時に存在しないクラスを生成する
+![inline fit](myapps.png)
 
 ---
 
-# ObjectiveC runtime API
+# メタデータとは
 
-`#import <objc/runtime.h>`
+メタ情報とは、すなわち**データについてのデータ**という意味で、あるデータが付随して持つそのデータ自身についての付加的なデータを指す。（Wiki調べ）[^1]
 
-objcの標準ランタイムAPIはimportするだけで利用できる
-Swiftの場合は`import ObjectiveC`
+🤔
+
+[^1]: https://ja.wikipedia.org/wiki/メタデータ
 
 ---
 
-# objc_setAssociatedObject
+# メタデータとは
+
+- クラス名
+- クラスのプロパティ名
+- 継承元
+- 準拠しているプロトコル
+...etc
+
+---
+
+# メタデータが必要な時
+
+- 今見ているビューコントローラをログに吐きたい
+- インスタンスをダンプして保存したい
+- 詳細で分かりやすいエラーを表示したい
+- いい感じのORM作りたいとか
+...etc
+
+---
+
+> Swiftでメタデータを取得するにはどうすればいい？
+
+---
+
+> そういえばObjective-Cではどうしていたのか？
+
+---
+
+# プロパティ一覧を取得する
+
+ObjectiveC-runtime API
 
 ```swift
-var animal = Animal()
-objc_setAssociatedObject(animal, &Key, "hello!", .OBJC_ASSOCIATION_RETAIN)
-objc_getAssociatedObject(animal, &Key) as! String // hello
+class_copyPropertyList(_:_:)
 ```
 
-実行時にクラスにオブジェクトを保有させる例
-
-SwiftのextensionでStored Propertyを生やそうとする時にお世話になる事が多い。
+https://developer.apple.com/documentation/objectivec/1418553-class_copypropertylist
 
 ---
 
-# objc_setAssociatedObject
+# プロパティ一覧を取得する
 
-```
-struct Animal {}
-var Key: UInt8 = 0
-var animal = Animal()
-objc_setAssociatedObject(animal, &Key, "hello!", .OBJC_ASSOCIATION_RETAIN)
-objc_getAssociatedObject(animal, &Key) // nil
-```
+```objc
+unsigned int propertyCount = 0;
+objc_property_t * properties = class_copyPropertyList([self class], &propertyCount);
 
-//TODO:ここnsobject継承しなくてもできてしまった・・・
-objc_setAssociatedObjectはstructでは使う事ができない。
-^ObjCのStructTypeでも同様
-
----
-
-# Swift runtime API?
-
-https://github.com/apple/swift/blob/master/docs/Runtime.md
-
-`The final runtime interface is currently a work-in-progress`
-なさそう。
-
----
-
-# valueForKey
-
-```
-class Person : NSObject {
-  @objc var name = ""
+NSMutableArray * propertyNames = [NSMutableArray array];
+for (unsigned int i = 0; i < propertyCount; ++i) {
+  objc_property_t property = properties[i];
+  const char * name = property_getName(property);
+  [propertyNames addObject:[NSString stringWithUTF8String:name]];
 }
-
-var p1 = Person()
-p1.setValue("Jhone Doe", forKey: #keyPath(Person.name))
+free(properties);
+NSLog(@"Names: %@", propertyNames);
 ```
 
 ---
 
-# Properties
+# プロパティ一覧を取得する
 
+ObjC runtime APIはSwiftでも使うことができる。
+
+```swift
+import ObjectiveC
 ```
+
+---
+
+# プロパティ一覧を取得する
+
+```swift
 var count: UInt32 = 0
-let properties = class_copyPropertyList(Person.self, &count)
+let properties = class_copyPropertyList(MyClass.self, &count)
 for i in 0..<Int(count) {
   let prop = properties![i]
   let propName = String(cString: property_getName(prop))
@@ -100,99 +114,227 @@ for i in 0..<Int(count) {
 
 ---
 
-# Swift runtime API
+# プロパティ一覧を取得する
+
+Swiftでclass_copyPropertyListを使うには制限がある
+
+```swift
+class MyClass: NSObject {
+  @objc var prop1 = ""
+  @objc var prop2 = ""
+}
+```
+
+プロパティに`@objc`をつけること！[^※1]
+
+[^※1]: @objcが必要であり、NSObjectを継承する必要はない。また@objcをつけるにはclassである必要がある
+
+---
+
+> @objcを付けずにプロパティ一覧を取得する方法はないでしょうか…？
+
+---
+
+# プロパティ一覧を取得する
+
+## Encodable
+
+```swift
+class MyClass: Encodable {
+  var prop1 = ""
+  var prop2 = ""
+}
+
+let data = try! JSONEncoder().encode(MyClass())
+let json = try! JSONSerialization.jsonObject(with: data, options: .allowFragments)
+print((json as! [String : Any]).keys)
+```
+
+- ["prop1", "prop2"]
+
+
+---
+
+## reflection
+
+```swift
+let mirror = Mirror(reflecting: MyClass())
+let propNames = mirror.children.compactMap({ $0.label })
+```
+
+---
+
+> Objective-C runtime APIに相当するframeworkは無いのか…
+
+---
+
+# swift/docs/Runtime.md
+
+**The final runtime interface is currently a work-in-progress;**[^3]
+
+なさそう
+
+[^3]:https://github.com/apple/swift/blob/master/docs/Runtime.md
+
+---
+
+# Third party runtime API
 
 https://github.com/wickwirew/Runtime
-文字列による変数代入やインスタンスの生成
-各種構造体のメタデータダンプ
-
-https://github.com/Meniny/DynamicKit
 https://github.com/Zewo/Reflection
 
-//TODO :ここで使われているようなのを例にしたい
+---
+
+# wickwirew/Runtime
+
+```swift
+var md = ClassMetadata(type: MyClass<Int>.self)
+let info = md.toTypeInfo()
+info.properties.compactMap { $0.name }
+```
 
 ---
 
-# Properties
+## Pros Cons
 
-流れ
-構造体をメタデータ構造体へマッピングしてプロパティ情報を取得
+||@objc|instance|metadata|
+|:---:|:---:|:---:|:---:|
+|ObjC runtime|x|o|o|
+|Encodable|o|x|x|
+|reflection|o|x|△|
+|third party api|o|o|o|
 
 ---
 
-## 構造体をメタデータ構造体へマッピング
+> ☺️
+-- じゃあThird partyの使おう〜〜
 
-let base = unsafeBitCast(type, to: UnsafeMutablePointer<Int>.self)
-ポインターを取得
-let metadataPointer = base.advanced(by: valueWitnessTableOffset).raw
-メタデータのポインターを取得（-1ずらす。ドキュメント参照）
-let metadata = metadataPointer.assumingMemoryBound(to: StructMetadataLayout.self)
+---
 
-StructMetadataLayout {
-  var valueWitnessTable: UnsafePointer<ValueWitnessTable>
-  var kind: Int
-  var nominalTypeDescriptor: UnsafeMutablePointer<NominalTypeDescriptor>
+> RuntimeやReflectionはどうやってメタデータを取得しているのか？
+
+---
+
+# Runtimeの処理
+
+Typeが保持されているメモリを直接参照してメタデータを取得している。
+これらを構造体に当て嵌めて使いやすいようにしたライブラリ
+
+---
+
+![inline](art1.png)
+
+---
+
+![inline](art2.png)
+
+---
+
+## STEP1
+
+```swift
+var type: Any.Type = Kind.self
+let typeAsPointer = unsafeBitCast(type, to: UnsafeMutablePointer<Int64>.self)
+let metadataPointer = typeAsPointer.advanced(by: -1)
+let metadataRawPointer = UnsafeMutableRawPointer(metadataPointer)
+```
+
+type自体のポインタから生ポインタを取得する
+
+---
+
+![inline](pointer.png)
+
+[^4]:https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst
+
+---
+
+[補足]value witness table
+
+関数を呼び出す時に経由するテーブル
+Runtimeではこのサイズや順序を元にインスタンスのメモリ構造を作り出して無理やり生成する機能がある
+
+---
+
+## STEP 2
+
+```swift
+let layout = metadataRawPointer.assumingMemoryBound(to: StructMetadataLayout.self)
+```
+
+`assumingMemoryBound`でポインタをMetadataLayoutの構造へのポインタと解釈します。
+
+---
+
+## STEP 2
+
+StructMetadataLayout.swift
+
+```swift
+struct StructMetadataLayout: NominalMetadataLayoutType {
+    var valueWitnessTable: UnsafePointer<ValueWitnessTable>
+    var kind: Int
+    var nominalTypeDescriptor: UnsafeMutablePointer<NominalTypeDescriptor>
 }
-https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst
-
-NominalTypeDescriptorはここ
-https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst#nominal-type-descriptor
-
-//TODO: 取れる情報一覧出したい
-
-注意：Swift4.1でのレイアウトなので変更する可能性ありSwift5のABI安定化で破壊されるかも
-//TODO: 参考文献見つけられればここに春
+```
 
 ---
 
- ## どの構造か判別
+## STEP 2
 
- https://github.com/apple/swift/blob/master/docs/ABI/TypeMetadata.rst#common-metadata-layout
- 
- Kind見ればおk
+```
+structLayout.kind //1
+enumLayout.kind //2
+protocolLayout.kind //12
+```
 
----
-
-## プロパティの代入と取得
-
-
+これでメモリの構造をstructにマッピングする事が出来た
 
 ---
 
-## インスタンスを生成する
+## STEP 3
 
-
-
-
----
-
-## 実行環境による差分
+`Nominal Type Descriptor`の`offset: ４`が`field names`なのでそこの実体を参照すると、プロパティ名のCStringの配列が取得できる。
 
 ---
 
-Runtimeとは実行時のこと
+## STEP 3
 
-https://github.com/wickwirew/Runtime
+```swift
+struct Animal {
+  var name: String
+}
+```
 
-SwiftでRuntime集
+```swift
+let cString = metadata.pointee.nominalTypeDescriptor.pointee.fieldNames.advanced()
+String(cString: cString) → name
+```
 
-Metadata
-Factory
-GetSet(Struct|Class)
-ValueWitnessTable
-
----
-
-# Metadata
-
-
-
-Runtimeの応用
-Runtimeを使って作ってみた
+CStringの参照をStringに変換すると、プロパティ名が取得できる。
 
 ---
 
-# words
+## STEP 4
 
-ABI:Application Binary Interface
-http://developer.hatenastaff.com/entry/learn-about-swift-3-point-0-from-swift-evolution#ABI-Stability
+あとはこのCStringの参照をプロパティ分ズラして取得していけば、全てのプロパティ名が取得できる。[^5]
+
+[^5]:実際は他のポインタからプロパティの数を取得してその分を取得している
+
+---
+
+# Warning
+
+この方法は当然Swiftの仕様変更でメモリのレイアウトが変わると使えなくなる。
+Swift ABI Stability Manifesto[^6]
+
+[^6]:https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md
+
+---
+
+# まとめ
+
+- メタデータにアクセスする方法は複数あり一長一短である
+- 純Swiftな構造体のMetadataを安全に得る方法はまだ無い。
+- メモリを参照する事で、通常取得出来ない多くの情報にアクセスできる
+
