@@ -1,3 +1,5 @@
+footer: 🦊 @noppefoxwolf, 2018
+slidenumbers: true
 
 > Video decode on iOS
 -- potatotips#52
