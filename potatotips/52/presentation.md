@@ -58,7 +58,7 @@ slidenumbers: true
 
 例えば、mp4 mov wmv...
 
-複数の**コンテナの集まり**、主に動画と音声が格納されているのが一般的なフォーマット
+複数の**メディアコンテナの集まり**、主に動画と音声が格納されているのが一般的なフォーマット
 他にも字幕や静止画のコンテナが含まれることもある
 
 ---
@@ -82,12 +82,6 @@ slidenumbers: true
 
 ---
 
-# ビデオファイルのデコードとは
-
-今回はこの中でも**h264/avcコーデックをデコード**する方法に絞って解説
-
----
-
 # iOSでのビデオコンテナのデコード方法
 
 - AVAssetReader
@@ -95,11 +89,29 @@ slidenumbers: true
 
 ---
 
+# 対応コーデックの確認
+
+これらのフレームワークは内部で**OS/端末のデコーダの実装を利用**している。
+
+同じmp4でもH.264かH.265みたいなコーデックの違いがあり、OSや端末によってサポートが異なるので注意。
+
+---
+
+# 対応コーデックの確認
+
+公式サイトのSpecみればサポートしているコーデックがわかる。[^2]
+
+対応コーデックを取得するメソッドは見つからなかった。😕
+
+[^2]:https://www.apple.com/jp/iphone-x/specs/ とか
+
+---
+
 # AVAssetReader
 
 ```swift
 let reader = try! AVAssetReader(asset: asset)
-let output = AVAssetReaderTrackOutput(track: videoTrack)
+let output = AVAssetReaderTrackOutput(track: asset.videoTrack)
 reader.add(output)
 reader.startReading()
 
@@ -110,23 +122,35 @@ output.copyNextSampleBuffer()
 ```
 
 とても簡単
+copyNextSampleBufferを呼ぶたびに取れるフレームのタイムスタンプが進む
+
+---
+
+# AVAssetReaderの特徴
+
+- 対応コーデックであればコーデックを気にせずにデコードできる
+- 非常に簡単なインターフェイス
+- 次のsampleBufferしか取れない
 
 ---
 
 # VTDecompressionSessionの特徴
 
-VideoToolbox.frameworkのデコード用の機能
-**ビデオフレームの復元**ができる
+低レイヤーのビデオデコード用フレームワーク
+多分AVAssetReader/AVAssetReaderTrackOutputはこれを使っている？
+やや複雑で面倒な代わりに柔軟性が高い
 
 ---
 
 # VTDecompressionSessionの流れ
 
 1. h264/avcを分割
-2. 映像が含まれるチャンクを取り出す
+2. 映像が含まれるチャンクを取り出す[^3]
 3. VTDecompressionSessionを生成
 4. チャンクをSessionに渡す
 5. デコード済みのImageBufferがコールバックに返される
+
+[^3]:サンプルでは例としてキーフレームを取り出している
 
 ---
 
@@ -144,9 +168,21 @@ NAL file format
 
 # 映像が含まれるチャンクを取り出す
 
-NALのヘッダを参照して0x05のものが基準となるフレームを持っている。
+NALのヘッダを参照して0x05のものがキーフレーム[^4]を持っている。
 
 ![inline](nalu_type.png)
+
+[^4]:差分情報が不要な完全なフレーム
+
+---
+
+# nal unit type
+
+ISO/IEC 14496で定義[^5]
+
+![right](nal.png)
+
+[^5]:http://www.staroceans.org/e-book/ISO-14496-10.pdf
 
 ---
 
@@ -156,7 +192,7 @@ NALのヘッダを参照して0x05のものが基準となるフレームを持�
 VTDecompressionSessionCreate(_:, _:, _:, _:, _:, _:)
 ```
 
-引数にはコールバック先やフレームの情報(pixelFormatやH264のパラメータ)が必要
+引数には**コールバック先**やフレームの情報(pixelFormatやH264のパラメータ)が必要
 
 ---
 
@@ -170,7 +206,6 @@ VTDecompressionSessionDecodeFrame(_:, _:, _:, _:, &sampleBuffer)
 byte配列を直接渡す事は出来ないので、byte配列から作ったBlockBufferを元にSampleBufferを作り渡す。
 
 ---
-
 # デコード済みのImageBufferがコールバックに返される
 
 ```swift
@@ -191,8 +226,10 @@ Sessionに登録したcallbackへデコードされたimageBufferが返ってく
 
 ||Easy|Streaming|Performance|Customize|
 |:---:|:---:|:---:|:---:|:---:|
-|AVAssetReader|o|x|o|△|
+|AVAssetReader|o|x[^6]|o|△|
 |VTDecompressionSession|x|o|o|o|
+
+[^6]:リモートのアセットのpixelBufferは取れない
 
 ---
 
@@ -222,13 +259,11 @@ Sessionに登録したcallbackへデコードされたimageBufferが返ってく
 
 ---
 
-# CfPの話
-
-iOSDC2018のCfP出してみました。
+# iOSDC2018のCfP出してみました。
 
 ![inline](cfp.jpg)
 
-今回の話のほか、Metal対応でどうなるのかとか比較してみたいと思っています 🦊
+今回の話のほか、KitsunebiをMetal対応させてどうなるのかとか比較してみたいと思っています 🦊
 
 ---
 

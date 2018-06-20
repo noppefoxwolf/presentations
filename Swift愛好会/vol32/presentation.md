@@ -52,11 +52,11 @@ Swift愛好会初参戦
 
 ---
 
-> Swiftでメタデータを取得するにはどうすればいい？
+#[fit] Swiftでメタデータを取得するにはどうすればいい？
 
 ---
 
-> そういえばObjective-Cではどうしていたのか？
+#[fit] そういえばObjective-Cではどうしていたのか？
 
 ---
 
@@ -332,6 +332,14 @@ CStringの参照をStringに変換すると、プロパティ名が取得でき�
 Swift ABI Stability Manifesto[^7]
 
 [^7]:https://github.com/apple/swift/blob/master/docs/ABIStabilityManifesto.md
+
+---
+
+# Example project
+
+![inline](github.png)
+
+#[fit]https://github.com/noppefoxwolf/MetadataExample
 
 ---
 
