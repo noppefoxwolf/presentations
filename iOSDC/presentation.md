@@ -164,3 +164,6 @@ https://developer.apple.com/documentation/metal/fundamental_lessons/cpu_and_gpu_
 Metalファミリー
 
 OpenGLよりもMetalのが簡単
+
+PyCoreImage
+CoreImage Kernel langはdeplicated
