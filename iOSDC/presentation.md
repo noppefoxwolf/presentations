@@ -217,7 +217,14 @@ https://developer.apple.com/documentation/metal/fundamental_lessons/cpu_and_gpu_
 
 Metalファミリー
 
+<<<<<<< HEAD
 mov -> mp4 alpha
 ffmpeg -i sample.mov -vf alphaextract,format=yuv420p output.mov
 
 mov -> 連番png
+=======
+OpenGLよりもMetalのが簡単
+
+PyCoreImage
+CoreImage Kernel langはdeplicated
+>>>>>>> 72f431522b19c7772e539e0758c10cc9f7aa1d30
