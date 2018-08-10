@@ -4,46 +4,260 @@ slidenumbers: true
 > ライブ配信アプリのアイテム再生をMetalで実装する事になった話
 -- iOSDC Japan Track B 2018/09/02 11:20〜
 
+^ ライブ配信アプリのアイテム再生をMetalで実装する事になった話というタイトルで発表します。
+
 ---
 
 #[fit] noppe
 
 📱 iOSアプリ開発8年目
 🦊 きつね好き
-👨🏻‍💻 株式会社ディー・エヌ・エー
+🏢 株式会社ディー・エヌ・エー
 
 ![right](IMG_0726.PNG)
 
-^ 自己紹介
+^ こんにちは、株式会社ディー・エヌ・エーのnoppeです
 
----
-
-//出したものあれば
+<!-- # 本トークについて
+自分はMetal初心者
+自分はOpenGLES初心者
+まだまだ知らないことが多いです、分からないところは逆に教えて
+OpenGLやMetalを学ぶ為に手頃な例を見つけたので紹介
+ライブ配信自体についてはしません 
+実際のプロダクトと仕様が異なる箇所がある -->
 
 ---
 
 今日の話
-・
-・
-・
-# 本トークについて
-自分はMetal初心者
-自分はOpenGLES初心者
-OpenGLやMetalを学ぶ為に手頃な例を見つけたので紹介
-話の割合は、サービス課題の対応が半分、Metal半分
-ライブ配信自体についてはしません
-後半はOpenGLES/Metalに入門した時の話
-
+・Pocochaの紹介
+・透過情報を持った動画の再生手法
+・UIKit/GLKit/MetalKitの描画
+・Metalのデバッグ手法
+・まとめ
 
 ---
 
+Pocochaの紹介
+
+---
+
+配信サービス
+//画像
+
+^ どんなサービス
+^ いつリリース
+
+---
+
+特徴
+・アイテムで盛り上げる
+
+---
+
+# 透過情報を持った動画の再生手法
+
+---
+
+アイテムの再生を見てみましょう
+//動画
+^ アイテムが採用された経緯、サービス市場とか
+
+---
+
+どういったものが再生されているか
+750 × 1334 60fps rgba nosound
+^ デバイス環境
+
+---
+
+再生されるリソース作成の流れ
+・アウトソーシング
+・ガイドライン
+
+---
+
+どうやって再生する？
+
+---
+
+直接AVPlayerに投げる
+> movはサポートしているが、透過はサポートしてない
+
+---
+
+UIImageView.animate
+//詳細
+
+---
+
+`ffmpeg -i M_sea30fps.mov M_sea30fps/output_%04d.png`
+du -h
+288M    ./M_sea60fps
+
+---
+
+実行
+開始命令から開始まで非常に遅い
+メモリ1GB程度占有、これなんでだ
+^ 極端なことをするのは無駄ではない、勉強になった
+^ パフォーマンスを意識する上で気にかけることができる
+
+---
+
+二つの問題
+・容量
+・再生パフォーマンス
+
+^ メモリを圧迫することでCPUやバッテリーに影響が
+^ 配信もしているのでそんなに余裕はない
+
+---
+
+・8fpsくらいに落として運用
+
+^ 半年くらい
+^ 最初はそんなに派手なエフェクトではなかったので大丈夫だった。
+^ 半年後にアイテムの表現をリッチにすることになった
+
+---
+
+まずは容量
+movファイル：493MB
+連番PNG:302MB
+
+^容量が多いとなぜ困るか
+^アプリの起動中に取ってくる
+
+---
+
+圧縮する必要がある
+そこで守らないといけない点
+・透過情報を持っている
+・fpsを落とさない
+・サイズを変更しない
+
+^ 透過はしないと真っ暗になる
+^ 下二つはクオリティの劣化に直接通じるから
+
+---
+
+一つは動画フォーマット
+一つはアニメーションをサポートした画像フォーマット
+
+---
+
+MOV
+Webm VP8 with alpha
+https://www.reddit.com/r/explainlikeimfive/comments/2p4a6c/eli5_the_difference_between_html5_video_webm_and/
+GIF
+APNG
+WEBP
+
+残念ながらmp4は透過に対応していない
+
+---
+
+- WEBM
+https://github.com/brion/OGVKit
+
+透過対応してなかったりする、あと不安定
+ハードウェアデコーダとソフトウェアデコードの観点
+h265の圧縮効率
+
+---
+
+- PNG/JPG
+ネイティブサポート
+
+---
+
+- GIF
+https://github.com/kirualex/SwiftyGif
+GIFを1フレームごとにUIImageに変換して、独自のループの中でUIImageView.imageを差し替えている
+一般的な非対応フォーマットの対応の仕方
+普通はUIImageViewを使うので使い勝手が良い
+
+---
+
+- APNG
+https://github.com/onevcat/APNGKit
+libpng
+APNGImageView: UIView
+一度UIImageに変換してからCGImageをlayer.contentsに設定
+これはUIImageViewと同じ仕組み
+
+---
+
+- WEBP
+libWEBP
+
+---
+
+- MP4
+h264
+透過情報持てない
+デフォで対応
+
+---
+
+- MOV
+透過情報が持てる
+
+---
+
+表
+|iOSで再生できるか|圧縮率|透過|
+
+^計測
+^なかなか良さげなフォーマットがない
+
+---
+
+昔ゲームを作っていた時
+透過PNGが使えなかった当時、jpgでalpha maskして透過していた。
+この手法は今回使えそう。
+
+---
+
+非透過のビデオA・非透過のビデオB
+毎フレーム透過合成していく、それを描画
+^ 容量比較
+
+---
+
+// ======================================================
+
+---
+
+UIKit/GLKit/MetalKitの描画
+
+^ 先ほどの毎フレーム合成した透過画像を表示したい。
+^ ここでは、どうやって、何に表示するのか
+
+---
+
+透過の方法
+
+---
+
+
+
+
+
+
+
+
+
+----
+
 # サービスの紹介
+
 ライブ配信知ってますか
 ライブ配信サービスの最近の動向
 配信するだけではなく、アイテムを使って配信を盛り上げる流れに
 アイテムの派手さや楽しさが差別要素に
 DeNAで自分はPocochaというサービスをやっている
-どんなものなのか
+アイテムとはどんなものなのか
 
 ---
 
@@ -53,6 +267,8 @@ Pocochaのアイテムを見て欲しい
 これをどのように実装したかを順を追って解説
 
 ---
+
+このように、アニメーションを表示させる
 
 # 要件の確認
 どんな手法があるか
@@ -176,6 +392,10 @@ MP4 -> SampleBuffer -> CIImage -> CIFilter -> UIImage -> 描画（EAGLView）
 UIImageViewは十分に高速、OpenGLESを直接使う意味は？
 シェーダーを使うことに意味がある
 
+CIFilterはoutputImageを受け取って、UIImageViewへ渡す
+GPU->CPU->GPU
+メモリが共存しているから良い？OpenGLESは共存していない。
+シェーダーならGPUから帰ってこない
 
 MP4 -> SampleBuffer -> CIImage -> シェーダーで描画（EAGLView）
 早くなった！これで良いじゃん！
@@ -217,14 +437,11 @@ https://developer.apple.com/documentation/metal/fundamental_lessons/cpu_and_gpu_
 
 Metalファミリー
 
-<<<<<<< HEAD
 mov -> mp4 alpha
 ffmpeg -i sample.mov -vf alphaextract,format=yuv420p output.mov
 
 mov -> 連番png
-=======
 OpenGLよりもMetalのが簡単
 
 PyCoreImage
 CoreImage Kernel langはdeplicated
->>>>>>> 72f431522b19c7772e539e0758c10cc9f7aa1d30
