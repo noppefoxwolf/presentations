@@ -496,6 +496,7 @@ GPU->CPU->GPU
 
 MP4 -> SampleBuffer -> CIImage -> シェーダーで描画（EAGLView）
 早くなった！これで良いじゃん！
+CIFilter使うならメタル非対応機種のパフォーマンスも確認しておくべき
 Kitsunebi
 
 OpenGLES deplicated!!
