@@ -4,88 +4,154 @@ slidenumbers: true
 > ライブ配信アプリのアイテム再生をMetalで実装する事になった話
 -- iOSDC Japan Track B 2018/09/02 11:20〜
 
-^ ライブ配信アプリのアイテム再生をMetalで実装する事になった話というタイトルで発表します。
-^ トークの目的は、実際のユースケースを元に画像の編集・表示の領域に関して興味を持っていただくこと
-^ Metalを仕事で使っている人はいますか
-^ 多くの人がMetal
+^ よろしくお願いします。
+^ 「ライブ配信アプリのアイテム再生を、Metalで実装する事になった話。」というタイトルで発表します。
+^ 本トークは、実際のユースケースを元に動画像の編集・表示の領域に関して興味を持っていただくこと
+^ また、GPUを操作するOpenGLESやMetalなどのレイヤーを実装の選択肢として持っていただくことを目的としています。
+^ ライブ配信技術自体に関する点については、本トークでは扱いませんのでご了承ください。
 
 ---
 
 #[fit] noppe
 
-📱 iOSアプリ開発8年目
-🦊 きつね好き
 🏢 株式会社ディー・エヌ・エー
+🦊 きつね好き
+💻 ２０１０〜
 
 ![right](IMG_0726.PNG)
 
-^ こんにちは、株式会社ディー・エヌ・エーのnoppeです
-
-<!-- # 本トークについて
-自分はMetal初心者
-自分はOpenGLES初心者
-まだまだ知らないことが多いです、分からないところは逆に教えて
-OpenGLやMetalを学ぶ為に手頃な例を見つけたので紹介
-ライブ配信自体についてはほとんどしません、（一応タイトルに書いてあるしやらないとダメかも
-実際のプロダクトと仕様が異なる箇所がある -->
+^ まず、自己紹介をさせてください。
+^ 株式会社ディー・エヌ・エーでiOSアプリエンジニアをしているnoppeと言います。
+^ 動物の狐が好きで、プロフィール画像も狐です。きつねのシャツ着ているのがいたら話しかけてください。
+^ アプリ開発は独学で2010年ごろから続けていて、今年で８年目です。
+^ これまで個人のアカウントで、アドベンチャーノベルゲームやTwitterクライアントをAppStoreでリリースしてきました。
+^ OpenGLやMetalなどのGPU周りは今年に入ってから触り始めました。
+^ 既に//TODO
+^ 今回は、これらのGPU周りの学習に置いて手頃な事例を用意出来たと思うので触ったことの無い方も//TODO
 
 ---
 
 今日の話
 ・Pocochaの紹介
-・透過情報を持った動画の再生手法
-・UIKit/GLKit/MetalKitの描画
-・本当にMetalで実装しないといけないのか
-・Metalのデバッグ手法
+・アイテムのエフェクトの再生手法
+・UIKit/OpenGLES/Metalでの描画
 ・まとめ
+    ・本当にMetalで実装しないといけないのか
+    ・Metalのデバッグ手法
+
+^ さて、今日お話する内容についてですが、最初に弊社でリリースしているライブ配信アプリのPocochaの紹介をします。
+^ そのあとで、アプリで使われているアイテムのエフェクト再生手法を解説します。
+^ 次に、それらの再生手法をUIKit、OpenGLES、Metalでそれぞれ実装した結果について解説します。
+^ 最後に今日のセッションのまとめをします。
+^ なお今回のセッションでは、解説の関係上実際リリースされているアプリと仕様が異なる箇所があります。ご了承ください。
+^ 本日は30分程度になりますが、ぜひ最後までよろしくお願いいたします。
 
 ---
 
-Pocochaの紹介
+#[fit] ライブ配信アプリPococha（ポコちゃ）の紹介
+
+^ それでは最初に弊社からリリースされているライブ配信アプリPocochaを紹介させてください。
 
 ---
 
-配信サービス
-//画像
+//Pocochaの画像、できれば右側に動画でおいてもいいかも
 
-^ どんなサービス
-^ いつリリース
-
----
-
-特徴
-・アイテムで盛り上げる
+^ Pocochaは、2017年初頭にリリースしたライブ配信アプリです。
+^ どこでも手軽にスマホで縦型のライブ配信ができ、視聴者はコメントやアイテムを使って配信枠を盛り上げたりといったコミュニケーションが楽しめます。
+^ また高機能な美顔・美肌フィルターを搭載していて、配信//TODO
+^ 今日はそんな機能の中でも、アイテムがどのような技術で再生されているのかの話をします。
 
 ---
 
-# 透過情報を持った動画の再生手法
+# アイテムエフェクトの再生手法
+
+^ アイテムの話をする前に、Pocochaのアイテムがどのようなギミックなのかを見て見ましょう。
 
 ---
 
-アイテムの再生を見てみましょう
-//動画
-^ アイテムが採用された経緯、サービス市場とか
+// アイテムが実際のライブ配信で発動する様子の動画
+
+^ アイテムは、有料で購入する事ができ利用すると配信者・視聴者の両方の画面でエフェクトが再生されます。
+^ 昨今のライブ配信アプリでは、このようなアイテムの概念が必ずと言っていいほど導入されておりアイテムの表現力もサービス差別化の上で重要になってきます。
+^ Pocochaでは、多くのアイテムで画面全体を覆う派手なエフェクトを採用しています。
 
 ---
 
-どういったものが再生されているか
+// メタデータの図解
 750 × 1334 60fps rgba nosound
-^ デバイス環境
+^ 先ほどのデモではどういった仕様のエフェクトが再生されているかというと
+^ 750x1334の透過情報を持ったエフェクトが再生されています。
+^ また、Pocochaは当時iOS9のOSをサポートしていたためiPhone5cや第三世代のiPadなどでも利用できました。
 
 ---
 
-再生されるリソース作成の流れ
-・アウトソーシング
-・ガイドライン
+// 再生されるリソース作成の流れ
+// アウトソーシング
+// ガイドライン
+^ アイテムは、movファイルとしてデザイナーから渡されます。
 
 ---
 
-どうやって再生する？
+① AVPlayerで再生する
+
+```swift
+let url = Bundle.main.url(forResource: "item_effect",
+                          withExtension: "mov")!
+let asset = AVURLAsset(url: url)
+let item = AVPlayerItem(asset: asset)
+let player = AVPlayer(playerItem: item)
+let playerLayer = AVPlayerLayer(player: player)
+playerLayer.backgroundColor = UIColor.clear.cgColor
+
+view.layer.addSubLayer(playerLayer)
+player.play()
+```
 
 ---
 
-直接AVPlayerに投げる
-> movはサポートしているが、透過はサポートしてない
+① AVPlayerで再生する
+
+[.code-highlight: 1-2]
+
+```swift
+let url = Bundle.main.url(forResource: "item_effect",
+                          withExtension: "mov")!
+let asset = AVURLAsset(url: url)
+let item = AVPlayerItem(asset: asset)
+let player = AVPlayer(playerItem: item)
+let playerLayer = AVPlayerLayer(player: player)
+playerLayer.backgroundColor = UIColor.clear.cgColor
+
+view.layer.addSubLayer(playerLayer)
+player.play()
+```
+
+^ AVPlayerはMOVファイルをサポートしているので、そのまま呼び出します。
+
+---
+
+① AVPlayerで再生する
+
+[.code-highlight: 7]
+
+```swift
+let url = Bundle.main.url(forResource: "item_effect",
+                          withExtension: "mov")!
+let asset = AVURLAsset(url: url)
+let item = AVPlayerItem(asset: asset)
+let player = AVPlayer(playerItem: item)
+let playerLayer = AVPlayerLayer(player: player)
+playerLayer.backgroundColor = UIColor.clear.cgColor
+
+view.layer.addSubLayer(playerLayer)
+player.play()
+```
+
+^ 透過情報を持つmovなので、背景色を透過します。結果は
+
+---
+
+
 
 ---
 
