@@ -343,32 +343,73 @@ h264
 
 ^ 容量比較
 
+^ 以上が、透過情報を持った動画を再生する手法です。
+^ ここからは、この手法を使っていくつかの方法で実装した結果を解説します。
+
 ---
 
-# UIKit/GLKit/MetalKitの描画
-
-^ 先ほどの毎フレーム合成した透過画像を表示したい。
-^ ここからはどうやって合成し何に表示するのかの話
+# 透過合成と描画
 
 ---
 
 合成の方法①
 
+CIFilter
+ - iOS 5.0+
+
+^ まず最初に思いついたのは、CIFilterを使う方法です。
+^ CIFilterは、CoreImageフレームワークに含まれている画像編集の機能です。
+^ CIFilterは内部的にMetalとOpenGLES、またCPUでの処理を切り替えられるようになっています。
+^ また、プリセットのフィルタに`CIBlendWithMask`というalpha mask用のフィルタが存在します。
+^ まずはこれを使って実装してみました。
+
+[^1]:https://developer.apple.com/documentation/coreimage/cifilter
+
+---
+
+合成の方法①
+
+[.code-highlight: 1-5]
+
 ```swift
 let filter = CIFilter(name: "CIBlendWithMask")!
-filter.setValue(baseCIImage, forKey: kCIInputImageKey)
-filter.setValue(alphaCIImage, forKey: kCIInputMaskImageKey)
-let image = UIImage(ciImage: filter.outputImage!)
+filter.setValue(baseCIImage,
+                forKey: kCIInputImageKey)
+filter.setValue(alphaCIImage,
+                forKey: kCIInputMaskImageKey)
+let filteredImage = filter.outputImage!
+
+let image = UIImage(ciImage: filteredImage)
 imageView.image = image
 ```
 
-・CIFilterを利用する
-^ CIFilterは、CoreImageフレームワークに含まれている画像編集の機能です。
-^ 複数のフィルターを重ねがけしても、重くなりにくい仕組みになっています。
-^ CIFilterは内部的にMetalとOpenGLES、またCPUでの処理を切り替えられるようになっています。
-^ また、プリセットのフィルタに`CIBlendWithMask`というalpha mask用のフィルタが存在します。
-^ このフィルタで作った画像をUIImageViewで表示するという作業を0.016秒ごとに繰り返します。
+^ 実装は非常に簡単です。
+^ フィルタ名を元に生成したCIFilterに対して、kCIInputImageKeyで非透過画像を
+^ kCIInputMaskImageKeyでアルファ画像を指定します。
+
+---
+
+合成の方法①
+
+[.code-highlight: 6-9]
+
+```swift
+let filter = CIFilter(name: "CIBlendWithMask")!
+filter.setValue(baseCIImage,
+                forKey: kCIInputImageKey)
+filter.setValue(alphaCIImage,
+                forKey: kCIInputMaskImageKey)
+let filteredImage = filter.outputImage!
+let image = UIImage(ciImage: filteredImage)
+imageView.image = image
+```
+
+^ filter.outputImageでフィルタをかけ終わったCIImageを取得することが出来ます。
+^ CIImage自体は元の画像をどのように描画するかの情報を持っているだけなので、outputImageを取得するまでは一瞬で行われます。
+^ 描画自体はこのCIImageをUIImageに詰めてUIImageViewで描画するタイミングで行われます。
+^ あとはこのフィルタで作った画像をUIImageViewで表示するという作業を0.016秒ごとに繰り返します。
 ^ 0.016秒は1秒間に60フレーム表示する場合の１フレームの時間です。
+^ それでは実際の動作を見てみましょう。
 
 ---
 
@@ -378,17 +419,159 @@ imageView.image = image
 ^ スローモーションのような動きになってしまいました。
 ^ これは１フレームあたりの処理が0.016秒を超えてしまっているために発生した問題です。
 ^ iPhone5cはMetalに対応していないので、OpenGLESを使って処理されているはずですが非常に時間がかかっています。
-^ ちなみに、Metalに対応したiPhone5sでは// TODO
-
----
-
-// Instruments 見れない…画像
+^ ちなみに、Metalに対応したiPhone5sでもややフレームが落ちてしまっています。
+^ 5cでは、`maskFilter?.setValue(mainCI, forKey: kCIInputImageKey)`のタイミングで0.01秒程度消費している。
 
 ---
 
 合成の方法②
 
-^ CIFilterでパフォーマンスが出なかった原因が分からない
+CAEAGLLayer
+ - 2.0–12.0
+
+^ そういったこともあって、CIFilterはリアルタイムの処理に向いてないのかもしれないと思いました。
+^ そこで、CIFilterの内部で実装されているだろう合成と描画の処理をOpenGLESで書いてみる事にしました。
+^ CAEAGLLayerは、OpenGLESのレンダリング先として利用できるレイヤーです。
+^ 実際に利用するときはUIViewのlayerClassをoverrideする必要があります。
+
+^ OpenGLESを直接使ったことのある人は、この会場内では分からないですがあまり多くないと思います。
+^ 実際、Pocochaのエンジニアは十数名いますが当時触ったことがある人はいませんでした。
+^ OpenGLESと聞くと、何だか難しそうなイメージがあります。
+^ 恐らくそのイメージは、ハローワールドを表示するまでの道のりが長いことや、そもそもUnityなどのおかげで触る必要が無いのでそれ以上触らないだけという話かもしれません。
+^ 僕も実際、暗中模索しながら始めました。
+^ 最初に僕がしたデバッグを紹介します。
+
+---
+
+```
+glGetError()
+```
+
+^ それが、これです。
+^ glGetError()は、この行が呼ばれたタイミングで発生しているエラーを取得します。
+^ glの関数はほとんどがエラーを直接返さないので、毎行このglGetErrorをチェックするコードを仕込みます。
+^ ちなみに最初に見つけたエラーは`GL_INVALID_ENUM`です。
+^ これは、異常なenumを渡した時に発生するエラーですが、OpenGLESはこのエラーが発生しても動作を停止しません。
+
+---
+
+// xcodeでbreak point仕込む方法
+
+^ そして、幸いな事にXcodeではOpenGLESでエラーが発生した時に動作を中断するbreakpointを仕込む事ができます。
+
+---
+
+// 図？
+
+^ さて、簡単なデバッグ手法を覚えた上で実装するわけですがCIFilterと違い
+^ OpenGLESの場合は、描画するまでが少し複雑です。
+^ 無理矢理当て込むと、次のような対応になります。
+
+|||
+|---|---|
+|CIImage|テクスチャ|
+|CIFilter|フラグメントシェーダー|
+|UIImageView|レンダラー|
+
+---
+
+合成の方法②
+
+```swift
+var texture: CVOpenGLESTexture? = nil
+
+CVOpenGLESTextureCacheCreateTextureFromImage(
+    kCFAllocatorDefault,
+    textureCahce,
+    pixelBuffer,
+    nil,
+    GLenum(GL_TEXTURE_2D),
+    GL_RGBA,
+    width,
+    height,
+    GLenum(GL_BGRA),
+    GLenum(GL_UNSIGNED_BYTE),
+    0,
+    &texture
+)
+```
+
+^ まずは、動画から取り出したCMSampleBufferからOpenGLESのテクスチャを作ります。
+^ 各引数の解説は省きますが、これを呼ぶ事で渡したtextureのポインタへCMSampleBufferの内容が焼かれたテクスチャが生成されます。
+^ ポインタによる処理が多いのも特徴的です。
+
+---
+
+合成の方法②
+
+```glsl
+varying highp vec2 textureCoordinate;
+uniform sampler2D baseVideoFrame;
+uniform sampler2D alphaVideoFrame;
+void main() {
+    highp vec4 color = texture2D(baseVideoFrame, textureCoordinate);
+    highp vec4 colorAlpha = texture2D(alphaVideoFrame, textureCoordinate);
+    gl_FragColor = vec4(color.r, color.g, color.b, colorAlpha.r);
+}
+```
+
+^ フラグメントシェーダは、受け取ったデータをどのように描画するのかを演算する機構です。
+^ シェーダは、GLSL（OpenGL Shading Language）を使って書きます。
+^ 実際の演算はGPU上で行われるので、このGLSLをコンパイルしGPUへ転送して演算を行います。
+^ コンパイルはアプリケーション実行時に行われます。
+
+---
+
+合成の方法②
+
+[.code-highlight: 7]
+
+```glsl
+varying highp vec2 textureCoordinate;
+uniform sampler2D baseVideoFrame;
+uniform sampler2D alphaVideoFrame;
+void main() {
+    highp vec4 color = texture2D(baseVideoFrame, textureCoordinate);
+    highp vec4 colorAlpha = texture2D(alphaVideoFrame, textureCoordinate);
+    gl_FragColor = vec4(color.r, color.g, color.b, colorAlpha.r);
+}
+```
+
+^ 透過を行なっているのは、この箇所でRGBの値は非透過画像の色を、Alphaはアルファ画像の明度を使っています。
+^ そうすることで、アルファ画像の明るい箇所ほど透明に描画されるようになります。
+
+---
+
+合成の方法②
+
+```
+glViewport(0, 0, backingWidth, backingHeight)
+glUseProgram(displayProgram)
+    
+glActiveTexture(GLenum(GL_TEXTURE0))
+glBindTexture(GLenum(GL_TEXTURE_2D), texture)
+    
+glActiveTexture(GLenum(GL_TEXTURE1))
+glBindTexture(GLenum(GL_TEXTURE_2D), alphaTexture)
+    
+glUniform1i(baseUniformLocation, 0)
+glUniform1i(alphaUniformLocation, 1)
+```
+
+^ ここは毎フレーム行われる描画の直前処理を抜粋したものです。
+^ 特にここのコードを理解する必要はありませんが、GPUへ何度も命令を送っている事がわかります。
+^ どんな広さを描画するのか、どのシェーダを使うのか、どのテクスチャに今からアクセスするのかなど
+^ 毎回GPUへ問い合わせます。
+
+---
+
+合成の方法②
+
+^ こうして最小構成のコードが書き終わりました。
+
+
+---
+
 <!-- ^ OpenGLESで直接表示したら早いのでは無いかと思い、やって見た。
 ^ CIFilterよりも優れている点として、//
 ^ ここは仕組みを解説したい
