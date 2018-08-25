@@ -704,54 +704,6 @@ iPhone5c / ≒60fps
 
 ---
 
-
-
-<!-- ^ OpenGLESで直接表示したら早いのでは無いかと思い、やって見た。
-^ CIFilterよりも優れている点として、//
-^ ここは仕組みを解説したい
-^ CVPixelBufferを直接OpenGLESのテクスチャにできる
-CIFilterのoutputが遅いということは、CGImageがどこかで作られている？（デモとしてCGImage作って適用でもいいかも）
-OpenGL使ってみた
-^ 理由は？
-^ シェーダー上で合成を行えば、その結果を表示すればいいだけなので効率的かもしれないと思った.
-^ CIFilterは連続して利用されるときに辛い？
-^ そもそもビデオのpixelBufferをCIImageに入れて処理するタイミングでCGImageへの変換が走っているかも
-^ CIFilter遅いって言われていた（2013ごろ
-^ この時点でMetalの選択肢もあったが、iPhone5cやiPad 3rdをアプリがサポートしていた
-^ CPU GPU間の転送は非常にコストが大きい。
-^ wwdcで効率的な事言ってたけどiOS10だとまだ最適化されてないのかも
-https://developer.apple.com/videos/play/wwdc2018/719/ -->
-
-<!-- とりあえず実際に実装してみた
-OpenGLESはUIKitでアプリを開発するエンジニアには馴染みがないかもしれない。
-僕もなかった。初めて触る、早い印象。高い互換性
-そして、ハローワールドが難しい。
-GPUImageでも利用されている。
-昔からある、
-OpenGLESは簡単に言えば、渡された画像をどのように表示するか＆表示を担う。
-これはCIFilterとUIImageViewの両方
-
-GLKitを利用すると簡単に作れる
-GLKViewやGLKViewController
-OpenGLESで
-
-透過する際のシェーダーのコード
-
-実際に実装して表示してみました。
-早い？遅い？
-早い！
-^ なんでだろう
-^ OpenGL/Metalの分岐が重い？
-^ リアルタイム処理には最適化されていない
-^ 中間バッファの生成コストがある
-^ 効率化の為にキャッシュしているから遅い
-
-Instrumentsでみてみましょう。
-GPU Driverがいい。
-Xcode7をダウンロードしよう。 -->
-
----
-
 # Metalで書いてみました
 
 ^ ということで、Metalへの興味とDeplicateの対応もあってMetalで実装してみることにしました。
@@ -772,16 +724,6 @@ Xcode7をダウンロードしよう。 -->
 ^ これはXcode build phaseのCompile Sourcesの中にmetalファイルがある事からも分かります。
 ^ OpenGLESのようにデバイス上でコンパイルすることも出来ます。
 ^ 今回のケースでは、シェーダーは一つですしOpenGLESの場合でもシェーダーコンパイル後に動画を描画し始めるのであまりこの点の恩恵を預かることはできません。
-
-
-<!-- ^ 次に、GPU/CPUのメモリ空間が共有されている点です。
-^ 
-^ ただし、メモリ共有はハードウェア的な制約がありこれがA7以降のチップセットという事になります。
-^ なお、Metal for Macではこのメモリ共有は使えず代わりにメモリのミラーリングがこの機能の代替をしています。
-
-^ そして、GPUへの命令をまとめて送れるという点です。
-^ OpenGLESでは命令を個別で送っていましたが、MetalではCommandBufferにまとめて送ることができます。 -->
-
 ^ 他にも色々利点があるのですが、これらの利点の多くは本格的な3D実装やパフォーマンスを気にするエンジニアが感じられる利点です。
 ^ 今回、Metalで実装してみた観点から自分なりに２つの利点を見つけました。
 
@@ -832,8 +774,9 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 
 ---
 
-<!-- Metalの実装映像 -->
-![inline center](dummy.mp4)
+![inline center](metal.mov)
+
+iPhone5s / ≒60fps
 
 ^ 実際の動作の様子です。
 ^ 5sでもOpenGLESと遜色無く動作しています。
@@ -842,41 +785,17 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 
 # Metalで書いてみました
 
+
+
 <!-- デバッガの様子 -->
-![inline center](dummy.png)
-
+![inline center](shader_warning.png)
+![inline center](debugger_001.png)
+![](debugger_drawcall.png)
+![](debugger_fps.png)
+![](GPU_frame_capture.png)
+![](deplicated_opengles_instruments.png)
+![](metal_instruments.png)
 ^ デバッガーの様子です。
-
----
-
-<!-- 
-
-^ Metalの描画の流れを知って置く必要があります。
-
-^ そこで、このコードをMetalへ移植する事にしました。
-^ 実際にコードを書いてみると、私がMetalを色々と勘違いしている事に気がつきました。
-^ ここからはMetalの話です
-^ OpenGLESのコードをMetalへ移植する上で、
-
----
-
-OpenGLESがdeplicatedになったのでMetal使って行きましょう
-toolsetでシェーダー書ける
-OpenGLESがなんとなく分かれば、Metalはもっとわかりやすい。
-なぜなら、Metalはリッチなinterfaceだから
-
----
-
-Metalを使う上でまだ辛いところ
-iOS9/10などのMetal非対応機種を含むOSではOpenGLESと一緒に実装が必要
-→デバッグ工数が増える
-シミュレータビルドができない
-
-いいところ
-OpenGLESよりも効率的にGPUへデータを転送できる
-高機能なデバッガーが利用できる
-シェーダを書くときにコンパイラが走る
-圧倒的に分かりやすいインターフェイス（もはや低レイヤーではない） -->
 
 ---
 
