@@ -63,7 +63,7 @@ slidenumbers: true
 - アイテムによるコミュニケーション
 
 <!-- //Pocochaの画像、できれば右側に動画でおいてもいいかも -->
-![right fit](dummy.mp4)
+![right fit](pococha.png)
 
 ^ Pocochaは、2017年初頭にリリースしたライブ配信アプリです。
 ^ どこでも手軽にスマホで縦型のライブ配信ができ、視聴者はコメントやアイテムを使って配信枠を盛り上げたりといったコミュニケーションが楽しめます。
@@ -95,8 +95,7 @@ slidenumbers: true
 - 透過色あり
 - 5秒
 
-<!-- アイテムエフェクトの動画 -->
-![right fit](dummy.png)
+![right fit](main.mp4)
 
 ^ 先ほどのデモではどういった仕様のエフェクトが再生されているかというと
 ^ 750x1334の透過情報を持ったエフェクトが60fpsで再生されていました。
@@ -175,10 +174,19 @@ player.play()
 
 ---
 
-<!-- //AVPlayerを透過した結果の動画 -->
-![inline center](dummy.mp4)
+AVPlayerLayerでは、透過情報のある動画を扱う事ができない。
 
+**Important**
+The value of a player layer’s inherited contents property is opaque and should not be used.[^1] (AVPLayerLayerドキュメントより)
+
+![right fit](blank_mov.PNG)
+
+
+^ 実は、この方法では再生できません。
+^ ProRes4444も非圧縮のRGBA形式も試したけどダメでした。
 ^ このように透過情報が反映されません。
+
+[^1]:https://developer.apple.com/documentation/avfoundation/avplayerlayer
 
 ---
 
@@ -234,7 +242,7 @@ $ ffmpeg -i input.mov images/output_%04d.png
 
 ```shell
 $ du -sh ./images
-289M    ./images
+302M    ./images
 ```
 
 ☺️
@@ -248,24 +256,23 @@ $ du -sh ./images
 
 <!-- //pngシーケンスの動画 -->
 
-![inline center](dummy.mp4)
+![inline center](crash_5c.mov)
 
-
-^ 一見すると、うまく動いているように見えます。
-^ しかし実はstartAnimationを読んでから数秒経ってから再生されています。
-^ これは、animationImagesを設定したタイミングで5秒分のpngファイルを読み込んでいるからだと思われます。
+^ アプリが落ちてしまいました…。
 
 ---
 
 ### ② UIImageViewで再生する
 
 <!-- //メモリめっちゃ使っているの図 -->
-![inline center](dummy.png)
+![inline center](Memory.png)
 
-^ また、メモリを瞬時に1GB程度使っています。
-^ これはこのコードの検証に利用したiPhoneXではギリギリ耐えられていますが、iPhone5sなどではアプリが「」で落とされてしまいます。
-<!-- ^ 極端なことをするのは無駄ではない、勉強になった -->
-<!-- ^ パフォーマンスを意識する上で気にかけることができる -->
+`Message from debugger: Terminated due to memory issue`
+でクラッシュ
+
+^ これは、animationImagesを設定したタイミングで5秒分のpngファイルを読み込んでいるからだと思われます。
+^ また、メモリを瞬時に500MB程度使っています。
+^ これはこのコードの検証に利用したiPhoneXではギリギリ耐えられていますが、iPhone5sなどではアプリが「Message from debugger: Terminated due to memory issue」で落とされてしまいます。
 
 ---
 
@@ -311,103 +318,65 @@ $ du -sh ./images
 
 ---
 
-// いきなり表にしていいかも
 
-^ なかなか良いフォーマットがありません。
+|フォーマット|透過|圧縮率|ハードウェアデコード|
+|:---:|:---:|:---:|:---:|
+|APNG|○|△|×|
+|WEBP|○|○|×|
+|WEBM|○(vp9 with alpha)|○|×|
+|mov|○|×|△(h264/h265)|
+|MP4|×|○|○(h264/h265)|
+
+^ 色々検証してみたのですが、なかなか良いフォーマットがありません。
+^ また、iOSが標準で対応していないコーデックはCPUでデコードする必要があったりとパフォーマンスも気になるところです。
 ^ 透過できないことを除けば、全体的にはmp4(h264)が良さそう
 
+---
 
-<!-- MOV
-Webm VP8 with alpha
-https://www.reddit.com/r/explainlikeimfive/comments/2p4a6c/eli5_the_difference_between_html5_video_webm_and/
-GIF
-APNG
-WEBP
+# mp4をなんとか透過に対応出来ないか
 
-残念ながらmp4は透過に対応していない
+ここで、昔ゲームを作っていた時のことを思い出す
 
 ---
 
-- WEBM
-https://github.com/brion/OGVKit
+<!-- // alpha maskの立ち絵の図 -->
 
-透過対応してなかったりする、あと不安定
-ハードウェアデコーダとソフトウェアデコードの観点
-h265の圧縮効率
+![inline center](alpha_demo.jpg)
 
----
-
-- PNG/JPG
-ネイティブサポート
-
----
-
-- GIF
-https://github.com/kirualex/SwiftyGif
-GIFを1フレームごとにUIImageに変換して、独自のループの中でUIImageView.imageを差し替えている
-一般的な非対応フォーマットの対応の仕方
-普通はUIImageViewを使うので使い勝手が良い
-
----
-
-- APNG
-https://github.com/onevcat/APNGKit
-libpng
-APNGImageView: UIView
-一度UIImageに変換してからCGImageをlayer.contentsに設定
-これはUIImageViewと同じ仕組み
-
----
-
-- WEBP
-libWEBP
-
----
-
-- MP4
-h264
-透過情報持てない
-デフォで対応
-
----
-
-- MOV
-透過情報が持てる
-
----
-
-表
-|iOSで再生できるか|圧縮率|透過|
-
-^計測
-^なかなか良さげなフォーマットがない -->
-
----
-
-// alpha maskの立ち絵の図
-
-^ 昔ゲームを作っていた時
-^ 透過PNGが使えなかった当時、jpgでalpha maskして透過していた。
-^ この手法は今回使えそう。
+^ 昔ゲームを作っていた時、
+^ ゲームエンジンはこのような画像を用意すると、緑の箇所を透明として描画してくれていました。
+^ この手法は今回も使えそうと思えました。
 
 ---
 
 <!-- // 非透過のビデオA・非透過のビデオB毎フレーム透過合成していく、それを描画の図 -->
-![inline center](dummy.png)
+![inline center](alpha_logic.png)
 
-^ 容量比較
-
-^ 以上が、透過情報を持った動画を再生する手法です。
+^ iOSには、MP4の毎フレームをCMSampleBufferで受け取れる高機能なデコーダであるAVAssetReaderとAVAssetReaderTrackOutputがあります。
+^ これらを使って毎フレームの画像を取り出して透過合成して表示すれば、透過動画が再生出来るはずです。
 
 ---
 
 # 透過合成と描画
 
-^ ここからは、先ほどのalpha maskの手法を使っていくつかの方法で実装した結果を解説します。
+ここからは、先ほどの手法を以下の方法で実装した話です
+
+- CoreImage
+- OpenGLES
+- Metal
+
+^ ここからは、先ほどのalpha maskの手法を使ってCoreImage/OpenGLES/Metalを使って合成・描画した結果を解説します。
 
 ---
 
-## 
+# 透過合成と描画
+
+- 750 × 1334
+- 60fps 
+- 透過色あり
+- 5秒
+
+![right fit](main.mp4)
 
 ---
 
@@ -433,6 +402,8 @@ CIFilter
 
 CIBlendWithMask
  - アルファ値の画像を使って透過マスクをかける
+
+![right fit](CIFilter.png)
 
 ^ また、プリセットのフィルタに`CIBlendWithMask`というalpha mask用のフィルタが存在します。
 ^ まずはこれを使って実装してみました。
@@ -488,10 +459,12 @@ imageView.image = image
 ---
 
 <!-- // CIFilterで実装した動画 -->
-![inline center](dummy.mp4)
+![inline center](cifilter.mov)
+
+iPhone5c / 24fps
 
 ^ これは、iPhone5cで動作させた様子です。
-^ スローモーションのような動きになってしまいました。
+^ スローモーションのような動きになってしまいました。これは大体24fps程度です。
 ^ これは１フレームあたりの処理が0.016秒を超えてしまっているために発生した問題です。
 ^ iPhone5cはMetalに対応していないので、OpenGLESを使って処理されているはずですが非常に時間がかかっています。
 ^ ちなみに、Metalに対応したiPhone5sでもややフレームが落ちてしまっています。
@@ -532,7 +505,6 @@ EAGLContext
 
 ^ まずは、EAGLContextです。
 ^ コンテキストは、テクスチャやエラー状態などを管理するものです。
-
 ---
 
 ### OpenGLES TIPS
@@ -632,6 +604,7 @@ CVOpenGLESTextureCacheCreateTextureFromImage(
 
 ^ まずは、動画から取り出したCMSampleBufferからOpenGLESのテクスチャを作ります。
 ^ 各引数の解説は省きますが、これを呼ぶ事で渡したtextureのポインタへCMSampleBufferの内容が焼かれたテクスチャが生成されます。
+^ ちなみにテクスチャを作る処理はCGImageやデータからはGLKitを使うと、もっと簡単に生成できるヘルパーが存在します。
 
 ---
 
@@ -704,7 +677,9 @@ glUniform1i(alphaUniformLocation, 1)
 
 ### OpenGLESを使った合成と描画
 
-![inline center](dummy.mp4)
+![inline center](opengles.mov)
+
+iPhone5c / ≒60fps
 
 ^ こうして最小構成のコードが書き終わりました。
 ^ ・・・という事で、OpenGLESを使う事で大きくパフォーマンスを向上させることができました。
@@ -715,7 +690,7 @@ glUniform1i(alphaUniformLocation, 1)
 
 ---
 
-![](Deprecated-in-macOS-Mojave-and-iOS-12.jpg)
+![inline center](Deprecated-in-macOS-Mojave-and-iOS-12.jpg)
 
 ^ 残念ながら、WWDC2018でOpenGLESはiOS12やmojave以降の環境では非推奨となってしまいました。
 
@@ -728,6 +703,8 @@ glUniform1i(alphaUniformLocation, 1)
 ^ ここで無事タイトルが回収できました。
 
 ---
+
+
 
 <!-- ^ OpenGLESで直接表示したら早いのでは無いかと思い、やって見た。
 ^ CIFilterよりも優れている点として、//
@@ -775,13 +752,19 @@ Xcode7をダウンロードしよう。 -->
 
 ---
 
-# Metalとは
+# Metalで書いてみました
+
+^ ということで、Metalへの興味とDeplicateの対応もあってMetalで実装してみることにしました。
+
+---
+
+# Metalの利点
 
 - シェーダーの事前コンパイル
 - GPU/CPUの共有メモリ空間
 - GPUへの命令をまとめて送れる
+...etc
 
-^ 非推奨というだけで、Metalへの乗り換えを準備する理由としては十分ですが//TODO
 ^ Metalへの移植の前に、Metalの利点について知っておく必要があります。
 ^ まずはシェーダーの事前コンパイル機能です。
 ^ 先ほどOpenGLESの例で見た通り、OpenGLESは実行時にGLSLをコンパイルします。
@@ -790,49 +773,79 @@ Xcode7をダウンロードしよう。 -->
 ^ OpenGLESのようにデバイス上でコンパイルすることも出来ます。
 ^ 今回のケースでは、シェーダーは一つですしOpenGLESの場合でもシェーダーコンパイル後に動画を描画し始めるのであまりこの点の恩恵を預かることはできません。
 
-^ 次に、GPU/CPUのメモリ空間が共有されている点です。
+
+<!-- ^ 次に、GPU/CPUのメモリ空間が共有されている点です。
 ^ 
 ^ ただし、メモリ共有はハードウェア的な制約がありこれがA7以降のチップセットという事になります。
 ^ なお、Metal for Macではこのメモリ共有は使えず代わりにメモリのミラーリングがこの機能の代替をしています。
 
 ^ そして、GPUへの命令をまとめて送れるという点です。
-^ OpenGLESでは命令を個別で送っていましたが、MetalではCommandBufferにまとめて送ることができます。
+^ OpenGLESでは命令を個別で送っていましたが、MetalではCommandBufferにまとめて送ることができます。 -->
 
-^ しかし、これらの利点の多くは本格的な3D実装やパフォーマンスを気にするエンジニアが感じられる利点です。
+^ 他にも色々利点があるのですが、これらの利点の多くは本格的な3D実装やパフォーマンスを気にするエンジニアが感じられる利点です。
 ^ 今回、Metalで実装してみた観点から自分なりに２つの利点を見つけました。
-
-//よくこういう図を見ますが、もっと細分化しようとかいうかも
 
 ---
 
-Metal
+# Metalを使ってみて感じた利点
 
 - 分かりやすいインターフェイス
 - デバッガー
 
 ^ まず、分かりやすいインターフェイスが備わっている事です。
-^ OpenGLESと同じレイヤーということや、GPUを操作するという観点から難しいものと思い込んでいましたがMetalを使うのはOpenGLESと比べて圧倒的に簡単です。
-^ OpenGLESを利用するには、//TODO
-^ これは、CGGraphicsのコードに似ているかもしれません。//TODO
+^ OpenGLESと同じレイヤーということや、GPUを操作するという観点からMetalが難しいものと思い込んでいましたがMetalを使うのはOpenGLESと比べて圧倒的に簡単だと思います。
 
+---
+
+# Metalを使ってみて感じた利点
+
+```swift
+let textureLoader = MTKTextureLoader(device: device)
+let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
+```
+
+^ 例えば、CGImageからテクスチャを作るにはMetalKitにあるTextureLoaderを使うとこのように書けます。
+^ textureの実態も、MTLTextureとして受け取れます。
+
+---
+
+# Metalを使ってみて感じた利点
+
+<!-- Metalのシェーダーコンパイルエラーの様子 -->
+![inline center](dummy.png)
+
+^ そして、シェーダーにコンパイルがかかるのも初心者に優しい点です。
+^ OpenGLESでは、実行時にコンパイルされているため実際にアプリを実行してみないとシェーダを書き間違えているか分かりません。
+^ しかし、Metalはコンパイルエラーをこのように分かりやすく表示してくれます。
+
+---
+
+# Metalを使ってみて感じた利点
 ^ そして、デバッガーの存在です。
 ^ これはMetalの利点というべきか怪しいですが、OpenGLESのInstrumentsやGPU frame captureなどのデバッガーはXcode8あたりから使えなくなっており、高機能なデバッガーを利用するにはMetalを使う必要があります。
 
 ---
 
-合成の方法③
-
-^ これらの利点を踏まえて、実際に透過動画の再生をMetalで実装してみます。
+# Metalで書いてみました
+^ これらの利点を踏まえて、実際に透過動画の再生をMetalで実装してみました。
 ^ Metalでの実装は堤さんのMetal入門がとても参考になりました。
 
 ---
 
-実際の動作の様子です。
-OpenGLESと遜色無く動作しています。
+<!-- Metalの実装映像 -->
+![inline center](dummy.mp4)
+
+^ 実際の動作の様子です。
+^ 5sでもOpenGLESと遜色無く動作しています。
 
 ---
 
-デバッガーの様子です。
+# Metalで書いてみました
+
+<!-- デバッガの様子 -->
+![inline center](dummy.png)
+
+^ デバッガーの様子です。
 
 ---
 
@@ -869,219 +882,62 @@ OpenGLESよりも効率的にGPUへデータを転送できる
 
 # まとめ
 
+---
+
+## アプリエンジニアもMetalは触るべきか
+
+- 思ったよりも、難しく無い
+- ARKitやCoreMLに繋がる技術
+
+^ アプリエンジニアもMetalを触るべきか
+^ これは普段UIKitを触っている人に向けてですが、
+^ 興味があるのであれば、ぜひ触ってみてほしいです。
+^ OpenGLを知らなくても、非常にモダンなインターフェイスで親しみやすいです。
+^ MetalからOpenGLを理解しても良いですし、MetalからARKitやCoreMLといった新しいAPIに手を伸ばすこともできます。
+^ オススメはシェーダーから触ってみる事かなと思います。
+
+---
+
 ## Metalで実装する必要はあるのか
 
-結局Metalで実装する必要はあるの？
+- CIFilterをまずは検討
 
-```
-UIImage(ciimage:)
-```
-使えば不要かも
-
-適切にUIImageを利用することで不要になる
-CIFilterで十分かもしれない。
-CIFilterは早いぞ
-でもさ、Metalを知っていることで、書くことで
-低いレイヤーを使うことの利点
-Metalは機械学習で使えるかも
+^ そしてMetalで実装するべきかどうか、これは非常に悩ましい問題です。
+^ 今回のような画像を加工する時は、まずはCIFilterを検討してみてください。
+^ 今回の検証では5cも対象としましたが、6s程度の端末であればCIFilterでも十分なパフォーマンスで動作しました。
+^ 大体の場合はCIFilterで事足りるでしょう。
+^ CIFilterはCore Image Kernel LanguageやMetal Shader Languageを使って自分でカーネルを書くこともできます。
 
 ---
 
-----------------------------------
+## Metalで実装する上での注意点
 
-# サービスの紹介
+- iOS11以降に対応するのであれば
+- シミュレータを使わないのであれば…
 
-ライブ配信知ってますか
-ライブ配信サービスの最近の動向
-配信するだけではなく、アイテムを使って配信を盛り上げる流れに
-アイテムの派手さや楽しさが差別要素に
-DeNAで自分はPocochaというサービスをやっている
-アイテムとはどんなものなのか
-
----
-
-具体的にイメージしてもらうために動画
-Pocochaのアイテムを見て欲しい
-[動画]
-これをどのように実装したかを順を追って解説
+^ Metalを使うには、大きな制限があります。
+^ まず、iOS11未満のOSはMetalに対応していない端末を含みます。
+^ これらをサポートする場合は、Metalで実装する処理と同等の処理をOpenGLESなどで実装することになります。
+^ そして、Metalを使う際に必要なMTLDeviceクラスのインスタンスは、シミュレータでは取得することができません。
+^ また、CoreAnimationやCoreVideoの一部のフレームワークのMetalヘルパーは
+^ i386やx86_64向けの宣言が存在しないのでビルドすることが出来ません。
 
 ---
 
-このように、アニメーションを表示させる
+## Pocochaでは
 
-# 要件の確認
-どんな手法があるか
-・動画プレイヤーのレイヤーを重ねる
-・描画
-・映像のエンコードに混ぜちゃうとか
-・配信をしながらなので、低燃費に動作する必要がある
+Metalで実装しましたが…
 
-アイテム再生＝画面全体にアニメーションを表示する
-//動画の仕様
-750 × 1334 60fps
-実際はもう少し低いが比較のためにこのスペック
-
-一番最初に実装したのはUIImageViewのanimateImages
-ffmpeg -i M_sea30fps.mov M_sea30fps/output_%04d.png
-
-du -h
-288M    ./M_sea60fps
-
-animateImagesが悪い？（ドキュメントみる
-movを連番pngに変換します
-再生
-[動画]
-ダメでした。
-animateImagesのタイミングでメモリが確保される？
-//始まるまで遅い
-    //メモリ使用量とfps
-    //シミュレータだと意外と動く...
-    //そもそもシーケンスの容量
-
-
-//パフォーマンス測定
-描画周りのパフォーマンス計測は非常に難しい
-Instrumentなどがあるが…
-目で見てやるのが良い
-実際の環境で行うのが良い
-古い端末、古いOSでやろう
-今回は5s
-最初はこうしていた
-こういう実装のアプリもあるんじゃないでしょうか
-
-次に毎フレームimageを切り替えていく
-これはどうかな
-
-ここまでで二つの問題
-・容量の問題
-・描画の問題
-
-# 容量の問題
-圧縮する必要がある。
-アニメーションする画像に最適なフォーマット=動画
-動画から毎フレーム画像を取り出せば、サイズは軽いままバンドルできる
-GIF/APNG/WEBP/MP4/MOV
-透過できるか、仕組み、公式に対応しているか、デコード負荷、容量、表現力
-
-- PNG/JPG
-ネイティブサポート
-
-- GIF
-https://github.com/kirualex/SwiftyGif
-GIFを1フレームごとにUIImageに変換して、独自のループの中でUIImageView.imageを差し替えている
-一般的な非対応フォーマットの対応の仕方
-普通はUIImageViewを使うので使い勝手が良い
-
-- APNG
-https://github.com/onevcat/APNGKit
-libpng
-APNGImageView: UIView
-一度UIImageに変換してからCGImageをlayer.contentsに設定
-これはUIImageViewと同じ仕組み
-
-- WEBP
-libWEBP
-
-- MP4
-h264
-透過情報持てない
-デフォで対応
-
-- MOV
-透過情報が持てる
-
-対応しているものも対応していないものも基本は同じ
-ファイルをデコード→ピクセル単位の色情報→描画
-デコード処理はCPUで行われる
-https://developer.apple.com/videos/play/wwdc2018/219/
-https://github.com/koher/EasyImagy
-容量とトレードオフにデコード
-drawinrect使うと最適化の恩恵が受けられない
-
-# iOSでは再生できない話
-movが一番良さそう。
-再生してみる、iOSではできない。
-
-透過出来るのが良さそうだけど…
-そもそもデコードは毎フレーム画像作っている
-容量と画質のバランスが良いものを選んで後から透過すればいい
-どうすれば透過出来るのか
-今回はmp4を選んだ
-・デコーダが公式提供されている
-
-
-# 透過動画の再生手法の紹介
-alpha maskを行う CIFilter
-二つのmp4をデコードしながらマスク
-デフォルトでFilterがある
-
-UIImageView.imageへ描画
-
-MP4 -> SampleBuffer -> CIImage -> CIFilter -> UIImage -> 描画（UIImageView）
-重い
-オーバーヘッドが大きい
-CIImageはレシピのようなものでイメージでは無い
-レンダリングのタイミングで初めて処理が走る
-CIFilterのoutputを待ってからになってしまう
-CIIMahgeは実態を持たない、UIImageViewでレンダリングされるタイミングでGPUによって処理される
-
-MP4 -> SampleBuffer -> CIImage -> CIFilter -> UIImage -> 描画（EAGLView）
-変わらない？
-シェーダーとは
-UIImageViewは十分に高速、OpenGLESを直接使う意味は？
-シェーダーを使うことに意味がある
-
-CIFilterはoutputImageを受け取って、UIImageViewへ渡す
-GPU->CPU->GPU
-メモリが共存しているから良い？OpenGLESは共存していない。
-シェーダーならGPUから帰ってこない
-
-MP4 -> SampleBuffer -> CIImage -> シェーダーで描画（EAGLView）
-早くなった！これで良いじゃん！
-CIFilter使うならメタル非対応機種のパフォーマンスも確認しておくべき
-Kitsunebi
-
-OpenGLES deplicated!!
-
-MP4 -> SampleBuffer -> CIImage -> シェーダーで描画（MTLView）
-OpenGLESのシェーダから書き直す
-早くなった、大きいテクスチャ使えるようになった。
-オーバーヘッドが少ないらしい
-Kitsunebi_Metal
-
-シミュレータビルド出来ないので注意
-対応OSによっては辛い
-
-これはシェーダーを使ったMetalの良いサンプルになるかもしれない
-
-# まだ効率化できる箇所はあります
-AVAssetReader -> 低レイヤーで実装してみよう
-オレオレAVPlayer
-俺コン、技術書展で発表
+- 今はOpenGLES版を使っています
+    - iOS10もサポートするため
 
 ---
-めも
 
-DeNAのライブ配信アプリPocochaで実装した画面全体に再生されるエフェクトの実装の話をします。
-iOSでは再生出来ない透過動画の再生を行う実装や、それらの実装の中で利用した巨大なシーケンス画像群の再生に最適なアーキテクチャをAPNG/WEBPなどのフォーマットやUIImageView/OpenGLES/Metalなどのパフォーマンス比較から読み解きます。
+その他の情報
 
-70枚前後にしたい
+|||
+|---|---|
+|Speaker rounge||
+|Speaker rounge||
 
-
-CPU/GPUのメモリは同じ場所にあるが、OpenGLESでは共有されていない
-http://dsas.blog.klab.org/archives/52168462.html
-
-https://developer.apple.com/documentation/metal/fundamental_lessons/cpu_and_gpu_synchronization
-
-60fpsの大きめのやつ用意出来るか
-
-Metalファミリー
-
-mov -> mp4 alpha
-ffmpeg -i sample.mov -vf alphaextract,format=yuv420p output.mov
-
-mov -> 連番png
-OpenGLよりもMetalのが簡単
-
-PyCoreImage
-CoreImage Kernel langはdeplicated
+---
