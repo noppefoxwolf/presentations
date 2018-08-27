@@ -554,8 +554,9 @@ glGetError()
 
 ---
 
-<!-- // xcodeでbreak point仕込む方法 -->
-![inline center](dummy.png)
+わざわざエラーハンドリングしなくても、Breakpointが仕込める
+
+![inline center](breakpoint.png)
 
 
 ^ そして、幸いな事にXcodeではOpenGLESでエラーが発生した時に動作を中断するbreakpointを仕込む事ができます。
@@ -753,8 +754,9 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 
 # Metalを使ってみて感じた利点
 
-<!-- Metalのシェーダーコンパイルエラーの様子 -->
-![inline center](dummy.png)
+![inline center](shader_warning.png)
+
+シェーダーのエラーはコンパイル時に教えてくれる
 
 ^ そして、シェーダーにコンパイルがかかるのも初心者に優しい点です。
 ^ OpenGLESでは、実行時にコンパイルされているため実際にアプリを実行してみないとシェーダを書き間違えているか分かりません。
@@ -769,6 +771,11 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 ---
 
 # Metalで書いてみました
+
+![inline center](nyumon.png)
+
+おすすめ
+
 ^ これらの利点を踏まえて、実際に透過動画の再生をMetalで実装してみました。
 ^ Metalでの実装は堤さんのMetal入門がとても参考になりました。
 
@@ -785,17 +792,44 @@ iPhone5s / ≒60fps
 
 # Metalで書いてみました
 
+![inline center](GPU_frame_capture.png)
 
+GPU Frame Capture
 
-<!-- デバッガの様子 -->
-![inline center](shader_warning.png)
+- カメラマークのボタン
+
+---
+
 ![inline center](debugger_001.png)
-![](debugger_drawcall.png)
-![](debugger_fps.png)
-![](GPU_frame_capture.png)
-![](deplicated_opengles_instruments.png)
-![](metal_instruments.png)
-^ デバッガーの様子です。
+
+^ このように、頂点シェーダの位置を確認したり
+^ そのフレームで利用されているリソースを確認できます。
+
+---
+
+![inline center](Texture 0x101ef19c0.png)
+
+各テクスチャをpngやtiffで書き出す事もできます。
+
+---
+
+![left fit](debugger_drawcall.png)
+
+![right fit](debugger_fps.png)
+
+^ 描画関数がかけた時間や、fpsも見る事ができます。
+
+---
+
+![inline center](deplicated_opengles_instruments.png)
+
+OpenGLES版のGPU Frame CaptrueやInstrumentsは、自分の環境では動かなくなっていました。
+
+---
+
+![inline center](metal_instruments.png)
+
+MetalのInstrumentsは当然利用できます。
 
 ---
 
@@ -820,6 +854,7 @@ iPhone5s / ≒60fps
 ## Metalで実装する必要はあるのか
 
 - CIFilterをまずは検討
+- Metalのデメリットを理解する
 
 ^ そしてMetalで実装するべきかどうか、これは非常に悩ましい問題です。
 ^ 今回のような画像を加工する時は、まずはCIFilterを検討してみてください。
@@ -831,15 +866,35 @@ iPhone5s / ≒60fps
 
 ## Metalで実装する上での注意点
 
-- iOS11以降に対応するのであれば
-- シミュレータを使わないのであれば…
+- iOS11未満のデバイスにはMetal非対応の端末があります
+- シミュレータはMetal非対応です
+
+```
+MTLCreateSystemDefaultDevice() != nil
+```
 
 ^ Metalを使うには、大きな制限があります。
 ^ まず、iOS11未満のOSはMetalに対応していない端末を含みます。
 ^ これらをサポートする場合は、Metalで実装する処理と同等の処理をOpenGLESなどで実装することになります。
 ^ そして、Metalを使う際に必要なMTLDeviceクラスのインスタンスは、シミュレータでは取得することができません。
+^ いずれのケースも、MTLCreateSystemDefaultDeviceからインスタンスが返ってくるかどうかで判別する事ができます。
+
+---
+
+## Metalで実装する上での注意点
+
+シミュレータでビルドできない事もあります
+一部のヘルパーはシミュレータSDKに含まれません[^3]
+
+- CAMetalDrawable
+- CAMetalLayer
+...etc
+
+[^3]:https://gist.github.com/noppefoxwolf/8540f2a18a8a8268422947cbbddb1f93
+
 ^ また、CoreAnimationやCoreVideoの一部のフレームワークのMetalヘルパーは
 ^ i386やx86_64向けの宣言が存在しないのでビルドすることが出来ません。
+^ シミュレータ向けにダミーの宣言をすれば回避可能です。
 
 ---
 
@@ -849,14 +904,14 @@ Metalで実装しましたが…
 
 - 今はOpenGLES版を使っています
     - iOS10もサポートするため
+    - シミュレータ使っている
 
 ---
 
-その他の情報
+# 配信機能の話や、気になる箇所は是非質問ください！
 
 |||
 |---|---|
-|Speaker rounge||
-|Speaker rounge||
+|DeNA Speaker Lounge|12:00 - 13:00|
 
 ---
