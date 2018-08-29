@@ -39,7 +39,7 @@ slidenumbers: true
 
 ^ さて、今日お話する内容についてですが、最初に弊社でリリースしているライブ配信アプリのPocochaの紹介をします。
 ^ そのあとで、アプリで使われているアイテムのエフェクト再生手法を解説します。
-^ 次に、それらの再生手法をUIKit、OpenGLES、Metalでそれぞれ実装した結果について解説します。
+^ 次に、それらの再生手法をCoreImage、OpenGLES、Metalでそれぞれ実装した結果について解説します。
 ^ 最後に今日のセッションのまとめをします。
 ^ なお今回のセッションでは、解説の関係上実際リリースされているアプリと仕様が異なる箇所があります。ご了承ください。
 ^ 本日は30分程度になりますが、ぜひ最後までよろしくお願いいたします。
@@ -79,7 +79,7 @@ slidenumbers: true
 ---
 
 <!-- アイテムが再生される様子 -->
-![inline](dummy.mp4)
+![inline center autoplay](pococha_movie.mp4)
 
 ^ はい、このように視聴者はアイテムを選択して使うことができます。
 ^ アイテムを使用すると配信者・視聴者の両方の画面でエフェクトが再生されます。
@@ -113,6 +113,10 @@ slidenumbers: true
 
 ### ① AVPlayerで再生する
 
+[.code-highlight: all]
+[.code-highlight: 1-2]
+[.code-highlight: 7]
+
 ```swift
 let url = Bundle.main.url(forResource: "item_effect",
                           withExtension: "mov")!
@@ -129,46 +133,8 @@ player.play()
 ^ 最初に試したのは、AVPlayerLayerに書き出したmovファイルを再生させる手法です。
 ^ movを試したのはQuickTimeフォーマットはRGB+Alphaのチャンネルをサポートしているからです。
 
----
-
-### ① AVPlayerで再生する
-
-[.code-highlight: 1-2]
-
-```swift
-let url = Bundle.main.url(forResource: "item_effect",
-                          withExtension: "mov")!
-let asset = AVURLAsset(url: url)
-let item = AVPlayerItem(asset: asset)
-let player = AVPlayer(playerItem: item)
-let playerLayer = AVPlayerLayer(player: player)
-playerLayer.backgroundColor = UIColor.clear.cgColor
-
-view.layer.addSubLayer(playerLayer)
-player.play()
-```
-
 ^ AVPlayerはMOVファイルをサポートしているので、そのまま呼び出します。
 ^ ちなみにmovファイルはそのままでは500MBくらいありました。
-
----
-
-### ① AVPlayerで再生する
-
-[.code-highlight: 7]
-
-```swift
-let url = Bundle.main.url(forResource: "item_effect",
-                          withExtension: "mov")!
-let asset = AVURLAsset(url: url)
-let item = AVPlayerItem(asset: asset)
-let player = AVPlayer(playerItem: item)
-let playerLayer = AVPlayerLayer(player: player)
-playerLayer.backgroundColor = UIColor.clear.cgColor
-
-view.layer.addSubLayer(playerLayer)
-player.play()
-```
 
 ^ 透過情報を持つmovなので、背景色を透過します。結果は
 
@@ -183,14 +149,19 @@ The value of a player layer’s inherited contents property is opaque and should
 
 
 ^ 実は、この方法では再生できません。
+^ このように真っ暗になってしまいます。
 ^ ProRes4444も非圧縮のRGBA形式も試したけどダメでした。
 ^ このように透過情報が反映されません。
+^ ドキュメントにも、レイヤーは不透過にして透過はしないでくれと書いてあります。
 
 [^1]:https://developer.apple.com/documentation/avfoundation/avplayerlayer
 
 ---
 
 ### ② UIImageViewで再生する
+
+[.code-highlight: all]
+[.code-highlight: 5-6]
 
 ```swift
 let imageView = UIImageView()
@@ -202,21 +173,6 @@ imageView.startAnimating()
 ```
 
 ^ 次に試したのは、UIImageViewです。
-
----
-
-### ② UIImageViewで再生する
-
-[.code-highlight: 5-6]
-
-```swift
-let imageView = UIImageView()
-let images = (0...300).compactMap({
-  UIImage(named: "\($0).png")
-})
-imageView.animationImages = images
-imageView.startAnimating()
-```
 
 ^ UIImageViewには、animationImagesというプロパティがあり
 ^ ここにUIImageの配列を与えてstartAnimationを呼ぶことで
@@ -371,12 +327,15 @@ $ du -sh ./images
 
 # 透過合成と描画
 
-- 750 × 1334
+- 1500 × 1334
 - 60fps 
 - 透過色あり
 - 5秒
+- mp4
 
 ![right fit](main.mp4)
+
+^ ここまでをまとめると、横のサイズが２倍になるので、このような動画を再生することになります。
 
 ---
 
@@ -414,7 +373,9 @@ CIBlendWithMask
 
 ### CIFilterを使った合成
 
+[.code-highlight: all]
 [.code-highlight: 1-5]
+[.code-highlight: 6-9]
 
 ```swift
 let filter = CIFilter(name: "CIBlendWithMask")!
@@ -431,23 +392,6 @@ imageView.image = image
 ^ 実装は非常に簡単です。
 ^ フィルタ名を元に生成したCIFilterに対して、kCIInputImageKeyで非透過画像を
 ^ kCIInputMaskImageKeyでアルファ画像を指定します。
-
----
-
-### CIFilterを使った合成
-
-[.code-highlight: 6-9]
-
-```swift
-let filter = CIFilter(name: "CIBlendWithMask")!
-filter.setValue(baseCIImage,
-                forKey: kCIInputImageKey)
-filter.setValue(alphaCIImage,
-                forKey: kCIInputMaskImageKey)
-let filteredImage = filter.outputImage!
-let image = UIImage(ciImage: filteredImage)
-imageView.image = image
-```
 
 ^ filter.outputImageでフィルタをかけ終わったCIImageを取得することが出来ます。
 ^ CIImage自体は元の画像をどのように描画するかの情報を持っているだけなので、outputImageを取得するまでは一瞬で行われます。
@@ -485,6 +429,7 @@ CAEAGLLayer
 
 ^ OpenGLESを直接使ったことのある人は、この会場内では分からないですがあまり多くないと思います。
 ^ 実際、Pocochaのエンジニアは十数名いますが当時触ったことがある人はいませんでした。
+^ ゲームで使うものというイメージが強いですが、UIKitと組み合わせて使う事もできます。
 ^ OpenGLESと聞くと、何だか難しそうなイメージがあります。
 ^ 恐らくそのイメージは、ハローワールドを表示するまでの道のりが長いことや、そもそもUnityなどのおかげで触る必要が無いのでそれ以上触らないだけという話かもしれません。
 ^ 実際、私も初めてOpenGLESを触りましたが、暗中模索しながら始めました。
@@ -505,6 +450,7 @@ EAGLContext
 
 ^ まずは、EAGLContextです。
 ^ コンテキストは、テクスチャやエラー状態などを管理するものです。
+
 ---
 
 ### OpenGLES TIPS
@@ -613,6 +559,9 @@ CVOpenGLESTextureCacheCreateTextureFromImage(
 
 #### fragment_shader.fsh
 
+[.code-highlight: all]
+[.code-highlight: 7]
+
 ```glsl
 varying highp vec2 textureCoordinate;
 uniform sampler2D baseVideoFrame;
@@ -629,27 +578,9 @@ void main() {
 ^ 実際の演算はGPU上で行われるので、このGLSLをコンパイルしGPUへ転送して演算を行います。
 ^ コンパイルはアプリケーション実行時に行います。
 
----
-
-### OpenGLESを使った合成と描画
-
-#### fragment_shader.fsh
-
-[.code-highlight: 7]
-
-```glsl
-varying highp vec2 textureCoordinate;
-uniform sampler2D baseVideoFrame;
-uniform sampler2D alphaVideoFrame;
-void main() {
-    highp vec4 color = texture2D(baseVideoFrame, textureCoordinate);
-    highp vec4 colorAlpha = texture2D(alphaVideoFrame, textureCoordinate);
-    gl_FragColor = vec4(color.r, color.g, color.b, colorAlpha.r);
-}
-```
-
 ^ 透過を行なっているのは、この箇所でRGBの値は非透過画像の色を、Alphaはアルファ画像の明度を使っています。
 ^ そうすることで、アルファ画像の明るい箇所ほど透明に描画されるようになります。
+//TODO ちゃんと解説、簡単さ
 
 ---
 
