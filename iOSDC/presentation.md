@@ -251,7 +251,7 @@ $ du -sh ./images
 
 |||
 |---|---|
-|movファイル|493MB|
+|非圧縮movファイル|493MB|
 |連番PNGファイル|302MB|
 
 ^ 容量が大きいと、アプリをダウンロードする時間が増えたり、
@@ -276,17 +276,37 @@ $ du -sh ./images
 ---
 
 
-|フォーマット|透過|圧縮率|ハードウェアデコード|
+|フォーマット|透過|圧縮率|デコード負荷|
 |:---:|:---:|:---:|:---:|
-|APNG|○|△|×|
-|WEBP|○|○|×|
-|WEBM|○(vp9 with alpha)|○|×|
-|mov|○|×|△(h264/h265)|
-|MP4|×|○|○(h264/h265)|
+|apng|○|150MB|×?|
+|webp|○|49MB|×(0.097s/1f)|
+|webm|○[^4]|387KB|×?|
+|mp4|×|1.2MB|○(h264)|
+
+[^4]:vp9 with alpha
+
+<!-- ffmpeg -i M_sea60fps.mov  -strict -2 output.webm -->
+
+<!-- ffmpeg -i M_sea60fps.mov output.mp4 -->
+
+<!-- ffmpeg -i M_sea60fps.mov  -vcodec libwebp -lossless 1 -preset default -loop 0 -an -vsync 0 output.webp -->
+
+^ 圧縮はffmepgを使って変換しました。オプション等は後日アップするスライドのコメントを参照してください。
+^ まずはAPNGですが、あまり容量が減りませんでした。
+^ 同様にWEBPも50MB程度の圧縮率でした。
+^ アニメーション対応の画像フォーマットは圧縮率が低いようです。
+^ また、apng/webpはiOSではデフォルトではサポートしていないためCPUを使ってデコードする必要があります。
+^ 5cでは1フレームに0.01秒程度かかる結果になりました。またCPU使用率も90%前後と高くなりました。
+^ webmでは、透過に対応したvp9 with alphaというコーデックを利用する必要があります。
+^ iOSでは探した限りではデコーダを見つけることができませんでした。
+^ webmもwebp同様CPUでのデコードが必要なので、適さないと思います。
+^ しかしvp9の圧縮率は驚異的ですね
+^ mp4のビデオコーデックであるh264は透過をサポートしていません。
+^ ですが、iOSはh264をハードウェア的にデコードをサポートしているので高速に処理できます。
 
 ^ 色々検証してみたのですが、なかなか良いフォーマットがありません。
-^ また、iOSが標準で対応していないコーデックはCPUでデコードする必要があったりとパフォーマンスも気になるところです。
 ^ 透過できないことを除けば、全体的にはmp4(h264)が良さそう
+
 
 ---
 
@@ -575,7 +595,7 @@ iPhone5c / ≒60fps
 
 ---
 
-# [fit] しかし
+# [fit] しかし…
 
 ---
 
@@ -821,6 +841,28 @@ Metalで実装しましたが…
 OpenGLESが廃止されたらどうするの？
 
 →その頃にはiOS10も対応しないだろうし、シミュレータでもMetalが動くようになっています！！（多分ね）
+
+---
+
+[.autoscale: true]
+
+## SourceCode
+
+透過処理を施して再生するプレーヤーライブラリを作っています
+
+![inline](repo-banner.png)
+
+---
+
+## SourceCode
+
+- Kitsunebi (OpenGLES)
+
+https://github.com/noppefoxwolf/Kitsunebi
+
+- Kitsunebi_Metal (Metal)
+
+https://github.com/noppefoxwolf/Kitsunebi_Metal
 
 ---
 
