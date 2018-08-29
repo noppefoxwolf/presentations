@@ -79,7 +79,8 @@ slidenumbers: true
 ---
 
 <!-- アイテムが再生される様子 -->
-![inline center autoplay](pococha_movie.mp4)
+
+![inline center autoplay](item_movie.mov)
 
 ^ はい、このように視聴者はアイテムを選択して使うことができます。
 ^ アイテムを使用すると配信者・視聴者の両方の画面でエフェクトが再生されます。
@@ -479,21 +480,13 @@ glDisable(GLenum(GL_DEPTH_TEST))
 glGetError()
 ```
 
-^ また、エラーの取り方も独特です。
+例：`GL_INVALID_ENUM`
+ - 無効なenum値を指定している。
+
+ ^ また、エラーの取り方も独特です。
 ^ glGetError()は、この行が呼ばれたタイミングで発生していたエラーを取得します。
 ^ glの関数はほとんどがエラーを直接返さないので、おかしな動作をしているときは
 ^ 怪しい箇所に毎行このglGetErrorをチェックするコードを仕込みます。
-
----
-
-### OpenGLES TIPS
-
-```
-glGetError()
-```
-
-例：`GL_INVALID_ENUM`
- - 無効なenum値を指定している。
 
 ^ ちなみに最初に見つけたエラーは`GL_INVALID_ENUM`です。
 ^ これは、異常なenumを渡した時に発生するエラーですが、OpenGLESはこのエラーが発生しても動作を停止しません。
@@ -530,46 +523,28 @@ glGetError()
 
 ### OpenGLESを使った合成と描画
 
-```swift
-var texture: CVOpenGLESTexture? = nil
-
-CVOpenGLESTextureCacheCreateTextureFromImage(
-    kCFAllocatorDefault,
-    textureCahce,
-    pixelBuffer,
-    nil,
-    GLenum(GL_TEXTURE_2D),
-    GL_RGBA,
-    width,
-    height,
-    GLenum(GL_BGRA),
-    GLenum(GL_UNSIGNED_BYTE),
-    0,
-    &texture
-)
-```
-
-^ まずは、動画から取り出したCMSampleBufferからOpenGLESのテクスチャを作ります。
-^ 各引数の解説は省きますが、これを呼ぶ事で渡したtextureのポインタへCMSampleBufferの内容が焼かれたテクスチャが生成されます。
-^ ちなみにテクスチャを作る処理はCGImageやデータからはGLKitを使うと、もっと簡単に生成できるヘルパーが存在します。
-
----
-
-### OpenGLESを使った合成と描画
-
 #### fragment_shader.fsh
 
 [.code-highlight: all]
-[.code-highlight: 7]
+[.code-highlight: 15-16]
 
 ```glsl
-varying highp vec2 textureCoordinate;
-uniform sampler2D baseVideoFrame;
-uniform sampler2D alphaVideoFrame;
+varying lowp vec2 textureCoordinate;
+uniform sampler2D videoFrame;
 void main() {
-    highp vec4 color = texture2D(baseVideoFrame, textureCoordinate);
-    highp vec4 colorAlpha = texture2D(alphaVideoFrame, textureCoordinate);
-    gl_FragColor = vec4(color.r, color.g, color.b, colorAlpha.r);
+  // ベースの色のx
+  lowp float x = textureCoordinate.x / 2.0;
+
+  // ベース色の取得
+  lowp vec2 baseCoord = vec2(x, textureCoordinate.y);
+  lowp vec4 baseColor = texture2D(videoFrame, baseCoord);
+
+  // alpha値の取得
+  lowp vec2 alphaCoord = vec2(x + 0.5, textureCoordinate.y);
+  lowp vec4 alphaColor = texture2D(videoFrame, alphaCoord);
+
+  // RGBはベース色、Aはalpha値を利用する
+  gl_FragColor = vec4(baseColor.r, baseColor.g, baseColor.b, alphaColor.r);
 }
 ```
 
@@ -580,30 +555,12 @@ void main() {
 
 ^ 透過を行なっているのは、この箇所でRGBの値は非透過画像の色を、Alphaはアルファ画像の明度を使っています。
 ^ そうすることで、アルファ画像の明るい箇所ほど透明に描画されるようになります。
-//TODO ちゃんと解説、簡単さ
 
 ---
 
-### OpenGLESを使った合成と描画
+#[fit] gl_FragColor = vec4(baseColor.r, baseColor.g, baseColor.b, alphaColor.r);
 
-```swift
-glViewport(0, 0, backingWidth, backingHeight)
-glUseProgram(displayProgram)
-    
-glActiveTexture(GLenum(GL_TEXTURE0))
-glBindTexture(GLenum(GL_TEXTURE_2D), texture)
-    
-glActiveTexture(GLenum(GL_TEXTURE1))
-glBindTexture(GLenum(GL_TEXTURE_2D), alphaTexture)
-    
-glUniform1i(baseUniformLocation, 0)
-glUniform1i(alphaUniformLocation, 1)
-```
-
-^ ここは毎フレーム行われる描画の直前処理を抜粋したものです。
-^ 特にここのコードを理解する必要はありませんが、GPUへ何度も命令を送っている事がわかります。
-^ どんな広さを描画するのか、どのシェーダを使うのか、どのテクスチャに今からアクセスするのかなど
-^ 毎回GPUへ送ります。
+![inline center](shader_logic.png)
 
 ---
 
@@ -625,10 +582,13 @@ iPhone5c / ≒60fps
 ![inline center](Deprecated-in-macOS-Mojave-and-iOS-12.jpg)
 
 ^ 残念ながら、WWDC2018でOpenGLESはiOS12やmojave以降の環境では非推奨となってしまいました。
+^ Metal使えよということですね
 
 ---
 
-# ライブ配信アプリのアイテム再生を**Metalで実装する事になった**話
+WWDC2018で突然のDeprecated。
+
+ライブ配信アプリのアイテム再生を**Metalで実装する事になった**話
 
 無事タイトル回収☺️
 
@@ -636,7 +596,7 @@ iPhone5c / ≒60fps
 
 ---
 
-# Metalで書いてみました
+#[fit] Metalで書いてみました
 
 ^ ということで、Metalへの興味とDeplicateの対応もあってMetalで実装してみることにしました。
 
@@ -648,6 +608,8 @@ iPhone5c / ≒60fps
 - GPU/CPUの共有メモリ空間
 - GPUへの命令をまとめて送れる
 ...etc
+
+3Dをゴリゴリに使う人くらいしか喜ばない…🤔
 
 ^ Metalへの移植の前に、Metalの利点について知っておく必要があります。
 ^ まずはシェーダーの事前コンパイル機能です。
@@ -663,23 +625,32 @@ iPhone5c / ≒60fps
 
 # Metalを使ってみて感じた利点
 
-- 分かりやすいインターフェイス
-- デバッガー
+GPUプログラミング初心者に優しいMetal
 
-^ まず、分かりやすいインターフェイスが備わっている事です。
-^ OpenGLESと同じレイヤーということや、GPUを操作するという観点からMetalが難しいものと思い込んでいましたがMetalを使うのはOpenGLESと比べて圧倒的に簡単だと思います。
+- GPUを触る上で書きやすいI/F
+- 理解を深める上でも重要なデバッガー
+
+^ 一つはGPUを触る上で最も書きやすいコードということです。
+^ MetalフレームワークはSwiftやObjective-Cで書きやすいモダンな設計です。
 
 ---
 
 # Metalを使ってみて感じた利点
 
 ```swift
-let textureLoader = MTKTextureLoader(device: device)
-let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
+let desc = MTLRenderPipelineDescriptor()
+desc.vertexFunction = library.makeFunction(name: vertexFunctionName)
+desc.fragmentFunction = library.makeFunction(name: fragmentFunctionName)
+desc.colorAttachments[0].pixelFormat = pixelFormat
 ```
 
-^ 例えば、CGImageからテクスチャを作るにはMetalKitにあるTextureLoaderを使うとこのように書けます。
-^ textureの実態も、MTLTextureとして受け取れます。
+Swift/ObjCでも書きやすいモダンなI/F
+コンパイル時に問題が発覚しやすい。
+
+^ 例えば、pixelFormatを指定する場面でも型があるので不正なenumを与えることもありません。
+^ コンパイル時に問題が分かることで、初学者でも暗中模索にトライエラーを繰り返す必要が無くなります。
+
+^ 各リソースも、プロパティを埋めていく感覚で実装できるのでどのリソースが依存した関係なのかもコードから学ぶことができます。
 
 ---
 
@@ -687,7 +658,7 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 
 ![inline center](shader_warning.png)
 
-シェーダーのエラーはコンパイル時に教えてくれる
+シェーダーのエラーもコンパイル時に教えてくれる
 
 ^ そして、シェーダーにコンパイルがかかるのも初心者に優しい点です。
 ^ OpenGLESでは、実行時にコンパイルされているため実際にアプリを実行してみないとシェーダを書き間違えているか分かりません。
@@ -696,6 +667,12 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 ---
 
 # Metalを使ってみて感じた利点
+
+- GPUを触る上で書きやすいI/F
+- 理解を深める上でも重要なデバッガー
+
+デバッガーについてはこの後紹介します。
+
 ^ そして、デバッガーの存在です。
 ^ これはMetalの利点というべきか怪しいですが、OpenGLESのInstrumentsやGPU frame captureなどのデバッガーはXcode8あたりから使えなくなっており、高機能なデバッガーを利用するにはMetalを使う必要があります。
 
@@ -703,9 +680,11 @@ let texture = textureLoader.newTexture(cgImage: cgImage, options: nil)
 
 # Metalで書いてみました
 
-![inline center](nyumon.png)
+これらの利点を踏まえて、Metalで書いてみました。
 
-おすすめ
+堤さんのMetal入門が読みやすくておすすめです。
+
+![right fit](nyumon.png)
 
 ^ これらの利点を踏まえて、実際に透過動画の再生をMetalで実装してみました。
 ^ Metalでの実装は堤さんのMetal入門がとても参考になりました。
@@ -754,7 +733,7 @@ GPU Frame Capture
 
 ![inline center](deplicated_opengles_instruments.png)
 
-OpenGLES版のGPU Frame CaptrueやInstrumentsは、自分の環境では動かなくなっていました。
+OpenGLES版のGPU Frame CaptrueやInstrumentsは、自分の環境では動かなくなっていました😰
 
 ---
 
@@ -768,9 +747,9 @@ MetalのInstrumentsは当然利用できます。
 
 ---
 
-## アプリエンジニアもMetalは触るべきか
+## アプリエンジニアもMetalは触るべきか?
 
-- 思ったよりも、難しく無い
+- 思ったよりも難しく無く、理解しやすい世界
 - ARKitやCoreMLに繋がる技術
 
 ^ アプリエンジニアもMetalを触るべきか
@@ -782,10 +761,10 @@ MetalのInstrumentsは当然利用できます。
 
 ---
 
-## Metalで実装する必要はあるのか
+## Metalで実装する必要はあるのか?
 
-- CIFilterをまずは検討
-- Metalのデメリットを理解する
+- 画像編集ならばCIFilterをまずは検討
+- Metalのデメリットを理解した上で採用するべき
 
 ^ そしてMetalで実装するべきかどうか、これは非常に悩ましい問題です。
 ^ 今回のような画像を加工する時は、まずはCIFilterを検討してみてください。
@@ -831,11 +810,17 @@ MTLCreateSystemDefaultDevice() != nil
 
 ## Pocochaでは
 
+[.autoscale: true]
+
 Metalで実装しましたが…
 
 - 今はOpenGLES版を使っています
     - iOS10もサポートするため
     - シミュレータ使っている
+
+OpenGLESが廃止されたらどうするの？
+
+→その頃にはiOS10も対応しないだろうし、シミュレータでもMetalが動くようになっています！！（多分ね）
 
 ---
 
