@@ -1,4 +1,4 @@
-footer: 🦊 @noppefoxwolf, 2018
+footer: \#iosdc \#b 🦊 < share!
 slidenumbers: true
 
 > ライブ配信アプリのアイテム再生をMetalで実装する事になった話
@@ -15,7 +15,7 @@ slidenumbers: true
 #[fit] noppe
 
 🏢 株式会社ディー・エヌ・エー
-🦊 きつね好き
+🦊 きつねかわいい！！！
 💻 ２０１０〜
 
 ![right](IMG_0726.PNG)
@@ -33,7 +33,7 @@ slidenumbers: true
 
 今日の話
 ・Pocochaの紹介
-・アイテムのエフェクトの再生手法
+・アイテムエフェクトの再生手法
 ・再生手法の実装比較
 ・まとめ
 
@@ -254,6 +254,8 @@ $ du -sh ./images
 |非圧縮movファイル|493MB|
 |連番PNGファイル|302MB|
 
+圧縮する必要がある
+
 ^ 容量が大きいと、アプリをダウンロードする時間が増えたり、
 ^ オンデマンドで取得する場合はモバイルデータ通信を使い過ぎてしまう問題があります。
 ^ そこで、これらのファイルを圧縮する事にしました。
@@ -280,10 +282,10 @@ $ du -sh ./images
 |:---:|:---:|:---:|:---:|
 |apng|○|150MB|×?|
 |webp|○|49MB|×(0.097s/1f)|
-|webm|○[^4]|387KB|×?|
+|webm|○[^2]|387KB|×?|
 |mp4|×|1.2MB|○(h264)|
 
-[^4]:vp9 with alpha
+[^2]:vp9 with alpha
 
 <!-- ffmpeg -i M_sea60fps.mov  -strict -2 output.webm -->
 
@@ -296,7 +298,7 @@ $ du -sh ./images
 ^ 同様にWEBPも50MB程度の圧縮率でした。
 ^ アニメーション対応の画像フォーマットは圧縮率が低いようです。
 ^ また、apng/webpはiOSではデフォルトではサポートしていないためCPUを使ってデコードする必要があります。
-^ 5cでは1フレームに0.01秒程度かかる結果になりました。またCPU使用率も90%前後と高くなりました。
+^ 5cでは1フレームに0.1秒程度かかる結果になりました。またCPU使用率も90%前後と高くなりました。
 ^ webmでは、透過に対応したvp9 with alphaというコーデックを利用する必要があります。
 ^ iOSでは探した限りではデコーダを見つけることができませんでした。
 ^ webmもwebp同様CPUでのデコードが必要なので、適さないと思います。
@@ -336,11 +338,13 @@ $ du -sh ./images
 
 # 透過合成と描画
 
-ここからは、先ほどの手法を以下の方法で実装した話です
+ここからは、透過動画プレーヤーを実装していく話
 
 - CoreImage
 - OpenGLES
 - Metal
+
+をそれぞれ使って作った結果を比較します。
 
 ^ ここからは、先ほどのalpha maskの手法を使ってCoreImage/OpenGLES/Metalを使って合成・描画した結果を解説します。
 
@@ -375,7 +379,7 @@ CIFilter
 
 ### CIFilterを使った合成
 
-CIFilter
+CIFilter[^3]
  - iOS 5.0+
  - 200以上のプリセットフィルタ
  - CPUかGPUで処理
@@ -388,7 +392,7 @@ CIBlendWithMask
 ^ また、プリセットのフィルタに`CIBlendWithMask`というalpha mask用のフィルタが存在します。
 ^ まずはこれを使って実装してみました。
 
-[^1]:https://developer.apple.com/documentation/coreimage/cifilter
+[^3]:https://developer.apple.com/documentation/coreimage/cifilter
 
 ---
 
@@ -503,7 +507,7 @@ glGetError()
 例：`GL_INVALID_ENUM`
  - 無効なenum値を指定している。
 
- ^ また、エラーの取り方も独特です。
+^ また、エラーの取り方も独特です。
 ^ glGetError()は、この行が呼ばれたタイミングで発生していたエラーを取得します。
 ^ glの関数はほとんどがエラーを直接返さないので、おかしな動作をしているときは
 ^ 怪しい箇所に毎行このglGetErrorをチェックするコードを仕込みます。
@@ -513,10 +517,11 @@ glGetError()
 
 ---
 
-わざわざエラーハンドリングしなくても、Breakpointが仕込める
+### OpenGLES TIPS
 
 ![inline center](breakpoint.png)
 
+Xcodeではブレークポイントを仕込むことも可
 
 ^ そして、幸いな事にXcodeではOpenGLESでエラーが発生した時に動作を中断するbreakpointを仕込む事ができます。
 ^ これらも合わせて使うと問題が早く解決します。
@@ -542,8 +547,6 @@ glGetError()
 ---
 
 ### OpenGLESを使った合成と描画
-
-#### fragment_shader.fsh
 
 [.code-highlight: all]
 [.code-highlight: 15-16]
@@ -814,13 +817,13 @@ MTLCreateSystemDefaultDevice() != nil
 ## Metalで実装する上での注意点
 
 シミュレータでビルドできない事もあります
-一部のヘルパーはシミュレータSDKに含まれません[^3]
+一部のヘルパーはシミュレータSDKに含まれません[^4]
 
 - CAMetalDrawable
 - CAMetalLayer
 ...etc
 
-[^3]:https://gist.github.com/noppefoxwolf/8540f2a18a8a8268422947cbbddb1f93
+[^4]:https://gist.github.com/noppefoxwolf/8540f2a18a8a8268422947cbbddb1f93
 
 ^ また、CoreAnimationやCoreVideoの一部のフレームワークのMetalヘルパーは
 ^ i386やx86_64向けの宣言が存在しないのでビルドすることが出来ません。
@@ -856,20 +859,18 @@ OpenGLESが廃止されたらどうするの？
 
 ## SourceCode
 
-- Kitsunebi (OpenGLES)
+- noppefoxwolf/Kitsunebi
 
-https://github.com/noppefoxwolf/Kitsunebi
+- noppefoxwolf/Kitsunebi_Metal
 
-- Kitsunebi_Metal (Metal)
-
-https://github.com/noppefoxwolf/Kitsunebi_Metal
+🌟 🦊 🌟
 
 ---
 
-# 配信機能の話や、気になる箇所は是非質問ください！
+# 🦊 < ご静聴ありがとうございました！
 
 |||
 |---|---|
-|DeNA Speaker Lounge|12:00 - 13:00|
+|Ask the speaker|12:00 - 12:15|
+|DeNA Speaker Lounge|12:15 - 13:00|
 
----
