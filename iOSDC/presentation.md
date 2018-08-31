@@ -1,8 +1,8 @@
 footer: \#iosdc \#b 🦊 < share!
 slidenumbers: true
 
-> ライブ配信アプリのアイテム再生をMetalで実装する事になった話
--- iOSDC Japan Track B 2018/09/02 11:20〜
+# ライブ配信アプリのアイテム再生をMetalで実装する事になった話
+## iOSDC Japan Track B 2018/09/02
 
 ^ よろしくお願いします。
 ^ 「ライブ配信アプリのアイテム再生を、Metalで実装する事になった話。」というタイトルで発表します。
@@ -46,13 +46,13 @@ slidenumbers: true
 
 ---
 
-#[fit] ライブ配信アプリPococha（ポコちゃ）の紹介
+#[fit] ライブ配信アプリPocochaの紹介
 
 ^ それでは最初に弊社からリリースされているライブ配信アプリPocochaを紹介させてください。
 
 ---
 
-# Pococha (ポコちゃ)
+# Pococha
 
 - ライブ配信アプリ
 
@@ -280,12 +280,14 @@ $ du -sh ./images
 
 |フォーマット|透過|圧縮率|デコード負荷|
 |:---:|:---:|:---:|:---:|
-|apng|○|150MB|×?|
+|apng|○|150MB|×[^3]|
 |webp|○|49MB|×(0.097s/1f)|
-|webm|○[^2]|387KB|×?|
+|webm|○[^2]|387KB|×[^3]|
 |mp4|×|1.2MB|○(h264)|
 
 [^2]:vp9 with alpha
+
+[^3]:APNGは容量の時点で不採用だったので未測定。WEBMはデコーダが無さそうなので未測定
 
 <!-- ffmpeg -i M_sea60fps.mov  -strict -2 output.webm -->
 
@@ -379,7 +381,7 @@ CIFilter
 
 ### CIFilterを使った合成
 
-CIFilter[^3]
+CIFilter[^4]
  - iOS 5.0+
  - 200以上のプリセットフィルタ
  - CPUかGPUで処理
@@ -392,7 +394,7 @@ CIBlendWithMask
 ^ また、プリセットのフィルタに`CIBlendWithMask`というalpha mask用のフィルタが存在します。
 ^ まずはこれを使って実装してみました。
 
-[^3]:https://developer.apple.com/documentation/coreimage/cifilter
+[^4]:https://developer.apple.com/documentation/coreimage/cifilter
 
 ---
 
@@ -817,13 +819,13 @@ MTLCreateSystemDefaultDevice() != nil
 ## Metalで実装する上での注意点
 
 シミュレータでビルドできない事もあります
-一部のヘルパーはシミュレータSDKに含まれません[^4]
+一部のヘルパーはシミュレータSDKに含まれません[^5]
 
 - CAMetalDrawable
 - CAMetalLayer
 ...etc
 
-[^4]:https://gist.github.com/noppefoxwolf/8540f2a18a8a8268422947cbbddb1f93
+[^5]:https://gist.github.com/noppefoxwolf/8540f2a18a8a8268422947cbbddb1f93
 
 ^ また、CoreAnimationやCoreVideoの一部のフレームワークのMetalヘルパーは
 ^ i386やx86_64向けの宣言が存在しないのでビルドすることが出来ません。
