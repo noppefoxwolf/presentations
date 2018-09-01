@@ -81,7 +81,7 @@ slidenumbers: true
 
 <!-- アイテムが再生される様子 -->
 
-![inline center autoplay](item_movie.mov)
+![inline center autoplay loop](item_movie.mov)
 
 ^ はい、このように視聴者はアイテムを選択して使うことができます。
 ^ アイテムを使用すると配信者・視聴者の両方の画面でエフェクトが再生されます。
@@ -97,7 +97,7 @@ slidenumbers: true
 - 透過色あり
 - 5秒
 
-![right fit autoplay](main.mp4)
+![right fit autoplay loop](main.mp4)
 
 ^ 先ほどのデモではどういった仕様のエフェクトが再生されているかというと
 ^ 750x1334の透過情報を持ったエフェクトが60fpsで再生されていました。
@@ -214,7 +214,7 @@ $ du -sh ./images
 
 <!-- //pngシーケンスの動画 -->
 
-![inline center](crash_5c.mov)
+![inline center loop](crash_5c.mov)
 
 ^ アプリが落ちてしまいました…。
 
@@ -361,7 +361,7 @@ $ du -sh ./images
 - 5秒
 - mp4
 
-![right fit](side_by_side.mp4)
+![right fit loop](side_by_side.mp4)
 
 ^ ここまでをまとめると、横のサイズが２倍になるので、このような動画を再生することになります。
 
@@ -431,7 +431,7 @@ imageView.image = image
 ---
 
 <!-- // CIFilterで実装した動画 -->
-![inline center](cifilter.mov)
+![inline center loop](cifilter.mov)
 
 iPhone5c / 24fps
 
@@ -591,7 +591,7 @@ void main() {
 
 ### OpenGLESを使った合成と描画
 
-![inline center](opengles.mov)
+![inline center loop](opengles.mov)
 
 iPhone5c / ≒60fps
 
@@ -716,7 +716,7 @@ Swift/ObjCでも書きやすいモダンなI/F
 
 ---
 
-![inline center](metal.mov)
+![inline center loop](metal.mov)
 
 iPhone5s / ≒60fps
 
