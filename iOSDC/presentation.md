@@ -439,8 +439,7 @@ iPhone5c / 24fps
 ^ スローモーションのような動きになってしまいました。これは大体24fps程度です。
 ^ これは１フレームあたりの処理が0.016秒を超えてしまっているために発生した問題です。
 ^ iPhone5cはMetalに対応していないので、OpenGLESを使って処理されているはずですが非常に時間がかかっています。
-^ ちなみに、Metalに対応したiPhone5sでもややフレームが落ちてしまっています。
-^ 5cでは、`maskFilter?.setValue(mainCI, forKey: kCIInputImageKey)`のタイミングで0.01秒程度消費している。
+^ ここは調査してみると、5cではCIImageをUIImageに入れてUIImageViewにセットするタイミングで30ms程度使っていました。
 
 ---
 
@@ -453,7 +452,7 @@ CAEAGLLayer
 ^ そういったこともあって、CIFilterはリアルタイムの処理に向いてないのかもしれないと思いました。
 ^ そこで、CIFilterの内部で実装されているだろう合成と描画の処理をOpenGLESで書いてみる事にしました。
 ^ CAEAGLLayerは、OpenGLESのレンダリング先として利用できるレイヤーです。
-^ 実際に利用するときはUIViewControllerのlayerClassをoverrideする必要があります。
+^ 実際に利用するときはUIViewのlayerClassをoverrideする必要があります。
 
 ^ OpenGLESを直接使ったことのある人は、この会場内では分からないですがあまり多くないと思います。
 ^ 実際、Pocochaのエンジニアは十数名いますが当時触ったことがある人はいませんでした。
