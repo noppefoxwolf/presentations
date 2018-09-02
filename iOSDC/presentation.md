@@ -214,7 +214,7 @@ $ du -sh ./images
 
 <!-- //pngシーケンスの動画 -->
 
-![inline center loop](crash_5c.mov)
+![inline center autoplay loop](crash_5c.mov)
 
 ^ アプリが落ちてしまいました…。
 
@@ -279,7 +279,7 @@ $ du -sh ./images
 ---
 
 
-|フォーマット|透過|圧縮率|デコード負荷|
+|フォーマット|透過|圧縮結果|デコード負荷|
 |:---:|:---:|:---:|:---:|
 |apng|○|150MB|×[^3]|
 |webp|○|49MB|×(0.097s/1f)|
@@ -361,7 +361,7 @@ $ du -sh ./images
 - 5秒
 - mp4
 
-![right fit loop](side_by_side.mp4)
+![right fit autoplay loop](side_by_side.mp4)
 
 ^ ここまでをまとめると、横のサイズが２倍になるので、このような動画を再生することになります。
 
@@ -431,7 +431,7 @@ imageView.image = image
 ---
 
 <!-- // CIFilterで実装した動画 -->
-![inline center loop](cifilter.mov)
+![inline center autoplay loop](cifilter.mov)
 
 iPhone5c / 24fps
 
@@ -591,7 +591,7 @@ void main() {
 
 ### OpenGLESを使った合成と描画
 
-![inline center loop](opengles.mov)
+![inline center autoplay loop](opengles.mov)
 
 iPhone5c / ≒60fps
 
@@ -716,7 +716,7 @@ Swift/ObjCでも書きやすいモダンなI/F
 
 ---
 
-![inline center loop](metal.mov)
+![inline center autoplay loop](metal.mov)
 
 iPhone5s / ≒60fps
 
