@@ -12,7 +12,13 @@ slidenumbers: true
 
 # ライブ配信アプリのアイテム再生をMetalで実装する事になった話
 
-iOSDCで9/2に登壇しました
+iOSDCで9月2日に登壇しました。
+
+各方面にありがとうございます！
+
+https://goo.gl/BYwDNB
+
+![](iosdc.jpg)
 
 ---
 
@@ -21,6 +27,7 @@ iOSDCで9/2に登壇しました
 🏢 株式会社ディー・エヌ・エー
 🦊 きつねかわいい
 💻 アプリ開発２０１０〜
+🎈 今日誕生日
 
 ![right](IMG_0726.PNG)
 
@@ -28,9 +35,9 @@ iOSDCで9/2に登壇しました
 
 # What is 俺コン
 
-「採択してほしかった」「聞きたかった」トークをアンケート
+> 「採択してほしかった」「聞きたかった」トークをアンケート
 
-めっちゃ嬉しいです😂
+🦊 o O (めっちゃ嬉しい😂)
 
 ---
 
@@ -53,6 +60,10 @@ _動画は業務で触れてみないと知見が得られにくい領域です�
 
 ---
 
+//アジェンダ
+
+---
+
 # 一番簡単な方法
 
 ---
@@ -65,9 +76,13 @@ _動画は業務で触れてみないと知見が得られにくい領域です�
 
 - iOS8.0+
 
+^ iOS8.0未満ではMPMoviePlayerControllerとか言われていたものです
+
 ---
 
 # AVPlayerController
+
+使い方
 
 ```swift
 let vc = AVPlayerViewController()
@@ -91,7 +106,7 @@ present(vc, animated: true, completion: nil)
 
 ## 😩
 
-- UIのカスタマイズ性はない
+- UIや機能のカスタマイズ性はない
 
 
 ![right fit](avplayerviewcontroller.png)
@@ -137,6 +152,9 @@ view.layer.addSublayer(layer)
 
 ![right fit](avplayerlayer.png)
 
+^ CALayerとして使えるので、UITableViewCellの中にも置けます。
+^ アニメーションもかけれる
+
 ---
 
 # 特になし
@@ -165,15 +183,13 @@ view.layer.addSublayer(layer)
 
 ---
 
-# AVAssetReader
-
-- AVAssetReaderTrackOutputと組み合わせると毎フレームのCMSampleBufferが取れる
+![inline](avplayer.png)
 
 ---
 
 # AVAssetReader
 
-// 仕組みを図で
+- AVAssetReaderTrackOutputと組み合わせると毎フレームのCMSampleBufferが取れる
 
 ---
 
@@ -190,7 +206,13 @@ if reader.canAdd(output) {
 }
 
 output.copyNextSampleBuffer()
+output.copyNextSampleBuffer()
+output.copyNextSampleBuffer()
 ```
+
+---
+
+![inline](reader.png)
 
 ---
 
@@ -293,6 +315,45 @@ commandBuffer.commit()
 
 ---
 
+# 自分で映像をデコードすればOK!!
+
+---
+
+![inline ](whatdecode.png)
+
+^ ソフトウェアが扱える形式に復元すること
+
+---
+
+[.autoscale: true]
+
+# TIPS
+
+- ハードウェアデコーダ
+
+ハードとしてチップに搭載されているデコーダ
+高速にデコード可能
+
+- ソフトウェアデコーダ
+
+ソフトウェアで実装されたデコーダ
+基本的には遅い、CPUリソースを食う
+ハードウェアが対応していないコーデックを再生できる
+
+---
+
+# ソフトウェアデコーダの例
+
+- brion/OGVKit
+
+VP9/VP8などのソフトウェアデコーダが実装されている
+
+- onevcat/APNGKit
+
+apngをソフトウェアデコーダを使ってCGImageにデコード
+
+---
+
 # VTDecompressionSession
 
 - VideoToolbox.framework
@@ -303,17 +364,35 @@ commandBuffer.commit()
 
 - デコード済みのCVPixelBufferを返す
 
+^ iOSでビデオをデコードするにはこれを使います
+^ デコードの前に必要な事があります。
+
 ---
 
-# mp4の構造
+[.footer: MP4のパース]
 
-// ３枚のスライド
+![inline](mp4-container.png)
+
+---
+
+![inline](mp4-boxes.png)
+
+---
+
+![inline](box.png)
+
+---
+
+![inline](box-header.png)
+
+^ ツリー構造
 
 ---
 
 # swiftでmp4をboxごとにパースする
 
 InputStreamで4,4,boxSize - 8の順番で読み続ければOK[^1]
+特定のboxでは、自身のboxに対して再度検索を行う
 
 ```swift
 let stream = InputStream(url: url)
@@ -342,6 +421,8 @@ mdat(8754890)
 
 構造例
 
+^ ftyp/moov/mdatは大体ある
+
 ---
 
 # ftyp
@@ -358,6 +439,8 @@ Compatible Brand: mp42
 [^2]:http://www.ftyps.com
 
 [^3]:MajorとCompatibleの間には4byte空く
+
+^ ブランドとは、ファイルが準拠している規格
 
 ---
 
@@ -419,25 +502,17 @@ Extracting MPEG-4 AVC-H264 stream to h264
 
 ---
 
-# SPS/PPS
+# 登場人物
 
-NALユニットに存在
+- Iフレーム
+- B / P フレーム
+- SPS / PPS
 
----
-
-# SPS - (Sequence Parameter Set)
-
-プロファイル、レベル
+これらがNALと呼ばれる構造に入って並んでいる
 
 ---
 
-# PPS - (Picture Parameter Set)
-
-ピクチャの符号化
-
----
-
-# IDR Picture
+# Iフレーム
 
 - h264は、１枚の画像とその差分で数秒の映像を表現する
 
@@ -447,117 +522,187 @@ NALユニットに存在
 
 ---
 
+# P / Bフレーム[^6]
 
+- Iフレームからの差分情報
 
+- Pが１枚から予測したスライス
 
+- Bが２枚から予測したスライス
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-取り出し方
-8byteのヘッダをパース
-サイズ・タイプ
-タイプを見て入れ子になっているかを判定
-// 入れ子コード描きたい
-http://www.mpeg.co.jp/libraries/mpeg_labo/winPC_26.html
+[^6]:(Bi-)Predictive - 予測
 
 ---
 
-ftyp
-moov
-    trak
-mdat
+# SPS - (Sequence Parameter Set)
 
+プロファイル、レベル
 
-mp4v/s263/avc1: ビデオ
-mp4a: オーディオ
+# PPS - (Picture Parameter Set)
 
-https://albel06.hatenablog.com/entry/2018/07/01/173711
-https://www13.atwiki.jp/teematsu/pages/62.html
+ピクチャの符号化
 
-mdatからデータを取り出す
+^ SPSはBフレームを使うかとか、エラー補正するかとかのパラメタ
+^ PPSはどういうアルゴリズムで差分を作っているかとかの情報
 
 ---
 
-# aacの場合
+[.footer: NALの取り出し方]
 
-accheaderをつけて連結
-
----
-
-# h264の場合
-
-???
+![inline](nal.png)
 
 ---
 
-# aacの再生
-
-
-
+![inline](nalu_type.png)
 
 ---
 
-# 動画プレーヤ
-MP4 -> 映像・音
+# NALU header
 
-# AVKit
+NALの種類が書かれている
 
-AVPlayerViewController
+0x01~0x04 スライス
+0x05 Iフレーム
 
----
-
-# AVFounadtion
-
-AVPlayer
-AVPlayerLayer
-
-^ AVPlayerViewControllerも内部の構造はこのようになっている
-MP4 -> AVPlayer -> AVPlayerLayer
-                -> sound
+![right fit](nalunittype.png)
 
 ---
 
-MP4 -> H264+AAC -> Decoder -> Picture+PCM -> Output
+# VTDecompressSession
+
+実際はCのインターフェイスなので、Swiftインターフェイスを使った疑似コードで解説
 
 ---
 
-# H264
+# VTDecompressSessionの初期化
 
-VideoToolbox.framework
-
-VTDecompressSession
-
----
-
-# AAC
-
-AudioToolbox.framework
-
-AudioFileStreamOpen
+```swift
+let desc: CMVideoFormatDescription = ~~
+let callback = { (imageBuffer: CVImageBuffer?) in
+}
+let attrib = [.pixelFormat : .gbra]
+let session = VTDecompressSession(desc, params, attrib, callback)
+```
 
 ---
 
-# mp4の分割
+# CMVideoFormatDescription
 
-AAC
-trakの1番目
-とりあえずaacのヘッダで繋いであげれば出来上がる
-
-h264
+```swift
+let pps: [UInt8] = ~~
+let sps: [UInt8] = ~~
+let desc = CMVideoFormatDescriptionCreateFromH264ParameterSets([pps, pps])
+```
 
 ---
 
+# VTDecompressSession 
+
+```swift
+session.decodeFrame(sampleBuffer)
+```
+
+---
+
+# デコーダに渡すSampleBuffer
+
+```swift
+let packet = (IフレームやB/Pフレーム・スライス)
+let blockBuffer = CMBlockBuffer(packet)
+let sampleBuffer = CMSampleBuffer(blockBuffer)
+```
+
+---
+
+# 音周り(AudioToolbox)
+
+---
+
+# Audio Service Queue
+
+---
+
+# Audio Service Queueの初期化
+
+```swift
+let format: AudioStreamBasicDescription = ~
+let callback = {
+
+}
+let audioQueue = AudioQueue(format, callback)
+```
+
+---
+
+# AudioQueueへのenqueue
+
+```swift
+let buffer = audioQueue.allocate(size)
+buffer.read(packet)
+audioQueue.enqueue(buffer)
+```
+
+---
+
+# まとめ
+
+---
+
+# VideoToolkitはどういう時に使うべき？
+
+- AVKit/AVFoundationで実装出来ない時の最終兵器
+
+- rtmpのストリーミングの表示とか
+
+---
+
+[.autoscale: true]
+
+# 勉強方法
+
+- shogo4405/HaishinKit.swift
+
+mp4のbox構造がクラス定義されていたりするので、実装ベースで理解しやすい
+
+- 改訂三版 H.264/AVC教科書 (インプレス標準教科書シリーズ)
+
+符号化の話と構造の話が日本語で書いてある。少し理解してから読むと読めそう。（WIP）
+
+---
+
+# H264がちゃんとパース出来ているか知りたい
+
+- ヘッダがズレていないか
+
+- AVSampleBufferDisplayLayer
+
+デコード前のSampleBufferを表示できるすごいやつ
+
+---
+
+# 続く
+
+---
+
+# 技術書典５
+
+noppelab - え16
+
+本出します！（WIP 1%）
+
+![](techbook.png)
+
+---
+
+# Pococha
+
+配信サービスに興味のあるエンジニア募集中！
+
+![](pococha.png)
+
+---
+
+# ありがとうございました！
+## 今後ともよろしくお願いします〜🦊
+
+---
