@@ -31,36 +31,20 @@ https://goo.gl/BYwDNB
 
 ![right](IMG_0726.PNG)
 
----
-
-# What is 俺コン
-
-> 「採択してほしかった」「聞きたかった」トークをアンケート
-
-🦊 o O (めっちゃ嬉しい😂)
+^ 株式会社ディー・エヌ・エーのnoppeと言います。
+^ 大体狐の服着ているので、この後とか声をかけてください
 
 ---
 
-![inline](tweet.png)
+# AGENDA
 
----
+- 動画の再生方法と特徴
 
-_動画は業務で触れてみないと知見が得られにくい領域です。_
-→ 今日の話です！
+- ビデオの構造理解
 
-_暗号化やパフォーマンス面に考慮してカスタマイズを行っており_
+- Swiftでデコード処理を書く
 
----
-
-_動画は業務で触れてみないと知見が得られにくい領域です。_
-→ 今日の話です！
-
-~~_暗号化やパフォーマンス面に考慮してカスタマイズを行っており_~~
-→ 今日はやりません！
-
----
-
-//アジェンダ
+- まとめ
 
 ---
 
@@ -342,6 +326,8 @@ commandBuffer.commit()
 
 ---
 
+[.autoscale: true]
+
 # ソフトウェアデコーダの例
 
 - brion/OGVKit
@@ -572,6 +558,8 @@ NALの種類が書かれている
 
 実際はCのインターフェイスなので、Swiftインターフェイスを使った疑似コードで解説
 
+^ 時間無さげならスキップ
+
 ---
 
 # VTDecompressSessionの初期化
@@ -625,9 +613,8 @@ let sampleBuffer = CMSampleBuffer(blockBuffer)
 # Audio Service Queueの初期化
 
 ```swift
-let format: AudioStreamBasicDescription = ~
+let format: AudioStreamBasicDescription = file[kAudioFilePropertyDataFormat]
 let callback = {
-
 }
 let audioQueue = AudioQueue(format, callback)
 ```
@@ -670,17 +657,7 @@ mp4のbox構造がクラス定義されていたりするので、実装ベー�
 
 ---
 
-# H264がちゃんとパース出来ているか知りたい
-
-- ヘッダがズレていないか
-
-- AVSampleBufferDisplayLayer
-
-デコード前のSampleBufferを表示できるすごいやつ
-
----
-
-# 続く
+以上です！（ちょっと宣伝）
 
 ---
 
@@ -703,6 +680,4 @@ noppelab - え16
 ---
 
 # ありがとうございました！
-## 今後ともよろしくお願いします〜🦊
-
----
+## 今後ともよろしくお願いします🦊
