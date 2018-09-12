@@ -26,7 +26,6 @@ https://goo.gl/BYwDNB
 
 🏢 株式会社ディー・エヌ・エー
 🦊 きつねかわいい
-💻 アプリ開発２０１０〜
 🎈 今日誕生日
 
 ![right](IMG_0726.PNG)
@@ -157,6 +156,9 @@ view.layer.addSublayer(layer)
 
 - 動画にリアルタイムでエフェクトをかけたい
 
+^ レンズの屈折を考慮して描画したり
+^ 動画にフィルタをかけて表示する時
+
 ---
 
 # AVPlayerLayerで事足りない時
@@ -164,6 +166,8 @@ view.layer.addSublayer(layer)
 映像自体を歪ませたり、フィルタをかけるにはAVPlayerLayerではできない。
 
 特にリアルタイムの処理になるほど難しい。
+
+^ リアルタイムでなければ、AVExportSessionとかを使って毎回mp4を作れば比較的簡単です
 
 ---
 
@@ -174,6 +178,8 @@ view.layer.addSublayer(layer)
 # AVAssetReader
 
 - AVAssetReaderTrackOutputと組み合わせると毎フレームのCMSampleBufferが取れる
+
+^ 時間情報を持ったUIImageみたいなもの
 
 ---
 
@@ -269,7 +275,7 @@ commandBuffer.commit()
 
 ---
 
-# snapshot問題
+# 例えばsnapshotの問題
 
 ---
 
@@ -288,6 +294,10 @@ commandBuffer.commit()
 |AVAssetImageGenerator|ローカルのみ|
 |AVAssetReader|outputを接続できない|
 |OSのスクショ|撮れる|
+
+^ UIViewのスナップショットを撮るメソッド
+
+^ 動画からサムネイルを取得する時に使うようなもの
 
 ---
 
@@ -338,6 +348,8 @@ VP9/VP8などのソフトウェアデコーダが実装されている
 
 apngをソフトウェアデコーダを使ってCGImageにデコード
 
+^ HEVC(H265)を古めの端末でデコードするときにはハードウェアが無いのでソフトウェアデコードになっているかもしてません
+
 ---
 
 # VTDecompressionSession
@@ -351,13 +363,15 @@ apngをソフトウェアデコーダを使ってCGImageにデコード
 - デコード済みのCVPixelBufferを返す
 
 ^ iOSでビデオをデコードするにはこれを使います
-^ デコードの前に必要な事があります。
+^ デコードの前にMP4の構造を理解する必要な事があります。
 
 ---
 
 [.footer: MP4のパース]
 
 ![inline](mp4-container.png)
+
+^ 概念的にはこんな感じだけど、これがバイナリ上は実際どのように格納されているか
 
 ---
 
@@ -600,6 +614,8 @@ let blockBuffer = CMBlockBuffer(packet)
 let sampleBuffer = CMSampleBuffer(blockBuffer)
 ```
 
+^ 余談ですがCMSampleBufferはこのようにBlockBufferを内包することもあります
+
 ---
 
 # 音周り(AudioToolbox)
@@ -635,11 +651,15 @@ audioQueue.enqueue(buffer)
 
 ---
 
-# VideoToolkitはどういう時に使うべき？
+# VT/ATはどういう時に使うべき？
 
 - AVKit/AVFoundationで実装出来ない時の最終兵器
 
 - rtmpのストリーミングの表示とか
+
+^ 事前にAVKit/AVFoundationで実現できないか確認しましょう
+
+^ iOSが対応していない仕様でラップされたh264やaacを扱うとき
 
 ---
 
@@ -654,6 +674,8 @@ mp4のbox構造がクラス定義されていたりするので、実装ベー�
 - 改訂三版 H.264/AVC教科書 (インプレス標準教科書シリーズ)
 
 符号化の話と構造の話が日本語で書いてある。少し理解してから読むと読めそう。（WIP）
+
+- あと仕様書とか…
 
 ---
 
