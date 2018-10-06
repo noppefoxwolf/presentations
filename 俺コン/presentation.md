@@ -1,4 +1,4 @@
-footer: \#orecon \#c 🦊
+footer: \#orecon_ios \#c 🦊
 slidenumbers: true
 
 # iOSでmp4をデコードして自分だけの動画プレーヤーを作ろう！
@@ -44,6 +44,12 @@ https://goo.gl/BYwDNB
 - Swiftでデコード処理を書く
 
 - まとめ
+
+^ 今回は、細かい説明というよりもいうよりも概要をざっと話す感じになります。
+
+^ キーワードは散りばめておくので詳しいところはググって見てください。
+
+^ 自分も初学者なのでこの辺り詳しい人は、このあとの懇親会で理解を深めさせてください。
 
 ---
 
@@ -557,7 +563,7 @@ Extracting MPEG-4 AVC-H264 stream to h264
 
 ---
 
-# NALU header
+# nal_unit_header
 
 NALの種類が書かれている
 
