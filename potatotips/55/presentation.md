@@ -1,6 +1,7 @@
-# アプリにおけるアセットの管理
+footer: 🦊
+slidenumbers: true
 
-## Pocochaの事例
+# Pocochaにおけるアセットの管理
 
 ---
 
@@ -30,64 +31,75 @@
 
 ---
 
-# アセットの特徴
+# Pocochaでの画像アセット管理のルール
+
+- Asset Literalは使わない
+- 文字列でリソースにアクセスしない
+- Interface builderの中では画像を設定しない
+- アプリアイコンは単一ソースから生成
+
+^ それぞれどうしてなのか、どうしているのかを解説
+
+---
+
+## Asset Literalは使わない
+
+---
+
+## Color Literal / Image Literal
+
+![inline center](image-literal.png)
+
+`#imageLiteral(resourceName: "Facebook")`
+
+---
+
+## アセットの特徴
 
 - 視聴覚に頼ることで個々を認識出来る
 
 ---
 
-// TODO
-hex -> asset
+## アセットの特徴
+
+![inline](hexorviewer.png)
 
 ---
 
-// TODO
-ビューアの存在
-^ このように人間はアセットを管理していた
-
----
-
-# Xcodeでの管理
-
-xcassetsを使う
-
-- アプリ開発でよく使う形式のプレビューに対応
-- コード中にプレビューを表示して呼び出す事も出来る
-    - Color Literal / Image Literal
-
----
-
-# Color Literal / Image Literal
-
-![inline center](image-literal.png)
-
----
-
-# アセット管理の問題点
+## Asset Literalの問題点
 
 - 視聴覚は信頼できない
 
 ---
 
-![fit](color_diff.png)
+## Asset Literalの問題点
+
+![inline](color_diff.png)
 
 ---
 
-# アセット管理の問題点
+## Asset Literalの問題点
 
 プロジェクトの規模が大きくなるほど、類似のアセットが増える。
+
 - 解像度の違う画像アセット
 - 近似色のカラーアセット
 
+^ なのでAsset Literalは使っていない
+
 ---
 
-# 類似のアセットの可読性を上げる
+## Asset Literalの代替案
 
 結局は名前を付けて呼び出す事がベスト
 見た目＋特徴の組み合わせで、アセットを特定出来るような名前を付ける
 
 `TriangleRed`
 `TriangleLarge`
+
+---
+
+## 特殊なケース
 
 `Back`などの動作名はアセットの見た目が分からないのでNG
 //TODO Shareとかどうするんや
@@ -103,7 +115,7 @@ xcassetsを使う
 
 ---
 
-# 共通で使われるアセット
+## 共通で使われるアセット
 
 複数のビューで利用されるアセットは、`Common`などのネームスペースを切っておく
 
@@ -111,7 +123,7 @@ xcassetsを使う
 
 ---
 
-# ネームスペースを活用する
+## ネームスペースを活用する
 
 ビューのツリー構造に似た名称になっていくため、ネームスペースを活用する
 xcassetsのネームスペースを有効にする事で重複したファイル名を利用できる。
@@ -128,38 +140,74 @@ xcassetsのネームスペースを有効にする事で重複したファイル
 
 # ネームスペースを活用する
 
-`let image = UIImage(named: "News/Share")`
+```swift
+
+// Before
+let image = UIImage(named: "ProfileEditTriangleLarge")
+
+// After
+let image = UIImage(named: "ProfileEdit/Triangle/Large")
+```
 
 ---
 
-# XCAssetsとは
+# 文字列でリソースにアクセスしない
 
-画像とjsonを内包するディレクトリ
-更に管理しておくと最適化の恩恵も受けれる
+---
 
-# XCAssetsを呼び出す
+# Typoをなくす
 
-文字列だと微妙
-SwiftGen
+R.Swift / SwiftGen などを利用してTypoをなくす
 
-# XIB/Storyboard
+```swift
+let image = Asset.ProfileEdit.Triangle.large.image
+```
 
-画像は指定しない、コンパイル時に分からなくなる
-画像を使ってUIImageViewのサイズを指定したい時はintrinsicContentsize
-Inabaで見つけられる
+---
 
-# 構造と命名
+#  Interface builderの中では画像を設定しない
 
-見た目の名前をつける
-NameSpaceを切ったほうがいい
+---
 
-# ラスタライズ
-pdfからラスタライズ
-ランタイムでもラスタライズできる
+# 存在しないアセットへのアクセス
 
-# アプリのアイコン
-なぜかpdfで作れない（要検証）
-AppIconGenで作れる（重複処理も大丈夫）
+![inline](no_image.png)
 
-# 差分のある画像
-ランタイムで生成
+---
+
+![inline](noissue.png)
+
+---
+
+Could not load the "ImageName" image referenced from a nib in the bundle with identifier "com.bundle.app"
+
+---
+
+# 存在しないアセットへの対策
+Interface Builderでは画像を使わない方針
+
+https://github.com/noppefoxwolf/inaba
+
+---
+
+# Storyboardに画像を設定しない場合
+
+// intrinsic
+
+---
+
+# アプリアイコンは単一ソースから生成
+
+---
+
+AppIconGen
+
+---
+
+# まとめ
+
+- Asset Literalは使わない
+- 文字列でリソースにアクセスしない
+- Interface builderの中では画像を設定しない
+- アプリアイコンは単一ソースから生成
+
