@@ -29,9 +29,11 @@ slidenumbers: true
 - フォント
 - 動画
 
+^ 今日は画像アセットに関して話します
+
 ---
 
-# Pocochaでの画像アセット管理のルール
+# Pocochaでの画像アセットのルール
 
 - Asset Literalは使わない
 - 文字列でリソースにアクセスしない
@@ -42,7 +44,7 @@ slidenumbers: true
 
 ---
 
-## Asset Literalは使わない
+## 1.Asset Literalは使わない
 
 ---
 
@@ -52,23 +54,14 @@ slidenumbers: true
 
 `#imageLiteral(resourceName: "Facebook")`
 
----
-
-## アセットの特徴
-
-- 視聴覚に頼ることで個々を認識出来る
-
----
-
-## アセットの特徴
-
-![inline](hexorviewer.png)
+^ そもそもAssetLiteralは何かと言うと
+^ 便利に見えるけどなんで使わないのか
 
 ---
 
 ## Asset Literalの問題点
 
-- 視聴覚は信頼できない
+- Xcode上では、アセットの違いを認識しづらい
 
 ---
 
@@ -99,34 +92,27 @@ slidenumbers: true
 
 ---
 
-## 特殊なケース
-
-`Back`などの動作名はアセットの見た目が分からないのでNG
-//TODO Shareとかどうするんや
-
----
-
 # 重複する名称の対策
 
 画面が異なり、アセットも異なるが、見た目が似ているアセットがある可能性は事前に考慮しておく
 
-`UserProfileView/TriangleLarge`
-`ProfileEditView/TriangleLarge`
+`UserProfileViewTriangleLarge`
+`ProfileEditViewTriangleLarge`
 
 ---
 
 ## 共通で使われるアセット
 
-複数のビューで利用されるアセットは、`Common`などのネームスペースを切っておく
+複数のビューで利用されるアセットは、`Common`を先頭につける
 
-`Common/LeftArrow`
+`CommonLeftArrow`
 
 ---
 
 ## ネームスペースを活用する
 
-ビューのツリー構造に似た名称になっていくため、ネームスペースを活用する
-xcassetsのネームスペースを有効にする事で重複したファイル名を利用できる。
+ビューのツリー構造に似た名称になっていくため、冗長なファイル名になっていく。
+xcassetsのネームスペースを有効にする事でシンプルなファイル名を利用できる。
 
 `ProfileEdit/Triangle/Large`
 
@@ -151,7 +137,19 @@ let image = UIImage(named: "ProfileEdit/Triangle/Large")
 
 ---
 
-# 文字列でリソースにアクセスしない
+# 2.文字列でリソースにアクセスしない
+
+---
+
+# 文字列でアセットにアクセスする問題点
+
+```swift
+let image = UIImage(named: "TypoFileName")
+self.image = image! // nil exception
+```
+
+ランタイムでTypoが発覚
+Pocochaでは複雑な条件で画像を出し分けするため、普通に触っていると気が付けないアセットが多く存在
 
 ---
 
@@ -163,13 +161,17 @@ R.Swift / SwiftGen などを利用してTypoをなくす
 let image = Asset.ProfileEdit.Triangle.large.image
 ```
 
+コンパイル時にタイポが検出可能になる
+
+^ 動的に生成するアセット、連番アセットについては課題
+
 ---
 
-#  Interface builderの中では画像を設定しない
+# 3.Interface builderの中では画像を設定しない
 
 ---
 
-# 存在しないアセットへのアクセス
+# Interface builderの中で画像を設定する危険性
 
 ![inline](no_image.png)
 
@@ -181,26 +183,82 @@ let image = Asset.ProfileEdit.Triangle.large.image
 
 Could not load the "ImageName" image referenced from a nib in the bundle with identifier "com.bundle.app"
 
+^ しかもUIImageView.imageがoptionalなのでクラッシュしない
+
 ---
 
 # 存在しないアセットへの対策
+
 Interface Builderでは画像を使わない方針
+
+- ルールで禁止するのは無理
+
+---
+
+# 存在しないアセットへの対策
+
+Inaba - 稲羽
 
 https://github.com/noppefoxwolf/inaba
 
 ---
 
-# Storyboardに画像を設定しない場合
+# 存在しないアセットへの対策
 
-// intrinsic
+`$ Inaba ./Project`
+
+```
+> CaptureButton.xib
+🌁 An image is specified outside the code. (icon_camera)
+
+> NoticeView.xib
+🌁 An image is specified outside the code. (notice_dialog_image)
+
+> SignupViewController.storyboard
+🌁 An image is specified outside the code. (welcome)
+```
 
 ---
 
-# アプリアイコンは単一ソースから生成
+# Interface builderの中から画像を消す
+
+IBから画像を消すとAutolayoutが壊れることがある
+
+- UIImageViewはimageを設定するとその画像サイズでIntrinsic Content Sizeがつく
+
+- 明示的にIntrinsic content sizeを設定することで画像無しでもAutolayoutを解決できる
 
 ---
 
-AppIconGen
+# Interface builderの中から画像を消す
+
+![inline](intrinsic.png)
+
+---
+
+# 4.アプリアイコンは単一ソースから生成
+
+---
+
+# アプリアイコンの課題
+
+画像アセットはベクターpdfからビルド時に複数解像度のラスタ画像を生成できる
+
+何故かアプリアイコンは各解像度のラスタ画像を自前で用意しないとダメ
+
+---
+
+# ビルド時にアイコンを生成
+
+![](appicongen.png)
+
+https://github.com/noppefoxwolf/appicongen
+
+---
+
+# ビルド時にアイコンを生成
+
+![](appigongen_demo.gif)
 
 ---
 
@@ -211,3 +269,6 @@ AppIconGen
 - Interface builderの中では画像を設定しない
 - アプリアイコンは単一ソースから生成
 
+---
+
+---
