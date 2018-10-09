@@ -295,9 +295,40 @@ $PODS_ROOT/AppIconGen/appicongen --input $SRCROOT/$PRODUCT_NAME/Artwork.png --xc
 
 ---
 
-# iOSアプリにおけるダミーアセットの課題
+# ダミーアセットの課題
 
-iOSアプリ
+iOSアプリでアプリ内にデバッグメニューを表示してUIの確認をするのは良くある手法
+デバッグ用のViewControllerはBuild Configurationで隠せるがアセットは隠しにくい
+
+---
+
+# ダミーアセットの課題
+
+しかし、アプリにバンドルしてしまうと…
+
+- 著作権的にマズイ画像が…
+
+- リリース前のアイテム画像が…
+
+- 急遽取り下げる事になった画像が…
+
+---
+
+![inline](projects.png)
+
+機能ごとにproject管理
+
+---
+
+![inline](inproject.png)
+
+projectに機能QA用のアプリターゲットを配置
+
+---
+
+![inline](dummy_asset.png)
+
+機能QA用のアプリのxcassetsで管理
 
 ---
 
@@ -307,5 +338,6 @@ iOSアプリ
 - 文字列でリソースにアクセスしない
 - Interface builderの中では画像を設定しない
 - アプリアイコンは単一ソースから生成
+- ダミーアセットは明確にプロジェクトを分けて管理する
 
 ---
