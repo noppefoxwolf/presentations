@@ -9,13 +9,24 @@ slidenumbers: true
 
 🏢 株式会社ディー・エヌ・エー
 🦊 きつねかわいい
-💻 アプリ開発２０１０〜
+💻 Pococha iOSリードエンジニア
+
 
 ![right](profile.png)
 
 ---
 
-# Pocochaの紹介
+# Pococha
+
+- ライブ配信アプリ
+
+- 2017 〜
+
+- 多彩なイベント企画を実施
+
+- レベルに応じた演出ギミック
+
+![right fit](pococha.png)
 
 ---
 [.autoscale: true]
@@ -23,11 +34,14 @@ slidenumbers: true
 # アセットの例
 
 - 画像
+
 - 色
-- 効果音
+
 - Storyboard
+
 - フォント
-- 動画
+
+- ...etc
 
 ^ 今日は画像アセットに関して話します
 
@@ -54,7 +68,7 @@ slidenumbers: true
 
 `#imageLiteral(resourceName: "Facebook")`
 
-^ そもそもAssetLiteralは何かと言うと
+^ そもそもAssetLiteralは何かと言うと
 ^ 便利に見えるけどなんで使わないのか
 
 ---
@@ -250,7 +264,7 @@ IBから画像を消すとAutolayoutが壊れることがある
 
 # ビルド時にアイコンを生成
 
-![](appicongen.png)
+![inline](appicongen.png)
 
 https://github.com/noppefoxwolf/appicongen
 
@@ -258,7 +272,7 @@ https://github.com/noppefoxwolf/appicongen
 
 # ビルド時にアイコンを生成
 
-![](appigongen_demo.gif)
+![inline](appigongen_demo.gif)
 
 ---
 
@@ -268,7 +282,5 @@ https://github.com/noppefoxwolf/appicongen
 - 文字列でリソースにアクセスしない
 - Interface builderの中では画像を設定しない
 - アプリアイコンは単一ソースから生成
-
----
 
 ---
