@@ -45,7 +45,27 @@ slidenumbers: true
 
 - ...etc
 
+---
+
+[.autoscale: true]
+
+# アセットの例
+
+- **画像**
+
+- 色
+
+- Storyboard
+
+- フォント
+
+- ...etc
+
 ^ 今日は画像アセットに関して話します
+
+---
+
+# Pocochaでの画像アセットのルール
 
 ---
 
