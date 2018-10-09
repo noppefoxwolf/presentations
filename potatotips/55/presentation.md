@@ -47,6 +47,8 @@ slidenumbers: true
 
 ---
 
+[.autoscale: true]
+
 # Pocochaでの画像アセットのルール
 
 - Asset Literalは使わない
@@ -284,6 +286,16 @@ https://github.com/noppefoxwolf/appicongen
 pod 'AppIconGen'
 
 $PODS_ROOT/AppIconGen/appicongen --input $SRCROOT/$PRODUCT_NAME/Artwork.png --xcassets $SRCROOT/$PRODUCT_NAME/Assets.xcassets/
+
+---
+
+# 5. ダミーアセットは明確にプロジェクトを分けて管理する
+
+---
+
+# iOSアプリにおけるダミーアセットの課題
+
+iOSアプリ
 
 ---
 
