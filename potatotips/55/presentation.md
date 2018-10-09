@@ -276,6 +276,14 @@ https://github.com/noppefoxwolf/appicongen
 
 ---
 
+# ビルド時にアイコンを生成
+
+pod 'AppIconGen'
+
+$PODS_ROOT/AppIconGen/appicongen --input $SRCROOT/$PRODUCT_NAME/Artwork.png --xcassets $SRCROOT/$PRODUCT_NAME/Assets.xcassets/
+
+---
+
 # まとめ
 
 - Asset Literalは使わない
