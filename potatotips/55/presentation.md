@@ -3,6 +3,8 @@ slidenumbers: true
 
 # Pocochaにおけるアセットの管理
 
+### potatotips \#55 noppe ( @noppefoxwolf )
+
 ---
 
 #[fit] noppe
