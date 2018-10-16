@@ -15,6 +15,8 @@ slidenumbers: true
 
 ![right fit](profile.png)
 
+^ 普段ライブ配信のアプリ作ってますが、今日は趣味で得た知見の話します
+
 ---
 
 # こんなJSONばかり扱っていませんか？
@@ -40,6 +42,8 @@ slidenumbers: true
 # snake_caseとkebab-caseが混合している！ 
 
 ![](snake_and_kebab_json.png)
+
+^ ケバブケースというのはハイフンで区切られているケース
 
 ---
 
