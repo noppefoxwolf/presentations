@@ -9,31 +9,53 @@ slidenumbers: true
 
 #[fit] noppe
 
-💻 iOSアプリ
 🏢 ディー・エヌ・エー
+💻 ライブ配信iOSアプリ
 🦊 きつねかわいい
+📖 Otemachi.swift初参戦!
 
 ![right fit](profile.png)
 
 ---
 
-# こんなJSONばかり扱っていませんか？
+# スタンダードなJSON
 
 ![inline](normal_json.png)
 
 ---
 
-# 世の中にはカオスなJSONがある🤯
+# Codableでマッピング
+
+```swift
+struct UserData {
+  let id: String
+}
+
+let decoder = JSONDecoder()
+let userData = try decoder.decode(Response.self, data: data)
+```
+
+^ 非常に簡単です
 
 ---
 
-# カオス １/２
+# 世の中にはカオスなJSONがある🤯
+
+今日は２つ紹介
+
+---
+
+# 事例1
 
 ---
 
 # このJSON何がおかしいですか
 
 ![inline](snake_and_kebab_json.png)
+
+^ user_dataとno-moreの２つのキーがあるんですけど、
+^ snake_caseとkebab-caseが混合しています
+
 
 ---
 
@@ -50,7 +72,14 @@ slidenumbers: true
 # KeyDecodingStrategyとは？
 
 Swift 4.1 〜
-JSONキー名->プロパティ名のルールを指定する事で、`init(from decoder:)`を実装せずにマッピング出来る
+JSONキー名->プロパティ名のルールを指定する事で、`CodingKey`や`init(from decoder:)`を実装せずにマッピング出来る
+
+^ 通常であれば、jsonのキー名とプロパティ名が異なる場合はCodingKeyや`init(from decoder:)`を使ってマッピングする必要があります。
+^ ただ、Swift4.1からはdecoderのKeyDecodingStrategyを指定することで、キー名を自動的に解釈してくれる機能があります
+
+---
+
+# KeyDecodingStrategyとは？
 
 ```swift
 let decoder = JSONDecoder()
@@ -58,8 +87,9 @@ decoder.keyDecodingStrategy = .convertFromSnakeCase
 let obj = try decoder.decode(Response.self, from: data)
 ```
 
-^ snakeCaseでないものがあるとtryで弾かれる
-^ では、init(from:decoder)を実装しなきゃいけないのか？
+^ 例えばconvertFromSnakeCaseは、スネークケースのキー名をキャメルケースに変換してマッピングするルールです。
+^ ただ、snakeCaseでないものがあるとtryで弾かれる
+^ では、さきほどのような混合しているjsonはinit(from:decoder)を実装しなきゃいけないのか？
 
 ---
 
@@ -78,10 +108,9 @@ decoder.keyDecodingStrategy = .custom { keys in
 
 カスタムなkeyDecodingStrategyを作る事ができる。
 
-^ codingKeysを受け取ってCodingKeyを返す実装
-^ keysには探索したキーの経路が入っている
-^ stringValueで文字列が取り出せる
-^ キーをプロパティ名に変換してAnyKey(CodingKey)につめて返す
+^ 仕組みは簡単で
+^ マッピングするフィールドまでの経路が含まれたcodingKeysを受け取って、プロパティ名のCodingKeyを返す実装をするだけです。
+^ キーをキャメルのプロパティ名に変換して返すだけです
 
 ---
 
@@ -100,28 +129,12 @@ extension String {
 }
 ```
 
----
-
-```swift
-struct AnyKey : CodingKey {
-  var stringValue: String
-  var intValue: Int?
-  
-  init(stringValue: String) {
-    self.stringValue = stringValue
-  }
-  
-  init(intValue: Int) {
-    self.stringValue = "\(intValue)"
-  }
-}
-```
-
-AnyKeyは単純に受け取った文字列をキー名として解釈する
+^ 受け取ったキー名をキャメルに変換するのはこんな感じです。
+^ 一旦割愛します。興味がある人はスライドアップしたので読んでみてください。
 
 ---
 
-# カオス２/２
+# 事例２
 
 ---
 
@@ -129,9 +142,15 @@ AnyKeyは単純に受け取った文字列をキー名として解釈する
 
 ![inline](any_json_1.png)
 
+^ これだけでは実はおかしくないです
+
 ---
 
 ![inline](any_json_2.png)
+
+^ しかし、他のオブジェクトの中はこのようになっていたらどうでしょうか。
+^ attachmentの中身が配列のときと、オブジェクトが直に入っている場合です。
+^ これとかはgithubのAPIとかでたまに見かけるやつです
 
 ---
 
@@ -143,26 +162,27 @@ AnyKeyは単純に受け取った文字列をキー名として解釈する
 
 # 型が不定
 
-一回Anyに詰めて、取り出す時に型を付けてあげる
+- 一回Anyに詰めて、取り出す時に型を付けてあげる
+- 存在しうるすべてのフィールドを持ったオブジェクトにマッピングする
+- Dictionaryで持つ
 
-AnyやAnyObjectをDecodable準拠する事はできないので注意
+^ これはいくつか方法があって
+^ とかになると思います。
+^ 今回は一番上の方法を紹介します。
 
 ---
 
 # 型が不定
 
-Anyプロパティを包んで`init(from decoder: Decoder)`を直接書く範囲を減らす
-
 ```swift
-struct IndefiniteObject<T: Decodable>: Decodable {
+struct AttachmentObject: Decodable {
   let value: Any
   
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
-    print("hoge")
-    if let value = try? container.decode(T.self) {
+    if let value = try? container.decode(Media.self) {
       self.value = value
-    } else if let value = try? container.decode([T].self) {
+    } else if let value = try? container.decode([Media].self) {
       self.value = value
     } else {
       preconditionFailure()
@@ -170,6 +190,9 @@ struct IndefiniteObject<T: Decodable>: Decodable {
   }
 }
 ```
+
+^ Anyに直接詰めてもいいのですが、そうするとAnyプロパティを持つクラスで他のプロパティも含む`init(from:decoder)`実装しないといけないのでラップしたクラスを実装します。
+^ 中でデコードしうる型にデコードできるか繰り返し試しているだけです。
 
 ---
 
@@ -189,8 +212,45 @@ default: break
 
 ---
 
+# 🤔
+
+なんか他に良い方法がある気がするので、知っている人がいたら教えてください
+
+---
+
+# そもそも
+
+なんでこんなjsonパースしてるの？？
+
+---
+
+# gab.ai
+
+![](gab.png)
+
+APIクライアントライブラリを作ってます
+
+^ 海外のTwitterみたいなSNSがあって、そこのAPIクライアントライブラリを作ってます
+^ gabの話とか興味ある人
+
+---
+
 # noppefoxwolf/GabKit
 
-gab.comという海外のSNSのAPIを叩くライブラリ
-
 今回のテクニックで実装してます🤯
+
+gabまだまだ日本人少ないので、興味ある人は使ってみてください〜〜
+
+---
+
+# Cironnup - チヌロップ
+
+![inline center](Artwork.png)
+
+gab.comのiOSネイティブアプリ。審査中
+
+^ 出たら使ってみてください。AsyncDisplayKitとかで実装してます
+
+---
+
+# ありがとうございました🦊
