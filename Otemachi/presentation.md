@@ -16,6 +16,8 @@ slidenumbers: true
 
 ![right fit](profile.png)
 
+^ 普段ライブ配信のアプリ作ってますが、今日は趣味で得た知見の話します
+
 ---
 
 # スタンダードなJSON
@@ -62,6 +64,8 @@ let userData = try decoder.decode(Response.self, data: data)
 # snake_caseとkebab-caseが混合している！ 
 
 ![](snake_and_kebab_json.png)
+
+^ ケバブケースというのはハイフンで区切られているケース
 
 ---
 
