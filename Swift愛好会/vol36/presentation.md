@@ -276,12 +276,24 @@ private func update() {
 
 ---
 
+#[fit]😁
+
+---
+
 # UILayoutGuideで出来ない事
 
 - 短形領域でないものは生やせない
 - Debug View Hieralcyで見えない
 
 ^ これはAutolayout自体の制約でもあるが、円形状のものなどには
+
+---
+
+# まとめ
+
+- LayoutGuideは自作できる
+- 増やしてもレンダリングコストはない
+- 複雑な動的処理もVCから切り離せる
 
 ---
 
