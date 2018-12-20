@@ -160,6 +160,8 @@ button.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isAc
 - UIWindowに黒魔術でlayoutGuideを生やす
 - 回転によって制約を更新する
 
+### つ noppefoxwolf/NotchLayoutGuide
+
 ---
 
 # UILayoutGuideのサブクラスを作る
