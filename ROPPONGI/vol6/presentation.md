@@ -10,6 +10,7 @@ slidenumbers: true
 
 💻 ライブ配信アプリPococha
 🦊 きつねかわいい
+🌲 ROPPONGI.swift初参戦
 
 ![right](profile.png)
 
@@ -17,43 +18,69 @@ slidenumbers: true
 
 # Pocochaの紹介
 
-# 合宿しました
-Discord Swiftで動いてるSwiftbotをチーム内でも使ってみたくてSwift製のSlackBot作ったりしてました。
+![](pococha.jpeg)
 
 ---
 
-・CVBufferよくわからないけど使っている
-・パフォーマンスを気にしないといけない箇所である事が多い
-・CVBufferが何なのか何となく分かるとOpenGLESやMetalにも繋がるので紹介
-・動画配信アプリやh265、CoreVideoに触れる機会が増えている
+# 合宿しました
+Discord Swiftで動いてるSwiftbotをチーム内でも使ってみたくてSwift製のSlackBot作ったりしてました。
+
+![](swiftbot.png)
+
+---
+
+# 動画を扱う機会の増加
+
+- 動画配信アプリやh265の登場、CoreVideoに触れる機会が増えている
+- CVBufferは目にするけどSOのコピペで乗り切ってる
+- パフォーマンスを気にしないといけない箇所である事が多い
+- CVBufferが何なのか何となく分かるとOpenGLESやMetalにも繋がるので紹介
 
 ---
 
 # CVBuffer
 
-データバッファとのやりとりを行うためのベースクラス
+- CVBufferのCVはCoreVideoのCV
 
-データバッファを直接触らずに書き換える事ができる。（hexみなくて良い）
-無駄なコピーなしに実行できる
-CoreVideoなのでCV
-映像（画像）データをよく取り扱う
+データバッファを直接触らずに簡単に読み書きするためのベースクラス
 
 ---
 
 # 代表的なCVBufferの派生
 
-・CVImageBuffer
+- CVImageBuffer
 `public typealias CVImageBuffer = CVBuffer`
-・CVPixelBuffer
+- CVPixelBuffer
 `public typealias CVPixelBuffer = CVImageBuffer`
-CVOpenGLESTexture
+- CVOpenGLESTexture
 `public typealias CVOpenGLESTexture = CVImageBuffer`
-CMSampleBuffer
+
+- CMSampleBuffer
 `これは違う`
-CMBlockBuffer
-`これは違う`
+- CMBlockBuffer
+`これも違う`
 
 ---
+
+# CVPixelBuffer vs CVImageBuffer
+
+CVPixelBufferはメモリ内のピクセルバッファにアクセスするためのクラス
+CVImageBufferはメモリ内の画像にアクセスするためのクラス
+
+---
+
+# CVPixelBuffer
+
+
+
+---
+
+# UIImage/CIImageなどとの比較
+
+- CVBufferの利点
+無駄なコピーやキャッシュは行われない
+映像（画像）データをよく取り扱う
+要するに画像データ
 
 # CVImageBufferの構造
 
