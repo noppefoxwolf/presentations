@@ -1,16 +1,224 @@
-# ContactShadow
-# ContactShadowとは
+footer: 🦊
+slidenumbers: true
 
-In WWDC 2018, File app supports usdz files. 3D object casts shadow automatically in file app preview. This shadow called "Contact shadow" by apple. https://developer.apple.com/videos/play/wwdc2018/603/?time=417
+# ScneKitでふんわりした影を作る
 
-Contact Shadow is softy and blurry than direct lighting and spot lighting. I want to casts contact shadow to my object. Does I have any way?
+---
+# noppe
 
-I tried spot lighting and direct lighting. But object glow unnatural and casts clearly shadow.
+---
 
-# Contact Shadowの特徴
+# iOS12からusdzをサポート
 
-Contact Shadowは、動的キャラクタ達が、背景物に近づいたときに背景側に投射される柔らかい影のことで、影の投射元は、その空間に充満している環境光になる。そう、耳慣れた言葉で言えば「Ambient Occlusion」のことだ。
-https://game.watch.impress.co.jp/docs/series/3dcg/538525.html
-https://game.watch.impress.co.jp/docs/series/3dcg/518785.html
+usdz: AppleとPixerで共同開発した3Dファイルフォーマット
 
-http://appleengine.hatenablog.com/entry/2017/08/13/195639
+---
+
+![fit center](qr.png)
+
+---
+
+# FileでプレビューやAR配置も可能
+
+![right fit](IMG_2803.PNG)
+
+---
+
+# Fileのプレビューの影に注目⇨
+
+![right fit](IMG_2801.PNG)
+
+^ すごい綺麗
+
+---
+
+# WWDC2018でContact Shadowと表現[^1]
+
+![inline center](wwdc_contact_shadow.png)
+
+[^1]:https://developer.apple.com/videos/play/wwdc2018/603/?time=417
+
+---
+
+# Contact Shadow（接触影）とは
+
+"接地感・重なり感を出すためのもの"
+
+![right fit](contact_shadow_diff.gif)
+
+[^2]:https://twitter.com/unrealenginejp/status/800973173814480896
+
+---
+
+# Contact Shadow使ってみたい！
+
+---
+
+# SceneKitで影をつけてみる
+
+- SCNLightのcastsShadowをONにする
+- directionalか、spotタイプを使う[^3]
+
+[^3]:https://developer.apple.com/documentation/scenekit/scnlight/1523816-castsshadow
+
+---
+
+```swift
+// オブジェクト
+let scene = SCNScene(named: "stratocaster.scn")!
+
+// ライト
+let light = SCNLight()
+light.type = .directional
+light.castsShadow = true
+let lightNode = SCNNode()
+lightNode.light = light
+
+// 床
+let floor = SCNFloor()
+...
+```
+
+---
+
+SCNLightでははっきりした影になってしまう。
+
+![right fit](IMG_2808.PNG)
+
+---
+
+一応ShdaowRadiusもあるが、ボカし方が雑
+
+```swift
+lightNode.light!.shadowRadius = 16
+lightNode.light!.shadowSampleCount = 16
+```
+
+![right fit](IMG_2809.PNG)
+
+---
+
+ググっていると、ゲームの記事がヒット
+
+![inline](ambient.png)
+
+[^5]:https://game.watch.impress.co.jp/docs/series/3dcg/538525.html
+
+---
+
+[.autoscale: true]
+
+# screen-space ambient occlusion
+
+物体が近接して狭くなったところや部屋の隅などに、周囲の光（環境光）が遮られることによって影が現れる現象をアンビエント・オクルージョン（環境遮蔽/環境閉塞、英: ambient occlusion）と呼ぶ。SSAOは3D画面のレンダリング結果に後処理をかけるポストエフェクトの一種であり、擬似的なレンダリング結果に追加するものである。[^4]
+
+[^4]:https://ja.wikipedia.org/wiki/SSAO
+
+---
+
+# SSAO
+
+```swift
+camera?.screenSpaceAmbientOcclusionIntensity = 5
+camera?.screenSpaceAmbientOcclusionNormalThreshold = 0.1
+camera?.screenSpaceAmbientOcclusionDepthThreshold = 0.08
+camera?.screenSpaceAmbientOcclusionBias = 0.33
+camera?.screenSpaceAmbientOcclusionRadius = 3.0
+```
+
+---
+
+![](ssao.jpeg)
+
+---
+
+![inline center](ssaokana.jpeg)
+
+接地面以外の箇所の影もある
+
+---
+
+# ふんわりした影は自前で描画しないとダメそう
+
+---
+
+# SCNTechnique
+
+- マルチパスレンダリングのためのクラス
+画面１回の更新の間に、異なるシーンを複数回レンダリングして合成した結果を表示する機能。
+MetalやOpenGLESでシェーダを書く事が出来る。
+入力にシーンの色情報や深度情報が使える
+
+---
+
+![inline center](technique.png)
+
+---
+
+# やってみた
+
+カメラを二つ配置して、下からの入力を深度に変換してブラーをかける。
+
+---
+
+[^5]
+
+![inline fit](mirror_passes.png)
+
+[^5]:http://blog.simonrodriguez.fr/articles/26-08-2015_a_few_scntechnique_examples.html
+
+---
+
+# 影だけ作ってみた
+
+- よくみるとモアレ（縞模様）が…
+- そもそもカメラ2台置くのは…
+- シェーダ真面目に書こうとするとサクッと出来なそう
+
+![right fit](IMG_2792.jpg)
+
+---
+
+# 代替案を探す
+
+---
+
+# gobo
+
+SCNLightの影を自前の画像で描画する機能
+
+影を発射するライト
+
+![right fit](IMG_2812.jpg)
+
+^ なんとか影を作って、goboにセットすれば良さそう
+
+---
+
+# gobo
+
+- SCNTechniqueで深度画像に変換
+
+- SCNViewのsnapshotでUIImageを取得
+
+- CIFilterでブラーをかける
+
+- SCNLightのgoboに画像をセット
+
+---
+
+# 結果
+
+![right fit](IMG_2802.PNG)
+
+---
+
+# 課題
+
+- 影の濃淡などまだFileの表現に達していない
+
+- SCNTechniqueで全て完結出来るかも
+
+- shaderModifiersでライティングシェーダが弄れる
+
+
