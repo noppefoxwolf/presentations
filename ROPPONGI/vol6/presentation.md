@@ -1,40 +1,51 @@
 footer: 🦊
 slidenumbers: true
 
-# 今から理解するCVBuffer
+# CVBufferの話
 ## ROPPONGI.swift 第6回 望年会
 
 ---
 
 #[fit] noppe
 
-💻 ライブ配信アプリPococha
+💻 Pococha iOSエンジニア
 🦊 きつねかわいい
 🌲 ROPPONGI.swift初参戦
+📱 iOSDCで描画周りの話をしましたv
 
 ![right](profile.png)
 
 ---
 
-# Pocochaの紹介
+![fit](pococha.jpeg)
 
-![](pococha.jpeg)
+^ Discord Swiftで動いてるSwiftbotをチーム内でも使ってみたくてSwift製のSlackBot作ったりしてました。
 
----
-
-# 合宿しました
-Discord Swiftで動いてるSwiftbotをチーム内でも使ってみたくてSwift製のSlackBot作ったりしてました。
-
-![](swiftbot.png)
 
 ---
+
+[.autoscale: true]
 
 # 動画を扱う機会の増加
 
-- 動画配信アプリやh265の登場、CoreVideoに触れる機会が増えている
-- CVBufferは目にするけどSOのコピペで乗り切ってる
-- パフォーマンスを気にしないといけない箇所である事が多い
-- CVBufferが何なのか何となく分かるとOpenGLESやMetalにも繋がるので紹介
+- 動画配信アプリやhevcの登場、CoreVideoに触れる機会が増えている
+- データやメディアを扱うBuffer系クラスの利用頻度は増加
+- みんな、気持ちでCVPixelBufferを使っていませんか？
+
+---
+
+# Buffer系クラスの近況
+
+- 古いクラスなので、ほぼ変更はない
+
+- しかし環境は変化、クライアントでのデコードやOpenGLESやMetalへのデータ渡しに利用される
+
+^ ただでさえも難しいことが多いのでCVBuffer周りなんとなくこういうものなのかって思って貰えれば
+^ ということで今日は話しようかなと思いました。
+
+---
+
+# CVBuffer
 
 ---
 
@@ -42,11 +53,48 @@ Discord Swiftで動いてるSwiftbotをチーム内でも使ってみたくてSw
 
 - CVBufferのCVはCoreVideoのCV
 
-データバッファを直接触らずに簡単に読み書きするためのベースクラス
+データバッファを直接触らずに簡単に読み書きするためのIF
+
+---
+
+![fit](2.png)
 
 ---
 
 # 代表的なCVBufferの派生
+
+- CVImageBuffer
+- CVPixelBuffer
+- CVOpenGLESTexture
+
+---
+
+# CVBufferじゃない方
+
+- CMSampleBuffer
+`これは違う`
+- CMBlockBuffer
+`これも違う`
+
+^ この違いはあとで開設します。
+
+---
+
+# どんな時に取得できるものか
+
+ciImage.pixelBuffer //10_0~
+
+とか
+
+let ib = CMSampleBufferGetImageBuffer(sb)
+
+^ AVCaptureOutputから取れるsbから取り出したりします。
+
+---
+
+[.autoscale: true]
+
+# CVBufferの正体
 
 - CVImageBuffer
 `public typealias CVImageBuffer = CVBuffer`
@@ -55,90 +103,116 @@ Discord Swiftで動いてるSwiftbotをチーム内でも使ってみたくてSw
 - CVOpenGLESTexture
 `public typealias CVOpenGLESTexture = CVImageBuffer`
 
-- CMSampleBuffer
-`これは違う`
-- CMBlockBuffer
-`これも違う`
 
 ---
 
 # CVPixelBuffer vs CVImageBuffer
 
-CVPixelBufferはメモリ内のピクセルバッファにアクセスするためのクラス
-CVImageBufferはメモリ内の画像にアクセスするためのクラス
-
-アクセスする先は同じ、取る情報の種別が異なる
+- Q: typealiasなんだし同じでしょ？
+- A: 俺にもわからん
 
 ---
 
-# CVPixelBuffer
+# CVPixelBuffer vs CVImageBuffer
+
+- **CVPixelBuffer**
+
+メモリ内のピクセルバッファにアクセスするためのクラス
+
+- **CVImageBuffer**
+
+メモリ内の画像にアクセスするためのクラス
+
+^ それ違うの？取得出来るものを見れば分かってきそう。
+
+---
 
 ピクセル情報アクセスの例
 
 - 縦横のサイズ
 - データサイズ
 
+画像アクセスの例
+
+- カラースペース
 
 ---
 
-# UIImage/CIImageなどとの比較
+# ドキュメント
 
-- CVBufferの利点
-無駄なコピーやキャッシュは行われない
-映像（画像）データをよく取り扱う
-要するに画像データ
+> **CVImageBufferGetDisplaySize(_:)**
 
-# CVImageBufferの構造
+A CGSize structure defining the nominal display size of the buffer Returns zero size **if called with a non-CVImageBufferRef type or NULL**.
 
-//画像
-非常にシンプル
+^ CVImageBufferじゃなかったらnil返すと書いてある
 
 ---
 
-# どんな時に取得できるものか
+# 検証
 
-ciImage.pixelBuffer
-//CIImageでCVPixelBufferRef
+```swift
+var pb: CVPixelBuffer? = nil
+CVPixelBufferCreate(kCFAllocatorDefault, 
+                    128, 128,
+                    kCVPixelFormatType_32BGRA, nil, &pb)
+CVImageBufferGetDisplaySize(pb!)
 
-let ib = CMSampleBufferGetImageBuffer(sb)
-
-//自分で変換したり、作ったりする事もある
-
----
-
-# 変換
-
--> CIImage
-`CIImage(cvPixelBuffer: CVPixelBuffer)`
+// -> (128.0, 128.0)
+```
 
 ---
 
-# メソッドの呼び方
+[.autoscale: true]
 
-`let size = CVImageBufferGetDisplaySize(ib)`
+# 動画を扱う機会の増加
 
-ib.displaySizeのようなIFはない
-
-CVBuffer系はただのtypealiasなので上記メソッドにCVPixelBufferを入れても良い。
+- 動画配信アプリやhevcの登場、CoreVideoに触れる機会が増えている
+- データやメディアを扱うBuffer系クラスの利用頻度は増加
+- ~~みんな、気持ちでCVPixelBufferを使っていませんか？~~
 
 ---
 
-# どんな値が取得出来るのか
+# 気持ちで使っている
+
+^ 忘れましょう、教えてください
+
+---
+
+# UIImageとの違い
+
+![inline](2.png)
+
+^ ここでこの図を思い出したい
+^ これってUIImageと同じ？広義の意味では同じ
+
+---
+
+[.autoscale: true]
+
+# UIImageとの違い
+
+- CVBuffer
+アドレスを参照しているだけなので、ロックはするがコピーやキャッシュはされない
+中間レンダリングも勝手にされない
+**ビデオのように高速に処理する必要がある箇所に最適**
+
+^ CoreVideoだし
 
 ---
 
 # アドレスのロック
 
-CVBufferのデータバッファにCPUからアクセスする場合はアドレスをロックする必要がある
+CVBufferのデータバッファに**CPU**からアクセスする場合はアドレスをロックする必要がある
 
 ```
 CVPixelBufferLockBaseAddress(pb, .readOnly)
 defer { CVPixelBufferUnlockBaseAddress(pb, .readOnly) }
 ```
 
-0 or CVPixelBufferLockFlags.readOnly(= 1)
+^ 0 or CVPixelBufferLockFlags.readOnly(= 1)
+^ GPUからアクセスする場合は不要です（やるとパフォーマンス落ちる）
 
-GPUからのアクセスの場合はロック不要
+<!-- GPUからのアクセスの場合はロック不要
 おそらくCVOpenGLESTextureの事を指している
 
 GPU/CPUのメモリが共有になったけど？ロック必要なの？
@@ -147,17 +221,74 @@ GPU/CPUのメモリが共有になったけど？ロック必要なの？
 仮にMetalの機構だったとしてもMetal非対応の環境下では内部的にOpenGLが使われる処理もあるため
 OpenGLESの場合は共有されていない。
 
-//http://dsas.blog.klab.org/archives/52168462.html
+//http://dsas.blog.klab.org/archives/52168462.html -->
 
 ---
 
-# 生のData bufferの取り方
+# CVPixelBufferの中身を表示する
+
+^ 開発時はXcodeのbreak pointでquick look出来る
+^ デバッグの際に必要なので見てみる
+
+---
+
+# 一番簡単な方法
+
+CVPixelBuffer -> CIImage -> UIImage
+
+`CIImage(cvPixelBuffer: CVPixelBuffer)`
+
+`UIImage(ciImage: ciImage)`
+
+---
+
+# Metalで表示する
+
+`CVMetalTextureCache`経由で
+
+CVPixelBuffer -> MTLTexture
+
+MTKViewなどで表示
+
+^ シミュレータターゲットだと出てこない
+
+---
+
+# OpenGLESで表示する
+
+`CVOpenGLESTextureCache`経由で
+
+CVPixelBuffer -> OpenGLESTexture
+
+GLKViewなどで表示
 
 ---
 
 # CMSampleBufferとは
 
-名前は似ているが、構造は別物
+^ さっき見たアレ
+
+---
+
+![inline](5.png)
+
+^ 名前は似ているが、構造は別物
+
+---
+
+# CMSampleBufferとは
+
+・必ずしもCVPixelBufferが入っているとは限らない
+
+^ BlockBufferはオーディオやデコード前のバッファ
+
+---
+
+# 話そうと思っていた話題
+
+・CVPixelBufferからCMSampleBufferを作る話
+・ユースケース
+・利点
 
 BlockBufferはデコード前の映像フレームやオーディオが含まれる
 
