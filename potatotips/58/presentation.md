@@ -1,16 +1,39 @@
 footer: 🦊
 slidenumbers: true
 
-# ScneKitでふんわりした影を作る
+# SceneKitでふんわりした影を作る
+## potatotips 58
+
 
 ---
-# noppe
+
+# ライブ配信アプリPococha
+
+![inline fit](pococha.jpeg)
+
+https://medium.com/pococha-engineering
+
+---
+
+#[fit] noppe
+## @noppefoxwolf
+
+💻 Pococha[^0] iOSエンジニア
+🦊 きつねかわいい
+📱 iOSDCで描画周りの話をした
+🛩 最近ARに興味あり
+
+![right](profile.png)
+
+[^0]:ライブ配信アプリ
 
 ---
 
 # iOS12からusdzをサポート
 
 usdz: AppleとPixerで共同開発した3Dファイルフォーマット
+
+^ SceneKit使ってますか、AppleがARメガネ出したらUnityで開発とか出来ないと思うのでがんばりましょう
 
 ---
 
@@ -28,7 +51,9 @@ usdz: AppleとPixerで共同開発した3Dファイルフォーマット
 
 ![right fit](IMG_2801.PNG)
 
+^ シェードとシャドーがありますけど、シャドーの方
 ^ すごい綺麗
+^ 自作のモデルでも描画される
 
 ---
 
@@ -42,7 +67,7 @@ usdz: AppleとPixerで共同開発した3Dファイルフォーマット
 
 # Contact Shadow（接触影）とは
 
-"接地感・重なり感を出すためのもの"
+"接地感・重なり感を出すためのもの"[^2]
 
 ![right fit](contact_shadow_diff.gif)
 
@@ -98,7 +123,7 @@ lightNode.light!.shadowSampleCount = 16
 
 ---
 
-ググっていると、ゲームの記事がヒット
+ググっていると、ゲームの記事がヒット[^5]
 
 ![inline](ambient.png)
 
@@ -167,6 +192,12 @@ MetalやOpenGLESでシェーダを書く事が出来る。
 
 [^5]:http://blog.simonrodriguez.fr/articles/26-08-2015_a_few_scntechnique_examples.html
 
+^ 分かりやすい画像作っている方がいたので拾ってきました
+^ これは水面に反射する飛行機を描画する例なんですけど
+^ 一番左が下からのカメラで映した映像
+^ それを水面っぽいエフェクトかけます、隣が上からのカメラ映像
+^ それを平面と飛行機のデプスから手前にあるものだけを描画してこんな感じ
+
 ---
 
 # 影だけ作ってみた
@@ -188,6 +219,8 @@ MetalやOpenGLESでシェーダを書く事が出来る。
 SCNLightの影を自前の画像で描画する機能
 
 影を発射するライト
+
+リアルタイムで更新は出来ない
 
 ![right fit](IMG_2812.jpg)
 
@@ -221,4 +254,8 @@ SCNLightの影を自前の画像で描画する機能
 
 - shaderModifiersでライティングシェーダが弄れる
 
+^ オブジェクト自体につく影のトゥーンシェーダとかやっている人いた
 
+---
+
+# ありがとうございました！
