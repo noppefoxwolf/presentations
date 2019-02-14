@@ -1,0 +1,42 @@
+%{
+import os
+import sys
+
+try:
+    config
+except NameError:
+    sys.exit("`-Dconfig` is not specified.")
+
+config_path = os.path.abspath(config)
+if not os.path.exists(config_path):
+    sys.exit(config_path + " was not found.")
+execfile(config_path)
+
+try:
+    lenses_info
+except NameError:
+    sys.exit("no info of lens.")
+
+}%
+
+import L
+
+% for extending_type_name, properties in lenses_info.items():
+extension ${extending_type_name} {
+
+% for (key, attributes) in properties.items():
+    public var ${key}_lens: Lens<${extending_type_name}, ${attributes["type"]}> {
+        return Lens<${extending_type_name}, ${attributes["type"]}>(
+            get: { $0.${key} },
+            set: { new_${key}, obj in 
+                var newObj = obj
+                newObj.${key} = new_${key}
+                return obj
+            }
+        )
+    }
+% end
+}
+
+% end
+

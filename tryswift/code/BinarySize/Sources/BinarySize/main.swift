@@ -1,0 +1,3 @@
+import Core
+
+Object.call()

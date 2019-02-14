@@ -9,7 +9,7 @@ https://www.youtube.com/watch?v=E65lXzau_0Y&index=6&list=PLCl5NM4qD3u92PwamgwWr3
 
 https://nshipster.com/import/
 
-
+https://docs.swift.org/swift-book/ReferenceManual/Declarations.html
 
 ---
 
@@ -21,13 +21,20 @@ noppe
 
 ---
 
+import文の仕様
+submodule明示指定の効果
+バイナリの比較
+意味はない？
+
+---
+
 今日話をするのは、Swiftのimportについてです。
 importは、外部のフレームワークやモジュールで定義された関数やプロパティを呼び出す時に利用します。
 
 普段何気なく書いているimportですが、どのような構造になっているかご存知でしょうか。
 実はこのような構造になっています。
 
-attribute import kind module.symbol
+attributes? import import-kind? import-path
 
 これはswiftのソースコードから見つけることができます。
 普段書いているimport文よりも複雑であることが分かります。
