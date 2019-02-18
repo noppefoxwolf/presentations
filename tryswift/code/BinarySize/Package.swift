@@ -14,9 +14,12 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "BinarySize",
-            dependencies: ["Core"]),
+            dependencies: ["Core", "Core2"]),
         .target(
           name: "Core",
+          dependencies: []),
+        .target(
+          name: "Core2",
           dependencies: []),
         .testTarget(
             name: "BinarySizeTests",
