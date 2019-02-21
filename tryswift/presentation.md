@@ -74,22 +74,33 @@ submodule明示指定の効果
 ^ // ここにプロフ画像入れる
 
 ^ 私の名前はnoppeです。
-^ 今日は初めての英語のスピーチです。よろしくお願いします。
+^ Hello, My name is noppe.
+^ 今日は初めての英語のプレゼンテーションです。よろしくお願いします。
+^ Today is the first time for me to give a presentation in English. 
 ^ DeNAという会社でiOSアプリエンジニアをしています。
+^ I'm an iOS app developer at DeNA in Tokyo
 
 ---
 
 # import
 
 ^ 今日話をするのは、Swiftのimportについてです。
+^ Today, I'll talk about import which is a function of Swift.
 ^ importは、外部のフレームワークで定義された関数やプロパティを呼び出す時に利用します。
+<!-- It's used for import to your code functions and properties -->
 
 ---
 
 # import UIKit
 
-^ import宣言をみたことが無い人はいないでしょう。XcodeからSwiftファイルを作ると、UIKitがimportされているファイルが自動的に作られるからです。
-^ 普段何気なく書いているimportですが、どのような構造になっているかご存知でしょうか。
+^ import宣言をみたことが無い人はいないでしょう。
+^ I guess here is no developer who haven't seen a import declaration.
+^ XcodeからSwiftファイルを作ると、UIKitがimportされているファイルが自動的に作られるからです。
+^ Because a file is made by xcode automatically that imported an UIKit when we make a Swift file.
+^ 普段何気なく書いているimportですが、どのような 構成になっているかご存知でしょうか。
+^ We write import with no attention.
+^ Then, do you know what consist of it?
+//syntax?
 
 ---
 
@@ -105,20 +116,32 @@ submodule明示指定の効果
 [^1]: https://docs.swift.org/swift-book/ReferenceManual/Declarations.html
 
 ^ 実はこのような構造になっています。
+^ Look. These are all syntax of import. 
 ^ この仕様は、Swiftのドキュメントから見つけることができます。
+^ You can find the syntax in every swift documents.
 ^ 普段書いているimport文よりも複雑であることが分かります。
+^ Some tokens add to the import syntax we usually use.
+^ それではそれぞれのtokenについて説明します。
+^ Let's look at each tokens.
 
 ---
 
 # attributes
 
+^ まずはattributesについて見てみましょう
+^ At first, I introduce attributes.
+
+---
 
 ## @testable import MyFramework
 
 
-^ attributesには例えば@testableがあります。
+^ attributesには@testableがあるのを知っていますか。
+^ Do you know @testable which is a kind of attributes.
 ^ @testableを付けると、internalメソッドにもアクセス出来るようになります。
-^ これはテストをするときにモジュールを分けて実行する際に
+^ If you write it before import, you can acsess some internal methods. 
+^ これはテストをするときにモジュールを分けて実行する際に使います。
+^ It is useful??????
 
 ---
 
