@@ -86,18 +86,20 @@ submodule明示指定の効果
 
 ^ 今日話をするのは、Swiftのimportについてです。
 ^ Today, I'll talk about import which is a function of Swift.
+^ import宣言をみたことが無い人はいないでしょう。
+^ I guess here is no developer who haven't seen a import declaration.
+^ XcodeからSwiftファイルを作ると、UIKitがimportされているファイルが自動的に作られるからです。
+^ Because a file is made by xcode automatically that imported an UIKit when we make a Swift file.
 ^ import宣言は、外部のシンボルを呼び出す時に利用します。
 <!-- It's used for import to your code functions and properties -->
+^ 例えばUIKitをimportするとUIViewControllerやUILabelといったコンポーネントを使うことができます。
+^ もちろん、import宣言を行わないとコンパイルを完了する事ができません。
 
 ---
 
 # import UIKit
 
-^ import宣言をみたことが無い人はいないでしょう。
-^ I guess here is no developer who haven't seen a import declaration.
-^ XcodeからSwiftファイルを作ると、UIKitがimportされているファイルが自動的に作られるからです。
-^ Because a file is made by xcode automatically that imported an UIKit when we make a Swift file.
-^ 普段何気なく書いているimportですが、どのようなシンタックスなのかご存知でしょうか。
+^ さて、普段何気なく書いているimportですが、いくつかのオプションが存在する事を知っていますか？
 ^ We write import with no attention.
 ^ Then, do you know what consist of it?
 //syntax?
@@ -115,7 +117,7 @@ submodule明示指定の効果
 
 [^1]: https://docs.swift.org/swift-book/ReferenceManual/Declarations.html
 
-^ 実はこのような構造になっています。
+^ 実はこのようなオプションを使うことができます。
 ^ Look. These are all syntax of import. 
 ^ この仕様は、Swiftのドキュメントから見つけることができます。
 ^ You can find the syntax in every swift documents.
@@ -130,6 +132,9 @@ submodule明示指定の効果
 
 ^ まずはattributesについて見てみましょう
 ^ At first, I introduce attributes.
+^ attributesは、シンボルの取り込み方を指定するオプションです。
+^ arttibuteは書いてもいいですし、書かなくても良いです
+^ 現在Swiftには@testableと@_exportedの2つが存在します。
 
 ---
 
@@ -266,7 +271,7 @@ func function(_ value: Int) {
 保管が明瞭になる
 ...他は？
 
-^ さて、importの
+^ さて、importのオプションについて紹介しましたが何かいいことはあるでしょうか？
 ^ importを詳細に書くことで、多くの定義がある場合に補間が明瞭になります。
 では、他に影響はあるでしょうか？
 
