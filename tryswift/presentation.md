@@ -86,7 +86,7 @@ submodule明示指定の効果
 
 ^ 今日話をするのは、Swiftのimportについてです。
 ^ Today, I'll talk about import which is a function of Swift.
-^ importは、外部のフレームワークで定義された関数やプロパティを呼び出す時に利用します。
+^ import宣言は、外部のシンボルを呼び出す時に利用します。
 <!-- It's used for import to your code functions and properties -->
 
 ---
@@ -97,7 +97,7 @@ submodule明示指定の効果
 ^ I guess here is no developer who haven't seen a import declaration.
 ^ XcodeからSwiftファイルを作ると、UIKitがimportされているファイルが自動的に作られるからです。
 ^ Because a file is made by xcode automatically that imported an UIKit when we make a Swift file.
-^ 普段何気なく書いているimportですが、どのような 構成になっているかご存知でしょうか。
+^ 普段何気なく書いているimportですが、どのようなシンタックスなのかご存知でしょうか。
 ^ We write import with no attention.
 ^ Then, do you know what consist of it?
 //syntax?
@@ -138,10 +138,10 @@ submodule明示指定の効果
 
 ^ attributesには@testableがあるのを知っていますか。
 ^ Do you know @testable which is a kind of attributes.
+^ これはテストで利用するattributesです。
 ^ @testableを付けると、internalメソッドにもアクセス出来るようになります。
 ^ If you write it before import, you can acsess some internal methods. 
-^ これはテストをするときにモジュールを分けて実行する際に使います。
-^ It is useful??????
+^ テストのために元のコードを変更する必要がなくなります。
 
 ---
 
@@ -151,8 +151,10 @@ submodule明示指定の効果
 
 ^ @_exportedは自分自身のコードのようにシンボルをインポートします。
 ^ https://github.com/typelift/SwiftCheck/pull/114/files#r44612923
-^ 例えば、UmbrellaFrameworkのように複数のライブラリを単一のimportで取り込むライブラリを作る際に利用できます。
-^ アンダースコアで始まっているのはプライベートな宣言だからです。ABI安定化に対して影響を与える可能性もあります。
+^ 例えば、SwiftでUmbrellaFrameworkを作る際に利用できます。
+^ アンダースコアで始まっているのはプライベートな宣言です。
+^ 非推奨なので、開発時の利用に留める事をおすすめします。
+^ ABI安定化に対して影響を与える可能性もあります。
 
 ---
 
@@ -160,13 +162,16 @@ submodule明示指定の効果
 
 ```
 [attributes] import [module].[submodule]
-import MyLibrary.SubModule
-
-MyLibrary()._private()
+import SceneKit.ModelIO
 ```
 
+^ 次にサブモジュールの指定方法を見てみましょう。
 ^ submoduleを指定すると、submoduleの実装をimportすることができます。
-^ // ここrealmの例でもいいかも
+^ 例えばSceneKitでは、サブモジュールを上手に利用しています。
+^ SceneKitはModelIOのクラスからSceneを作ったり、SceneからModelを作る拡張があります。
+^ しかし、これらの実装をSceneKitに含むとSceneKitはModelIOの利用に関わらず依存することになります。
+^ そこで、SceneKitはModelIOの拡張をサブモジュールとして定義しています。
+^ サブモジュールを指定してimportすることで、SCNSceneのコンストラクタが増えることが確認できます。
 
 ---
 
@@ -187,34 +192,22 @@ framework module Umbrella {
 }
 ```
 
-^ これは基本的にはmodulemapのexplictで宣言されたモジュールを指します。
+^ サブモジュールのあるフレームワークを作るには、modulemapでexplictを使って宣言します。
 ^ Swiftは単一のモジュールとして定義されるため、サブモジュールを宣言できるのはObjective-Cのフレームワークだけです。
 ^ あなたはSwiftでモジュールを書くでしょうから、実際は、自分で作ったライブラリでこの宣言をすることは多く無いかもしれません。
-
----
-
-# module.submodule
-
-```
-import SceneKit.ModelIO
-```
-
-
-^ SceneKitでは、サブモジュールを上手に利用しています。
-^ SceneKitはModelIOのクラスからSceneを作ったり、SceneからModelを作る拡張があります。
-^ しかし、これらの実装をSceneKitに含むとSceneKitはModelIOの利用に関わらず依存することになります。
-^ そこで、SceneKitはModelIOの拡張をサブモジュールとして定義しています。
-^ サブモジュールを指定してimportすることで、SCNSceneのコンストラクタが増えることが確認できます。
 
 ---
 
 ```
 [attributes] import [import kind] [module].[symbol name]
 import class Core.Object
+
+Object().isKind
 ```
 
-^ ３種類目の記法はこれです。
+^ 次に3つ目の記法を紹介します。
 ^ kindを指定すると、指定した要素を取り込みます。
+^ kindを指定した場合、moduleの後に指定するのはサブモジュール名ではありません。要素の実装名を指定します。
 
 ---
 
@@ -226,20 +219,30 @@ struct, class, enum, protocol, typealias, func, let ,var
 
 ^ kindはsturct, class, enum, protocol, typealias, func, let, varが指定できます。
 ^ それぞれSwiftでみたことのある要素と同じ意味です。
-^ kindを指定した場合、moduleの後に指定するのはサブモジュール名ではありません。要素の実装名を指定します。
 
 ---
 
-- classを指定した場合、classの持つ要素もimportされる。
+# kindを指定する場合の注意点
 
-- 同名関数を個別にimportすることはできない。
+^ ここでは２つの注意点があります。
 
-^ ここでは２つの注意点があります。ちなみにclassを指定した場合は、classに実装されたメソッドやプロパティも含まれます。
+---
+
+# classを指定した場合、classの持つ要素もimportされる。
+
+```
+import class Core.Object
+
+Object().isKind //accessable property
+```
+
+^ 一つは、classやsturctのimportについてです。
+^ classやstructを指定した場合は、実装されたメソッドやプロパティも含まれます。
 ^ ここで指定するletやfuncはtop-levelの実装を指します。
 
-^ また、同名の関数をswiftでは定義することができます。
-
 ---
+
+# 同名関数を個別にimportすることはできない。
 
 ```
 func function(_ value: String) {
@@ -250,6 +253,9 @@ func function(_ value: Int) {
 
 }
 ```
+
+^ 二つ目は同名メソッドに関してです。
+^ 同名の関数をswiftでは定義することができます。
 ^ この場合は、個別にimportすることはできません。
 ^ 両方のfunctionがimportされることになります。
 
@@ -260,6 +266,7 @@ func function(_ value: Int) {
 保管が明瞭になる
 ...他は？
 
+^ さて、importの
 ^ importを詳細に書くことで、多くの定義がある場合に補間が明瞭になります。
 では、他に影響はあるでしょうか？
 
