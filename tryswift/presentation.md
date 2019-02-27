@@ -133,8 +133,11 @@ submodule明示指定の効果
 ^ まずはattributesについて見てみましょう
 ^ At first, I introduce attributes.
 ^ attributesは、シンボルの取り込み方を指定するオプションです。
+^ Attributes is an option that specifing how to import symbols.
 ^ arttibuteは書いてもいいですし、書かなくても良いです
+^ You don't have to write this.
 ^ 現在Swiftには@testableと@_exportedの2つが存在します。
+^ Today, There is two symbols in Swift, @testable and @_exported.
 
 ---
 
@@ -142,11 +145,13 @@ submodule明示指定の効果
 
 
 ^ attributesには@testableがあるのを知っていますか。
-^ Do you know @testable which is a kind of attributes.
+
 ^ これはテストで利用するattributesです。
+^ This is an attributes to use for test.  
 ^ @testableを付けると、internalメソッドにもアクセス出来るようになります。
-^ If you write it before import, you can acsess some internal methods. 
+^ If you write it before the import, you can acsess some internal methods. 
 ^ テストのために元のコードを変更する必要がなくなります。
+^ So it makes the original cords not have to change for testing.
 
 ---
 
@@ -155,11 +160,16 @@ submodule明示指定の効果
 ### Important⚠︎: private method
 
 ^ @_exportedは自分自身のコードのようにシンボルをインポートします。
+^ 
 ^ https://github.com/typelift/SwiftCheck/pull/114/files#r44612923
 ^ 例えば、SwiftでUmbrellaFrameworkを作る際に利用できます。
+^ For example, it can be used to make aUmbrellaFramework.
 ^ アンダースコアで始まっているのはプライベートな宣言です。
+^ The underscore stands for private.
 ^ 非推奨なので、開発時の利用に留める事をおすすめします。
+^ But it is not recommended and you should use in developping phase pnly.
 ^ ABI安定化に対して影響を与える可能性もあります。
+^ What's more, there is some possibility of havimg an impact on Swift ABI stability.
 
 ---
 
@@ -171,12 +181,19 @@ import SceneKit.ModelIO
 ```
 
 ^ 次にサブモジュールの指定方法を見てみましょう。
+^ Next, look å† how to specify a submodule.
 ^ submoduleを指定すると、submoduleの実装をimportすることができます。
+^ It becomes to import a submodule declaration when submodule is specified.  
 ^ 例えばSceneKitでは、サブモジュールを上手に利用しています。
+^ For instance, submodule is used well in the SceneKit.
 ^ SceneKitはModelIOのクラスからSceneを作ったり、SceneからModelを作る拡張があります。
-^ しかし、これらの実装をSceneKitに含むとSceneKitはModelIOの利用に関わらず依存することになります。
+^ The SceneKit has extentions that making a scene from the ModelIO class, and making a Model from scene. 
+^ しかし、これらの拡張をSceneKitに含むとSceneKitはModelIOの利用に関わらずModelIOに依存することになります。
+^ However, the SeneKit depends on the ModelIO when the extentions are included. 
 ^ そこで、SceneKitはModelIOの拡張をサブモジュールとして定義しています。
+^ So the SceneKit decralates the ModelIO as a submodule.
 ^ サブモジュールを指定してimportすることで、SCNSceneのコンストラクタが増えることが確認できます。
+^ You can check the adding SCNScene's constractor then you specify and import a submodule.
 
 ---
 
@@ -198,8 +215,11 @@ framework module Umbrella {
 ```
 
 ^ サブモジュールのあるフレームワークを作るには、modulemapでexplictを使って宣言します。
+^ To make a submodule, you should declarate with using a explict in the modulemap.
 ^ Swiftは単一のモジュールとして定義されるため、サブモジュールを宣言できるのはObjective-Cのフレームワークだけです。
+^ Because the Swift is declarated as a single module, there is only flamework that can declarate a submodule. It is the Objective-C. 
 ^ あなたはSwiftでモジュールを書くでしょうから、実際は、自分で作ったライブラリでこの宣言をすることは多く無いかもしれません。
+^ But you may not use this technique in your liberary because everyone write a submodule by the Swift, don't? 
 
 ---
 
@@ -211,8 +231,11 @@ Object().isKind
 ```
 
 ^ 次に3つ目の記法を紹介します。
+^ Lastly, I introduce an anothor syntax.
 ^ kindを指定すると、指定した要素を取り込みます。
+^ If you specify the kind, it imports an element. 
 ^ kindを指定した場合、moduleの後に指定するのはサブモジュール名ではありません。要素の実装名を指定します。
+^ 
 
 ---
 
@@ -309,8 +332,6 @@ Compile Swift Module 'BinarySize' (1 sources)
 Linking ./release/BinarySize
        19.97 real        19.51 user         0.48 sys
 ```
-
-結果はほとんど変りませんでした。
 
 ^ 結果はほとんど変りませんでした。
 
