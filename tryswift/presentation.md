@@ -234,7 +234,7 @@ Object().isKind
 ^ Lastly, I introduce an anothor syntax.
 ^ kindを指定すると、指定した要素を取り込みます。
 ^ If you specify the kind, it imports an element. 
-^ kindを指定した場合、moduleの後に指定するのはサブモジュール名ではありません。要素の実装名を指定します。
+^ ２つ目の記法と異なり、kindを指定した場合、moduleの後に指定するのはサブモジュール名ではありません。要素の実装名を指定します。
 ^ 
 
 ---

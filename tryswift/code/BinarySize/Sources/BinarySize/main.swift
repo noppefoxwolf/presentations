@@ -1,13 +1,10 @@
 //import class Core.Object
 //@testable import Core
-import class Core.Object
-import struct Core.Struct
-import let Core.variable
-import func Core.function0
-import func Core.functionXXX
+import func Core.function1000
+//import Core
 //import Core2
 
-Object.call()
+_ = function1000
 
 
 //full

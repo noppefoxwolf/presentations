@@ -1,6 +1,0 @@
-% for i in range(10000):
-public func function${i}() {
-    print(${i})
-}
-% end
-
