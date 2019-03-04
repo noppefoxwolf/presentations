@@ -1,0 +1,124 @@
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      285.65 real       281.81 user         3.91 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      303.29 real       299.16 user         4.20 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      303.69 real       299.52 user         4.23 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      284.23 real       279.63 user         3.94 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      311.29 real       302.99 user         5.77 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      316.77 real       309.46 user         5.52 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      304.75 real       300.53 user         4.26 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      305.83 real       301.50 user         4.31 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      304.35 real       299.19 user         4.48 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      277.28 real       273.48 user         3.84 sys
+Job 1, 'swift package clean &' has ended
+
+
+ここまでimportCore
+
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      302.99 real       298.61 user         4.54 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      316.25 real       308.88 user         5.83 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      272.91 real       269.26 user         3.96 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      297.86 real       293.45 user         4.57 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      268.88 real       265.25 user         4.04 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      301.91 real       297.37 user         4.62 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      321.90 real       312.99 user         6.36 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      294.99 real       290.68 user         4.49 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      308.22 real       303.28 user         4.65 sys
+Job 1, 'swift package clean &' has ended
+~/D/w/p/t/c/BinarySize (master|●2✚11) $ swift package clean & time swift build -c release
+Compile Swift Module 'Core' (2 sources)
+Compile Swift Module 'BinarySize' (1 sources)
+Linking ./.build/x86_64-apple-macosx10.10/release/BinarySize
+      275.47 real       271.60 user         4.21 sys
+Job 1, 'swift package clean &' has ended

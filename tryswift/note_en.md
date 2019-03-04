@@ -48,7 +48,8 @@ So it makes the original cords not have to change for testing.
 
 ---
 
-For example, it can be used to make aUmbrellaFramework.
+@_exported is import as own code.
+For example, it can be used to make a UmbrellaFramework.
 The underscore stands for private.
 But it is not recommended and you should use in developing phase only.
 What's more, there is some possibility of having an impact on Swift ABI stability.
@@ -64,16 +65,17 @@ So the SceneKit declarates the ModelIO as a submodule.
 You can check the adding SCNScene's contractor then you specify and import a submodule.
 
 ---
-
+<!-- 
 To make a submodule, you should declare with using a explict in the modulemap.
 Because the Swift is declared as a single module, there is only framework that can decelerate a submodule. It is the Objective-C. 
-But you may not use this technique in your library because everyone write a submodule by the Swift, don't? 
+But you may not use this technique in your library because everyone write a submodule by the Swift, don't?  -->
 
 ---
 
 Lastly, I introduce an another syntax.
 If you specified the kind, it imports an element. 
-Different from submodule import, it doesn’t need a submodule name but element name likes  
+It's not the submodule name that you specify after the module.
+For example, If you want to import a User class, Write a User to the back of the module.
 
 ---
 
