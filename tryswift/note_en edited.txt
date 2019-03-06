@@ -1,0 +1,141 @@
+
+
+Hello, My name is noppe.　※発音要注意。「Nope」になると「いやだ」という意味になります。
+Today is my first time giving a presentation in English.
+I'm an iOS app developer at DeNA in Tokyo.
+
+---
+
+Today I want to talk about import, which is a function of Switch.
+I'm sure all the developers here have seen an import declaration before.
+As I'm sure you know, when we make a Switch file from Xcode, UIKit automatically creates an imported file.
+
+---
+
+Let's look at import in more detail.
+If you use an import declaration, you can access external symbols.
+For example, UILabel and UIViewController are components of UIKit.
+So, if you write import UIKit into a file, you can use these components.
+
+---
+
+Of course, you cannot compile without doing the import declaration.
+
+---
+
+I think many of us use import without really thinking about it.
+But did you know that there are a few options?
+
+---
+
+In fact, there are three syntaxes for import.
+These syntaxes can be found in swift documents.
+Some tokens add to the import syntax we usually use.
+Let's look at each tokens.
+
+---
+
+First, I will introduce attributes.
+Attributes are an option for specifying how to import symbols.
+You don't have to write this.
+Today there are two symbols in Swift, @testable and @)exported.
+
+---
+
+Testable is an attribute to use for test.
+If you write it before the import, you can access internal methods.
+Since it is a test, there is no need to change the original code.
+
+---
+
+@exported is used to import symbols as though they were your own code.
+For example, it can be used to make an UmbrellaFramework.
+The underscore stands for private.
+But it is not recommended, and you should use it in the development phase only.
+What's more, there is some possibility of having an impact on Swift ABI stability.
+
+---
+
+Next, let's look at how to specify a submodule.
+When a submodule is specified, if becomes possible to import the submodule implementation.
+There is a good example of submodule usage in SceneKit.
+SceneKit has extensions that allow it to create scenes from the ModelIO class, and make models from scenes.
+However, the SceneKit depends on the ModelIO when the extensions are included, even if it doesn't actually use ModelIO.
+So the SceneKit declares the ModelIO as a submodule.
+You can see that by designated and implementing the submodule, the number of contractors in SCNScene increases.
+
+---
+<!-- 
+To make a framework with submodules, you should declare using explicit in modulemap.
+Because Swift is declared as a single module, the only framework that can declare a submodule is the Objective-C framework. 
+However, I'm sure you write modules in Swift, so in reality you may not declare this in the library you made yourself very often. -->
+
+---
+
+Lastly, I will introduce the third syntax.
+If you specify the kind, it will import the specified element.
+If you have specified the kind, then what you specify after the module is not the submodule name. Rather, you specify the implementation name of the element.
+For example, if you want to only import the User class, you would write User after the module name.
+
+---
+
+kind can specify  struct, class,  enum, protocol, typealias, func, let and var.
+These are the same elements as you see in Swift.
+
+---
+
+But, please note two things.
+Firstly, about import class or struct.
+if you choice class or struct as the kind, swift will import all accessible methods and properties in class or struct.
+The let and func specified here indicated the top-level implementation.
+
+---
+
+Secondly, about overloaded functions.
+In Swift you can declare functions of the same name, but in that case you cannot import them separately. 
+Both functions would be important together.
+
+---
+
+Now, I introduced some import options using kinds.
+When you are declaring different modules using functions of the same name, you will need to use the following notation.
+For example, the Cat module and Fox module have the printEmoji function.
+The printEmoji outputs the module name animal.
+If you import both these modules, you will get an error.
+Imports using kind prioritize finding methods.
+---
+
+Now I've covered the import options.
+Using them can be challenging, but let's look at some clear benefits.
+
+---
+
+Let's measure the build time.  
+I made 100,000(a hundred thousand) methods using the gyb which is a template engine.
+and then compared the build time when declaring the kind and not declaring it.
+
+---
+
+The result is that it was almost same.
+
+---
+
+So, how about the binary size?
+
+---
+
+This was also same.
+And the md5 of the binary files was the same too.
+What this means, is that no matter your notation, the Swift compiler optimizes so that the result is the same.
+
+---
+
+These are the Pros and Cons.
+According to this table, there is no need to write import in detail, unless there are any problem with the namespace.
+
+---
+
+So in conclusion, you should write your code the same as you always have.
+Thank you for listening. d
+
+---
