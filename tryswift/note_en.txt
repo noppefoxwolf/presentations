@@ -6,23 +6,7 @@ I'm an iOS app developer at DeNA in Tokyo.
 
 ---
 
-Today I want to talk about import, which is a function of Switch.
-I'm sure all the developers here have seen an import declaration before.
-As I'm sure you know, when we make a Switch file from Xcode, UIKit automatically creates an imported file.
-
----
-
-Let's look at import in more detail.
-If you use an import declaration, you can access external symbols.
-For example, UILabel and UIViewController are components of UIKit.
-So, if you write import UIKit into a file, you can use these components.
-
----
-
-Of course, you cannot compile without doing the import declaration.
-
----
-
+Today I want to talk about import, which is a function of Swift.
 I think many of us use import without really thinking about it.
 But did you know that there are a few options?
 
@@ -65,12 +49,6 @@ So the SceneKit declares the ModelIO as a submodule.
 You can see that by designated and implementing the submodule, the number of contractors in SCNScene increases.
 
 ---
-<!-- 
-To make a framework with submodules, you should declare using explicit in modulemap.
-Because Swift is declared as a single module, the only framework that can declare a submodule is the Objective-C framework. 
-However, I'm sure you write modules in Swift, so in reality you may not declare this in the library you made yourself very often. -->
-
----
 
 Lastly, I will introduce the third syntax.
 If you specify the kind, it will import the specified element.
@@ -86,14 +64,10 @@ These are the same elements as you see in Swift.
 
 But, please note two things.
 Firstly, about import class or struct.
-if you choice class or struct as the kind, swift will import all accessible methods and properties in class or struct.
-The let and func specified here indicated the top-level implementation.
-
----
-
+swift will import all accessible methods and properties in class or struct.
+You can import methods and properties using `kind` limitedly what implemented in top-level.
 Secondly, about overloaded functions.
-In Swift you can declare functions of the same name, but in that case you cannot import them separately. 
-Both functions would be important together.
+You cannot import them separately. 
 
 ---
 
@@ -136,6 +110,6 @@ According to this table, there is no need to write import in detail, unless ther
 ---
 
 So in conclusion, you should write your code the same as you always have.
-Thank you for listening. d
+Thank you for listening. 
 
 ---
