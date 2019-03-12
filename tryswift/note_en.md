@@ -1,6 +1,6 @@
 
 
-Hello, My name is noppe.　※発音要注意。「Nope」になると「いやだ」という意味になります。
+Hello, My name is Tomoya Hirano.
 Today is my first time giving a presentation in English.
 I'm an iOS app developer at DeNA in Tokyo.
 
@@ -32,7 +32,7 @@ Since it is a test, there is no need to change the original code.
 
 ---
 
-@exported is used to import symbols as though they were your own code.
+@_exported is used to import symbols as though they were your own code.
 For example, it can be used to make an UmbrellaFramework.
 The underscore stands for private.
 But it is not recommended, and you should use it in the development phase only.
@@ -77,6 +77,7 @@ For example, the Cat module and Fox module have the printEmoji function.
 The printEmoji outputs the module name animal.
 If you import both these modules, you will get an error.
 Imports using kind prioritize finding methods.
+
 ---
 
 Now I've covered the import options.
