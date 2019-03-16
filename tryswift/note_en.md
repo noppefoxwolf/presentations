@@ -109,8 +109,3 @@ These are the Pros and Cons.
 According to this table, there is no need to write import in detail, unless there are any problems with the namespace.
 
 ---
-
-So in conclusion, you should write your code the same as you always have.
-Thank you for listening. 
-
----
