@@ -52,3 +52,78 @@ ARKitは
 # USDZプレビュー
 
 レンダリングが変わったぽい、つるつるになった…。
+
+# Xcode Debugging
+熱問題の再現
+ネットワークのコンディション再現
+
+
+
+
+---
+
+# ARKit
+
+- People Occlusion
+- Motion Capture
+
+---
+
+# People Occulustion
+
+- 3Dオブジェクトを身体で遮れるようになった
+
+---
+
+```swift
+let configuration = ARWorldTrackingConfiguration()
+configuration.frameSemantics = .personSegmentation
+session.run(configuration)
+```
+
+---
+
+# Motion Capture
+
+- 2次元および3次元のモーションキャプチャができるようになった
+- A12 ~ 
+
+---
+
+```
+let configuration = ARWorldTrackingConfiguration()
+configuration.frameSemantics = .bodyDetection
+session.run(configuration)
+```
+
+---
+
+リグの名称が揃っていれば転送しただけでいい感じに動く？
+
+---
+
+# ARCoachingOverlayView
+
+iPhoneをどうやって動かせばよいか教えるためのビューが追加！
+
+```
+coachingOverlay.session = sceneView.session
+```
+
+---
+
+# RealityKit
+
+---
+
+# RealityKit
+
+SceneKitの表現を拡張するフレームワーク
+
+---
+
+
+
+
+
+---
