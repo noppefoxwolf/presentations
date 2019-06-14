@@ -1,3 +1,5 @@
+slidenumbers: true
+
 # ソーシャルライブから見たWWDC
 ### iOS de KANPAI !【WWDC 2019 報告会】
 
@@ -7,14 +9,19 @@
 
 # noppe
 
-きつねすきすきエンジニア
-ソーシャルライブ「Pococha」
+- きつねすきすきエンジニア
+- ＷＷＤＣ初参戦
+- HomePod買ってきました
+- 小田原いちごイケル派
+
+![right](profile.png)
 
 ---
 
-# Pococha
+![](mgWokbmTt9qAFyR_denacom記事メイン.png)
 
-- 誰でも気軽にライブ配信出来るサービス
+^ DeNAではソーシャルライブ「Pococha」
+^ 誰でも気軽にライブ配信出来るサービス
 
 ---
 
@@ -24,9 +31,11 @@
 
 # GPUレンダリング
 
-- カメラのフィルタやアイテムの再生に利用
+- カメラのフィルタやアイテムの再生にOpenGLESやMetalを利用
 
 - iOSDC18でアイテム再生の話をしました
+
+![right fit autoplay](/Users/tomoya.hirano/Documents/workspace/private/presentation/iOSDC/pococha_movie.mp4)
 
 ---
 
@@ -34,19 +43,22 @@
 
 - 顔の輪郭補正や肌質の変更
 
+- フェイスステッカー
+
 - iOSDC19でCfP応募しました
+
+![right fit](pococha002.png)
 
 ---
 
 # 今日の内容
 
-- GPU周りの更新
-- ソーシャルライブサービス特有の問題
-- AR周りの更新
+- 映像周り
+- ARKit周り
 
 ---
 
-# GPU
+# 映像
 
 ---
 
@@ -109,25 +121,39 @@ textureDescriptor.storageMode = .shared
 
 ---
 
+[.autoscale: true]
 
-ProcessInfo.thermalStateDidChangeNotification
+# デバイスの温度上昇が取れるようになった
 
+- カメラやGPU/CPUを酷使するアプリは熱問題に悩まされていました
+
+- 夏になると上がるクラッシュレート
+
+- 冬になると布でくるみながら充電
+
+- 排熱性の低いケース
+
+- ...etc
+
+---
+
+`ProcessInfo.thermalStateDidChangeNotification`
+
+NotificationCenter経由で取得可能
+
+```
  ProcessInfo.ThermalState.nominal
- case .nominal, .fair:
+ case .nominal:
+ case .fair:
  case .serious:
  case .critical:
+```
 
- 
+適宜stateに合わせてfps下げたりしましょう
 
 ---
 
 # ARKit3
-
----
-
-- SwiftStrike
-
-//SwiftStrikeの動画貼る
 
 ---
 
@@ -140,53 +166,50 @@ ProcessInfo.thermalStateDidChangeNotification
 
 # People Occlusion
 
-A12 ~
+- 3Dオブジェクトを人が遮れるようになった
+
+- A12 ~ (XS/iPadPro)
+
+![right fill](po.png)
 
 ---
 
+# Before
 
+- 常にオブジェクトは手前だった
 
----
-
-# RealityKit
-
-より写実的な表現が可能になった
-ARKitは
+![right fill](po1.png)
 
 ---
 
-# USDZプレビュー
+# After
 
-レンダリングが変わったぽい、つるつるになった…。
+- 常に人が前 or 奥行きを付けて遮る事ができるようになった
+- 人以外のものは手前に置けない
 
-
-# Xcode Debugging
-熱問題の再現
-ネットワークのコンディション再現
-
-
-
+![right fill](po2.png)
 
 ---
 
-# ARKit
+# OcclusionMaterial
 
-- People Occlusion
-- Motion Capture
+- RealityKitのコンポーネント
 
----
+- MLとかVisionで輪郭取れれば自前のOcculusionもワンチャンあるかも
 
-# People Occulustion
-
-- 3Dオブジェクトを身体で遮れるようになった
+![right fit autoplay](om.mov)
 
 ---
+
+# People Occlusion
 
 ```swift
 let configuration = ARWorldTrackingConfiguration()
 configuration.frameSemantics = .personSegmentation
 session.run(configuration)
 ```
+
+比較的カンタンに実装できるっぽい
 
 ---
 
@@ -195,17 +218,33 @@ session.run(configuration)
 - 2次元および3次元のモーションキャプチャができるようになった
 - A12 ~ 
 
+![right fit autoplay loop](mc.mov)
+
 ---
 
-```
+# Motion Capture
+
+```swift
 let configuration = ARWorldTrackingConfiguration()
 configuration.frameSemantics = .bodyDetection
 session.run(configuration)
 ```
 
+こちらもframeSemanticsを指定すればframeに情報が入った状態でdelegateが叩かれる
+
 ---
 
-リグの名称が揃っていれば転送しただけでいい感じに動く？
+- リグの名称が揃っていればいい感じに動く
+
+- SceneKitのSceneをRealityKitに持ってくるのはちょっと難しそう
+
+- 自前でフレームから情報取ることもできる
+
+![right fit](joint.png)
+
+---
+
+![](mc2.png)
 
 ---
 
@@ -217,16 +256,24 @@ iPhoneをどうやって動かせばよいか教えるためのビューが追�
 coachingOverlay.session = sceneView.session
 ```
 
----
-
-# RealityKit
+![right fit](ARCoachingOverlayView.png)
 
 ---
 
 # RealityKit
 
-SceneKitの表現を拡張するフレームワーク
+---
+
+# RealityKit
+
+ARKitを軸に、SceneKitの表現を拡張するフレームワーク
+
+---
+
+![fit](framework.png)
 
 ---
 
 
+
+---
