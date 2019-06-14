@@ -35,7 +35,7 @@ slidenumbers: true
 
 - iOSDC18でアイテム再生の話をしました
 
-![right fit autoplay](/Users/tomoya.hirano/Documents/workspace/private/presentation/iOSDC/pococha_movie.mp4)
+![right fit autoplay](../iOSDC/pococha_movie.mp4)
 
 ---
 
@@ -264,16 +264,74 @@ coachingOverlay.session = sceneView.session
 
 ---
 
-# RealityKit
-
-ARKitを軸に、SceneKitの表現を拡張するフレームワーク
-
----
-
 ![fit](framework.png)
 
+^ ARKitがカメラやジャイロからどんなものが映っているかを分析
+^ UnityやSceneKitはそれを元にレンダリングする
+^ RealityKitは、SceneKitで行うには複雑な処理（シェーダとか）を簡単に扱えるインターフェースを提供する
+
 ---
 
+# RealityKit
 
+- SceneKitでのAR表現を簡単に扱うためのIFを提供する
+- レンダリング
+- アニメーション
+- マルチプレイヤー
+- ヒエラルキー
+- オーディオ
 
 ---
+
+# レンダリング
+
+- RealityKitの目玉機能
+
+- 3Dモデルを現実に溶け込ませることに重きを置いている
+
+^ なんで今こんなことをAppleがするのかはわからない。
+
+---
+
+# コンタクトシャドウ
+
+- ARQuickLookで先行実装されていた機能がオープン化
+
+- 動的な影を付けることも可能になった
+
+![right fit autoplay loop](shadow.mov)
+
+---
+
+# ブラー
+
+背景はブレているのに、モデルがくっきりする問題が解消
+
+![right fit autoplay loop](blur.mov)
+
+---
+
+# 深度ブラー
+
+カメラのフォーカスとモデルのフォーカスが合うようになった
+
+![right fit autoplay loop](depth.mov)
+
+---
+
+# ノイズ
+
+薄暗い場所でモデルだけ浮くようなことがなくなった
+
+![right fit autoplay loop](noise.mov)
+
+---
+
+# まだよくわかっていない箇所
+
+- Entity : SceneKitとヒエラルキー構造が変わったぽい
+
+---
+
+# 以上です！
+## ほか興味あれば話しかけてください！
