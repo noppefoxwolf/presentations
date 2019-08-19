@@ -118,6 +118,7 @@ high pass skin smoothingが有名、これを解説します。
 ガウシアンブラーかける
 ハイパスかける
 //https://qiita.com/secang0/items/f3a3ff629988dc660d87#ハイパスフィルター
+//https://askjapan.me/q/photoshop-35033779880
 
 ---
 
