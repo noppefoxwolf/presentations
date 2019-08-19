@@ -12,19 +12,11 @@ autoscale: true
 # noppe
 
 - DeNA inc
-- Pococha
+- **Pococha**
 - 💖🦊
 - Github: noppefoxwolf
 
-![right fit](profile.png)
-
----
-
-# noppe
-
-- 書籍
-
-^ ここにwebdbとか
+![right fill](profile.png)
 
 ---
 
@@ -32,17 +24,19 @@ autoscale: true
 
 ---
 
-# Pococha 
+# Pococha
 
 - **ソーシャルライブサービス**
 - アイテムによる動画演出 ( iOSDC 2018 )
 - デジタル化粧による映像補正　←　今日の話
 
+^ 生放送を通してコミュニケーションをする
+
 ---
 
 # デジタル化粧
 
-^ とはなんでしょうか
+^ さて、デジタル化粧とはなんでしょうか
 
 ---
 
@@ -50,9 +44,12 @@ autoscale: true
 
 - 映像を加工する事でリアルタイムに補正をかける技術
 
-^ ここ画像欲しい
+- 主にセルフィーアプリや、ライブアプリで採用されることが多い
+
+![right fit autoplay](preview.mov)
 
 ^ デジタル化粧という言葉に明確な定義がないので本トークでは、「映像を加工する事でリアルタイムに補正をかける技術」と定義します。
+^ セルフィーアプリや、ライブアプリで採用されることが多いので見たことがある方も多いのでは無いでしょうか？
 
 ---
 
@@ -64,18 +61,16 @@ autoscale: true
 
 - 現実では出来ないメイクが出来る
 
-^ デジタル化粧の利点は〜
+^ デジタル化粧にはどんな利点があるでしょうか
 ^ では、具体的にどのような機能が世の中にはあるでしょうか？
 
 ---
 
-# デジタル化粧の種類
+# デジタル化粧の機能種別
 
 - コスプレ
 - メイク
 - 整形
-
-<!-- パネル横に3枚 -->
 
 ^ 今日は大きく３つに分けてみました。
 ^ そして、今日はこの３つの実装方法を紹介します。
@@ -83,19 +78,24 @@ autoscale: true
 
 ---
 
-# 共通する技術
+# 実装に必要な技術
 
 - 顔認識
-- 画像加工
+- シェーディング
+
+^ これらは、顔認識とシェーダーによる処理によって実現できます。
+^ そこで、まずはiOSにおける顔認識をどのように行うかを決めましょう。
 
 ---
 
 # 顔認識技術の選定
 
 ・ CIDetector　・Vision
-・ ARKit　・MLKit
-・ OpenCV　・SenseMe
-・ ByteDanceSDK
+・ ARKit　・MLKit ・SenseMe ...etc
+
+^ iOSでは、標準でいくつかの顔認識をすることができるフレームワークがあります。
+^ また、サードパーティのライブラリも存在します。
+^ 今回調査したフレームワークを比較してみましょう。
 
 ---
 
@@ -144,7 +144,7 @@ autoscale: true
 # ARKit
 
 - iOS11+ (Require True depth camera)
-- 30, 60fps
+- 60fps
 - 1220 points
 - 三次元空間の特徴点しか取れない
 
@@ -168,47 +168,63 @@ autoscale: true
 
 ---
 
-# ???
+![inline](AR2DFaceDetector.png)
 
-- 二次元座標を提供
-- landmarkを提供
+^ 使いやすいようにするライブラリを作りました
 
 ---
 
-# 共通する技術
+# noppefoxwolf/AR2DFaceDetector
 
-- 顔認識 - ARKit
-- 画像加工 - CoreImage
+- ジオメトリの二次元座標を提供
+- ジオメトリの頂点から擬似landmarkを提供
 
-^ CoreImageの採用理由は、複数のフィルタを重ねがけしても最適化してくれるから。多分パフォーマンスはあんま良くない。
+---
+
+# シェーディング
+
+**CoreImage.framework**
+
+Metal Shader Languageを使ってフィルタが書けるフレームワーク
+標準フィルタも充実している
+
+---
+
+# 早速実装をしていきましょう！
+
+---
+
+# 1.コスプレ
 
 ---
 
 # コスプレ
 
----
-
-# コスプレ
-
-- 現実にないパーツをオーバーレイする機能
+- スタンプ画像をオーバーレイする機能
 
 <!-- ビデオ -->
 
 ---
 
-# コスプレ機能に必要な技術
+<!-- 図の画像欲しい -->
 
-- 顔認識
-- 合成
+^ 映像と位置を調整したスタンプ画像を合成する
 
 ---
 
 # 実装
 
-- pngからCIImageを生成
-- CISourceOverCompositingで合成
+[.code-highlight: 2, 3, 4-5]
 
-^ 本当は角度も入れたい
+```
+let stickerImage = CIImage()
+let captureImage = frame.captureImage
+
+let filter = CIFilter.sourceOverCompositing()
+filter.inputImage = stickerImage
+filter.backgroundImage = captureImage
+let outputImage = filter.outputImage
+```
 
 ---
 
@@ -231,8 +247,6 @@ autoscale: true
 ---
 
 # メイク機能に必要な技術
-
-
 
 ---
 
