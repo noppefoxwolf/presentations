@@ -236,30 +236,40 @@ let outputImage = filter.outputImage
 
 ---
 
-# メイク
+# 2.メイク
 
 ---
 
 # メイク
 
-ここでは肌質を良くするフィルタを描いてみます。
-
----
-
-# メイク機能に必要な技術
+- 肌質を良くするフィルタを描いてみましょう
+- Photoshopのチュートリアルを探すのがオススメ
+- https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
+- https://retamame.com/high-pass-skin-retouch
 
 ---
 
 # 処理の過程
 
-ステッカーで実装することも出来ます（チークなど）
-Photoshopの加工例
-<!-- https://liginc.co.jp/web/design/photoshop/129524 -->
-high pass skin smoothingが有名、これを解説します。
+- ハイパスフィルタを階調反転したものをマスクでオーバーレイ合成する
 
 ---
 
 # 解説
+
+ハイパスフィルタ・高周波だけの画像になる（大きく色が変化する箇所）
+階調反転：ネガポジにする
+マスク：マスク
+オーバーレイ：http://www.cg-ya.net/2dcg/aboutimage/composite-is-math/
+スクリーンと乗算を出しわける
+
+
+ハイパスでエッジ強調、反転でエッジ部分が白に
+オーバーレイでエッジ部分にスクリーン効果があたり、明るくなる
+
+
+
+打ち消すようになる？
 
 ガウシアンブラーかける
 ハイパスかける
