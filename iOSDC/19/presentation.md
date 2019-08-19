@@ -242,7 +242,7 @@ let outputImage = filter.outputImage
 
 # メイク
 
-- 肌質を良くするフィルタを描いてみましょう
+- 肌質を良くするフィルタを書いてみましょう
 - Photoshopのチュートリアルを探すのがオススメ
 - https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
 - https://retamame.com/high-pass-skin-retouch
@@ -263,44 +263,90 @@ let outputImage = filter.outputImage
 オーバーレイ：http://www.cg-ya.net/2dcg/aboutimage/composite-is-math/
 スクリーンと乗算を出しわける
 
-
 ハイパスでエッジ強調、反転でエッジ部分が白に
 オーバーレイでエッジ部分にスクリーン効果があたり、明るくなる
 
+---
 
-
-打ち消すようになる？
-
-ガウシアンブラーかける
-ハイパスかける
-//https://qiita.com/secang0/items/f3a3ff629988dc660d87#ハイパスフィルター
-//https://askjapan.me/q/photoshop-35033779880
+# 実演
 
 ---
 
 # 実装
 
+ハイパス: 自作
+反転：CIColorInvert
+オーバーレイ：CIOverlayBlendMode
+マスク画像：ARKit
+マスク合成：CIBlendWithMask
+
+---
+
+![inline](SkinSmoothingFilter.png)
+
+---
+
+# noppefoxwolf/SkinSmoothingFilter
+
+- 反転ハイパスをCIFilterで提供
+
+---
+
+# 3.整形
+
 ---
 
 # 整形
 
----
-
-# 整形
-
-- 歪ませる
+- 頬を細くするフィルタを作る
 
 ---
 
-# 整形機能に必要な技術
+# 解説
 
-- Warp Shader
+- 頬の周辺のピクセルだけを引き寄せれば良い
+- CIFilterにはない
+- 自分で計算して実装するのも結構大変…
 
 ---
 
-# ???
+# SKWarpGeometryGrid
+
+- SpriteKit
+- iOS 10.0+
+- グリッドの移動前・移動後を指定することで、グリッド周辺を歪ませる
+
+---
+
+# SpriteKit...
+
+---
+
+![inline](WarpGeometryFilter.png)
+
+---
+
+# noppefoxwolf/WarpGeometryFilter
 
 - WarpGeometryをCIFIlterとして提供
+- 内部的にSpriteKitをオフスクリーンレンダリング
+- Metal経由でレンダリング結果をCIImageとして提供
+- 60fps
+
+---
+
+# 実装
+
+- 顔周辺を切り取り CIPerspectiveCorrection
+- 歪ませる WarpGeometryFilter
+- 元に戻す CIPerspectiveTransform
+
+---
+
+# まとめ
+
+- 特殊な知識が無くても、デジタル化粧は作れるようになってきた！
+- 3つのOSSを公開しました
 
 ---
 
