@@ -403,6 +403,8 @@ let outputImage = filter.outputImage
 - Metal経由でレンダリング結果をCIImageとして提供
 - 60fps
 
+![right fill](WarpGeometryFilterPreview.gif)
+
 ---
 
 # 実装
