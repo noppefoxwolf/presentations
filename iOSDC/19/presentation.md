@@ -206,9 +206,21 @@ Metal Shader Languageを使ってフィルタが書けるフレームワーク
 
 ---
 
-<!-- 図の画像欲しい -->
+![fit](IMG_0048.PNG)
 
 ^ 映像と位置を調整したスタンプ画像を合成する
+
+---
+
+![fit](IMG_0049.PNG)
+
+---
+
+![fit](IMG_0050.PNG)
+
+---
+
+![fit](IMG_0051.PNG)
 
 ---
 
@@ -225,14 +237,6 @@ filter.inputImage = stickerImage
 filter.backgroundImage = captureImage
 let outputImage = filter.outputImage
 ```
-
----
-
-# 応用例
-
-アニメーションさせたり
-
-^ アニメーションなど
 
 ---
 
@@ -281,18 +285,21 @@ let outputImage = filter.outputImage
 
 - 高周波を取り出すフィルタ
 
+![right fit](IMG_0047.PNG)
 
-<!-- 画像 -->
+---
+
+![fill](IMG_0047.PNG)
 
 ---
 
-# ハイパス画像の作り方
-
-- orig = low-pass + high-pass
-
-- high-pass = orig
+![fill](IMG_0046.PNG)
 
 ---
+
+
+[.slidenumbers: false]
+[.footer: [Image by Core Image Filter Reference](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html#//apple_ref/doc/filter/ci/CIOverlayBlendMode)]
 
 # 階調反転
 
@@ -300,39 +307,46 @@ let outputImage = filter.outputImage
 
 - つまりはネガポジにすること
 
+![right fit](CIColorInvert_2x.png)
+
 ---
+
+[.slidenumbers: false]
+[.footer: [Image by Core Image Filter Reference](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html#//apple_ref/doc/filter/ci/CIOverlayBlendMode)]
 
 # オーバーレイ
 
 - 乗算とスクリーン合成を基本色で切り替える合成方法
 - 明るく鮮やかになる
 
+![right fit](CIOverlayBlendMode_2x.png)
+
 ---
 
 # マスク
 
+[.slidenumbers: false]
+[.footer: [Image by Core Image Filter Reference](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html#//apple_ref/doc/filter/ci/CIOverlayBlendMode)]
+
 - 白黒のマスク画像を使い、黒い部分を描画しないようにして合成
 
----
-
-マスク：マスク
-オーバーレイ：http://www.cg-ya.net/2dcg/aboutimage/composite-is-math/
-スクリーンと乗算を出しわける
-
-ハイパスでエッジ強調、反転でエッジ部分が白に
-オーバーレイでエッジ部分にスクリーン効果があたり、明るくなる
+![right fit](CIBlendWithMask_2x.png)
 
 ---
 
 # 実装
 
-ハイパス: Original - CIGaussianBlurをCIKernelで
+ハイパス: 自作
 反転：CIColorInvert
 オーバーレイ：CIOverlayBlendMode
-マスク画像：ARKitのARFrame.segmentationBuffer
+マスク画像：ARFrame.segmentationBuffer
 マスク合成：CIBlendWithMask
 
 ^ iOS13
+
+---
+
+![](IMG_0043.PNG)
 
 ---
 
