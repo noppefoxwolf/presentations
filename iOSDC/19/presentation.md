@@ -46,7 +46,7 @@ autoscale: true
 
 - 主にセルフィーアプリや、ライブアプリで採用されることが多い
 
-![right fit autoplay](preview.mov)
+![right fit autoplay loop](preview.mov)
 
 ^ デジタル化粧という言葉に明確な定義がないので本トークでは、「映像を加工する事でリアルタイムに補正をかける技術」と定義します。
 ^ セルフィーアプリや、ライブアプリで採用されることが多いので見たことがある方も多いのでは無いでしょうか？
@@ -244,21 +244,77 @@ let outputImage = filter.outputImage
 
 - 肌質を良くするフィルタを書いてみましょう
 - Photoshopのチュートリアルを探すのがオススメ
-- https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
-- https://retamame.com/high-pass-skin-retouch
+
+^ https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
+^ https://retamame.com/high-pass-skin-retouch
 
 ---
 
 # 処理の過程
 
-- ハイパスフィルタを階調反転したものをマスクでオーバーレイ合成する
+- ハイパスフィルタを階調反転したものをオーバーレイでマスク合成する
+
+^ 実際にやってみましょう
+
+---
+
+# 実演
 
 ---
 
 # 解説
 
-ハイパスフィルタ・高周波だけの画像になる（大きく色が変化する箇所）
-階調反転：ネガポジにする
+---
+
+色々登場人物が出てきました
+
+・ハイパス
+・階調反転
+・オーバーレイ
+・マスク合成
+
+---
+
+# ハイパスフィルタ
+
+- 周波数分解して得られる画像
+
+- 高周波を取り出すフィルタ
+
+
+<!-- 画像 -->
+
+---
+
+# ハイパス画像の作り方
+
+- orig = low-pass + high-pass
+
+- high-pass = orig
+
+---
+
+# 階調反転
+
+- 色と輝度を反転すること
+
+- つまりはネガポジにすること
+
+---
+
+# オーバーレイ
+
+- 乗算とスクリーン合成を基本色で切り替える合成方法
+- 明るく鮮やかになる
+
+---
+
+# マスク
+
+- 白黒のマスク画像を使い、黒い部分を描画しないようにして合成
+
+---
+
 マスク：マスク
 オーバーレイ：http://www.cg-ya.net/2dcg/aboutimage/composite-is-math/
 スクリーンと乗算を出しわける
@@ -268,17 +324,15 @@ let outputImage = filter.outputImage
 
 ---
 
-# 実演
-
----
-
 # 実装
 
-ハイパス: 自作
+ハイパス: Original - CIGaussianBlurをCIKernelで
 反転：CIColorInvert
 オーバーレイ：CIOverlayBlendMode
-マスク画像：ARKit
+マスク画像：ARKitのARFrame.segmentationBuffer
 マスク合成：CIBlendWithMask
+
+^ iOS13
 
 ---
 
@@ -298,14 +352,16 @@ let outputImage = filter.outputImage
 
 # 整形
 
-- 頬を細くするフィルタを作る
+- 目を大きくしたり、頰を細くしたり
+
+- 今回は頬を細くするフィルタを作る
 
 ---
 
 # 解説
 
 - 頬の周辺のピクセルだけを引き寄せれば良い
-- CIFilterにはない
+- …がCIFilterにはない
 - 自分で計算して実装するのも結構大変…
 
 ---
@@ -354,3 +410,6 @@ let outputImage = filter.outputImage
 
 ソーシャルライブにおけるデジタル化粧は、自然さや外れないことも重要
 その瞬間に映像は配信されるので求められる品質は非常に高い
+
+---
+
