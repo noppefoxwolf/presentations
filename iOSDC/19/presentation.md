@@ -18,6 +18,8 @@ autoscale: true
 
 ![right fill](profile.png)
 
+^ 今回は難しい計算とかは出てきません
+
 ---
 
 ![fill](pococha.png)
@@ -129,10 +131,10 @@ autoscale: true
 - 特徴点 132 points
 - 各部位の輪郭と位置が取れる
 
+![right fit](mlkit.png)
+
 ^ https://firebase.google.com/docs/ml-kit/detect-faces?hl=ja
 ^ https://firebase.google.com/docs/ml-kit/face-detection-concepts
-
-
 
 ---
 
@@ -143,20 +145,25 @@ autoscale: true
 - 有料
 - 60fps
 - 特徴点 106 points
-- **美白や整形なども出来る全部乗せ**
+- メイクや整形なども出来る全部乗せ
+
+![right fit](senseme.jpg)
 
 ^ https://dena.com/jp/press/004432
+^ 類似のSDKもあるので、興味がある人はask the speakerで
 
 ---
 
 # ARKit
 
-- iOS11+ (Require True depth camera)
+- iOS11+ (True depth camera)
 - 60fps
 - 1220 points
 - 三次元空間の特徴点しか取れない
 
-^ シミュレータで使えない
+^ 口とか鼻の位置は分からない。シミュレータで使えない
+
+![right fit](arkithero_1280x960.jpg)
 
 ---
 
@@ -174,6 +181,11 @@ autoscale: true
 |SenseMe|有料|**60**|⭕|
 |ARKit|**無料**|**60**|×|
 
+^ 全部どりというのは無いというのが現実
+^ ここにさらに対応機種などの縛りを入れていくと中々難しくなるのですが、未来の話をしましょう。
+^ 有料で良いならSenseMeなどのSDKを購入するのが手早い
+^ ARKitも工夫すれば使うことができます。
+
 ---
 
 ![inline](AR2DFaceDetector.png)
@@ -184,8 +196,15 @@ autoscale: true
 
 # noppefoxwolf/AR2DFaceDetector
 
-- ジオメトリの二次元座標を提供
+![right fit](detector.png)
+
+- ARKitで取得したジオメトリのスクリーン座標を提供
 - ジオメトリの頂点から擬似landmarkを提供
+- 60fps
+
+^ どういうことかというと、先ほど解説した通りARKitは3次元空間での座標しかくれない
+^ そこで、それらをスクリーン上のどの位置の点なのかをカメラやジオメトリから計算するライブラリ
+^ というわけで顔認識に関しては今日はARKitを使っていきましょう。
 
 ---
 
@@ -194,7 +213,10 @@ autoscale: true
 **CoreImage.framework**
 
 Metal Shader Languageを使ってフィルタが書けるフレームワーク
-標準フィルタも充実している
+CIFilter使えば重ねがけが楽
+標準フィルタも充実している(200種類くらい)
+
+^ 今回はなるべく標準フィルタ使いながら実装していく
 
 ---
 
@@ -208,9 +230,15 @@ Metal Shader Languageを使ってフィルタが書けるフレームワーク
 
 # コスプレ
 
-- スタンプ画像をオーバーレイする機能
+- 衣装をオーバーレイする機能
+
+- 今回は動物のスタンプを顔に表示してみましょう。
 
 <!-- ビデオ -->
+
+---
+
+# 処理の過程
 
 ---
 
@@ -222,6 +250,8 @@ Metal Shader Languageを使ってフィルタが書けるフレームワーク
 
 ![fit](IMG_0049.PNG)
 
+^ 先ほどのAR2DFaceDetectorを使って
+
 ---
 
 ![fit](IMG_0050.PNG)
@@ -230,21 +260,27 @@ Metal Shader Languageを使ってフィルタが書けるフレームワーク
 
 ![fit](IMG_0051.PNG)
 
+^ 非常に簡単に実装できます
+
 ---
 
 # 実装
 
-[.code-highlight: 2, 3, 4-5]
+[.code-highlight: all]
+[.code-highlight: 6]
 
-```
-let stickerImage = CIImage()
+```swift
+let inputStickerImage = CIImage()
 let captureImage = frame.captureImage
+let transformedStickerImage = inputStickerImage.transformed(by: transform)
 
-let filter = CIFilter.sourceOverCompositing()
-filter.inputImage = stickerImage
-filter.backgroundImage = captureImage
-let outputImage = filter.outputImage
+//composited は SourceOverCompositing のメソッド版
+transformedStickerImage.composited(over: inputImage)
 ```
+
+^ 実装コードも非常に簡単です
+^ 一部のフィルタはCIImageにも生えているので、こんな感じで繋いでも良いですね
+^ compositedはSourceOverCompositingのメソッド版です
 
 ---
 
@@ -254,7 +290,7 @@ let outputImage = filter.outputImage
 
 # メイク
 
-- 肌質を良くするフィルタを書いてみましょう
+- 肌質を滑らかにするフィルタを書いてみましょう
 - Photoshopのチュートリアルを探すのがオススメ
 
 ^ https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
@@ -271,10 +307,6 @@ let outputImage = filter.outputImage
 ---
 
 # 実演
-
----
-
-# 解説
 
 ---
 
@@ -295,13 +327,22 @@ let outputImage = filter.outputImage
 
 ![right fit](IMG_0047.PNG)
 
+^ 画像の周波数というのは、近辺のピクセルとの色の違いを指します。
+
 ---
 
 ![fill](IMG_0047.PNG)
 
+^ 右がハイパス画像ですが、輪郭が強調されているのは境目で色が大きく変わるからです。
+
 ---
 
 ![fill](IMG_0046.PNG)
+
+^ ハイパスの逆に、高周波を除いたローパスというものも存在します。
+^ 周波数分解した画像を合わせると元の画像になる性質があります。
+^ つまり、図のようにオリジナル画像はローパスとハイパスの足し算で表現できるということです。
+^ ハイパス画像を得たい時はこの逆で、オリジナルからローパスを引けばいいわけです
 
 ---
 
@@ -317,6 +358,11 @@ float4 highpass(sample_t image, sample_t blurredImage) {
     return float4(rgb + 0.5, image.a);
 }
 ```
+
+^ この処理をMetal Shader languageで書いてみましょう。
+^ 非常に簡単な式になります
+^ 見た通りrgbをオリジナルからブラー分引くだけです。
+
 
 ---
 
@@ -413,12 +459,15 @@ let kernel = try! CIColorKernel(
 
 ---
 
-# 解説
+# 処理の過程
 
 - 顔認識で輪郭を取得
-- 頬の周辺のピクセルだけを引き寄せる
+- 頬の周辺のピクセル**だけ**を引き寄せる
 
 ![right fill](IMG_0053.PNG)
+
+^ 歪ませることをWarpやDistortionというCIFilterは無い
+^ 自作してたけど、結構難しい
 
 ---
 
@@ -429,6 +478,8 @@ let kernel = try! CIColorKernel(
 - グリッドの移動前・移動後を指定することで、グリッド周辺を歪ませる
 
 ![right fill](warp.png)
+
+^ なんとか使えないかなと思って、使えるようにしました
 
 ^ https://developer.apple.com/videos/play/wwdc2016/610/?time=1718
 
@@ -443,20 +494,61 @@ let kernel = try! CIColorKernel(
 - WarpGeometryをCIFIlterとして提供
 - 内部的にSpriteKitでオフスクリーンレンダリング
 - Metal経由でレンダリング結果をCIImageとして提供
-- 60fps
 
 ![right fill](WarpGeometryFilterPreview.gif)
 
 ---
 
+[.code-highlight: all]
+[.code-highlight: 1-6]
+[.code-highlight: 7-12]
+[.code-highlight: 13-18]
+
+```swift
+let sourcePositions: [SIMD2<Float>] = [
+  .init(0.00, 0.00), .init(0.10, 0.00), .init(0.90, 0.00), .init(1.00, 0.00),
+  .init(0.00, 0.25), .init(0.10, 0.25), .init(0.90, 0.25), .init(1.00, 0.25),
+  .init(0.00, 0.55), .init(0.10, 0.55), .init(0.90, 0.55), .init(1.00, 0.55),
+  .init(0.00, 1.00), .init(0.10, 1.00), .init(0.90, 1.00), .init(1.00, 1.00),
+]
+let destinationPositions: [SIMD2<Float>] = [
+  .init(0.00, 0.00), .init(0.10, 0.00), .init(0.90, 0.00), .init(1.00, 0.00),
+  .init(0.00, 0.25), .init(0.13, 0.25), .init(0.87, 0.25), .init(1.00, 0.25),
+  .init(0.00, 0.55), .init(0.10, 0.55), .init(0.90, 0.55), .init(1.00, 0.55),
+  .init(0.00, 1.00), .init(0.10, 1.00), .init(0.90, 1.00), .init(1.00, 1.00),
+]
+let warpGeometry = SKWarpGeometryGrid(columns: 3, rows: 3,
+                                      sourcePositions: sourcePositions,
+                                      destinationPositions: destinationPositions)
+warpGeometryFilter.setValue(perspectiveCorrectionOutput, forKey: kCIInputImageKey)
+warpGeometryFilter.setValue(warpGeometry, forKey: kCIInputWarpGeometryKey)
+warpGeometryOutput = warpGeometryFilter.outputImage!
+```
+
+---
+
 ![fit](IMG_0056.PNG)
+
+^ これを使って整形するわけですが、顔の角度とかを考え始めると大変なので一回顔を切り抜きます。
+^ ここの座標はAR2DFaceDetectorが提供しているので渡すだけです。
+
+---
+
+# 実演
+
+---
+
+# noppefoxwolf/iOSDC19-Example
+
+- 今日のデモで使ったもの
 
 ---
 
 # まとめ
 
-- 特殊な知識が無くても、デジタル化粧は作れるようになってきた！
+- 特殊な知識が無くても、デジタル化粧は作れるようになってきた
 - 3つのOSSを公開しました
+
 
 ---
 
