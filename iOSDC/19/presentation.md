@@ -61,6 +61,7 @@ autoscale: true
 
 - 現実では出来ないメイクが出来る
 
+^ 実際にメイクせずに撮影を開始することができるので、利用までのハードルが低い
 ^ デジタル化粧にはどんな利点があるでしょうか
 ^ では、具体的にどのような機能が世の中にはあるでしょうか？
 
@@ -105,13 +106,18 @@ autoscale: true
 - 10fps (iPhoneX)
 - 鼻や目の位置は取れるが輪郭は取れない
 
+^ 笑っているか
+
 ---
 
 # Vision.framework
 
 - iOS 11.0+
 - 10fps (iPhone X)
+- 特徴点 72 points
 - 各部位の輪郭と位置が取れる
+
+^ つまり、口なら口の位置だけで無く唇の輪郭も取ることもできます。
 
 ---
 
@@ -119,22 +125,24 @@ autoscale: true
 
 - Firebase
 - 無料
-- 15fps (iPhone X)
-- 132 points
+- 15fps (iPhone X)　若干遅延があり
+- 特徴点 132 points
 - 各部位の輪郭と位置が取れる
 
 ^ https://firebase.google.com/docs/ml-kit/detect-faces?hl=ja
 ^ https://firebase.google.com/docs/ml-kit/face-detection-concepts
+
+
 
 ---
 
 # SenseMe
 
 - SenseTime Group Ltd
-- 有料
 - **Pocochaで利用中**
+- 有料
 - 60fps
-- 106 point
+- 特徴点 106 points
 - **美白や整形なども出来る全部乗せ**
 
 ^ https://dena.com/jp/press/004432
@@ -297,6 +305,38 @@ let outputImage = filter.outputImage
 
 ---
 
+# ハイパスのMSL
+
+
+[.code-highlight: all]
+[.code-highlight: 2]
+
+```cpp
+float4 highpass(sample_t image, sample_t blurredImage) {
+    float3 rgb = float3(image.rgb - blurredImage.rgb);
+    return float4(rgb + 0.5, image.a);
+}
+```
+
+---
+
+# CIKernelとして読み込む
+
+```swift
+let url = Bundle.main.url(
+    forResource: "default",
+    withExtension: "metallib"
+)
+
+let data = try! Data(contentsOf: url)
+let kernel = try! CIColorKernel(
+    functionName: "highpass",
+    fromMetalLibraryData: data
+)
+```
+
+---
+
 
 [.slidenumbers: false]
 [.footer: [Image by Core Image Filter Reference](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html#//apple_ref/doc/filter/ci/CIOverlayBlendMode)]
@@ -356,7 +396,8 @@ let outputImage = filter.outputImage
 
 # noppefoxwolf/SkinSmoothingFilter
 
-- 反転ハイパスをCIFilterで提供
+- 反転ハイパスによる化粧フィルタをCIFilterで提供
+- 60fps
 
 ---
 
@@ -374,21 +415,22 @@ let outputImage = filter.outputImage
 
 # 解説
 
-- 頬の周辺のピクセルだけを引き寄せれば良い
-- …がCIFilterにはない
-- 自分で計算して実装するのも結構大変…
+- 顔認識で輪郭を取得
+- 頬の周辺のピクセルだけを引き寄せる
+
+![right fill](IMG_0053.PNG)
 
 ---
 
-# SKWarpGeometryGrid
+# SKWarpGeometry
 
-- SpriteKit
+- **SpriteKit**
 - iOS 10.0+
 - グリッドの移動前・移動後を指定することで、グリッド周辺を歪ませる
 
----
+![right fill](warp.png)
 
-# SpriteKit...
+^ https://developer.apple.com/videos/play/wwdc2016/610/?time=1718
 
 ---
 
@@ -399,7 +441,7 @@ let outputImage = filter.outputImage
 # noppefoxwolf/WarpGeometryFilter
 
 - WarpGeometryをCIFIlterとして提供
-- 内部的にSpriteKitをオフスクリーンレンダリング
+- 内部的にSpriteKitでオフスクリーンレンダリング
 - Metal経由でレンダリング結果をCIImageとして提供
 - 60fps
 
@@ -407,11 +449,7 @@ let outputImage = filter.outputImage
 
 ---
 
-# 実装
-
-- 顔周辺を切り取り CIPerspectiveCorrection
-- 歪ませる WarpGeometryFilter
-- 元に戻す CIPerspectiveTransform
+![fit](IMG_0056.PNG)
 
 ---
 
