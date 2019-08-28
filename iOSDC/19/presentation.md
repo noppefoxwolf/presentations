@@ -91,7 +91,7 @@ autoscale: true
 # 顔認識技術の選定
 
 ・ CIDetector　・Vision
-・ ARKit　・MLKit ・SenseMe ...etc
+・ ARKit　・MLKit ・SenseME ...etc
 
 ^ iOSでは、標準でいくつかの顔認識をすることができるフレームワークがあります。
 ^ また、サードパーティのライブラリも存在します。
@@ -128,7 +128,7 @@ autoscale: true
 
 ---
 
-# SenseMe
+# SenseME
 
 - SenseTime Group Ltd
 - 有料
@@ -163,7 +163,7 @@ autoscale: true
 |CIDetector|**無料**|10|△|
 |Vision|**無料**|10|⭕|
 |MLKit|**無料**|15|⭕|
-|SenseMe|有料|**60**|⭕|
+|SenseME|有料|**60**|⭕|
 |ARKit|**無料**|**60**|×|
 
 ---
