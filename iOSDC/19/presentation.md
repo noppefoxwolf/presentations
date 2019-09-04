@@ -335,11 +335,13 @@ extension ViewController: ARSessionDelegate {
 # 実装
 
 [.code-highlight: all]
-[.code-highlight: 6]
+[.code-highlight: 7-8]
 
 ```swift
-let inputStickerImage = CIImage()
-let captureImage = frame.captureImage
+let inputStickerImage = CIImage(named: "sticker")
+let captureImage = CIImage(cvPixelBuffer: frame.captureImage)
+
+//transformed は CIAffineTransform のメソッド版
 let transformedStickerImage = inputStickerImage.transformed(by: transform)
 
 //composited は SourceOverCompositing のメソッド版
@@ -361,6 +363,8 @@ transformedStickerImage.composited(over: inputImage)
 - 肌質を滑らかにするフィルタを書いてみましょう
 - Photoshopのチュートリアルを探すのがオススメ
 
+
+^ これ系の処理はPhotoshopのチュートリアルが参考になります。
 ^ https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
 ^ https://retamame.com/high-pass-skin-retouch
 
@@ -370,7 +374,8 @@ transformedStickerImage.composited(over: inputImage)
 
 - ハイパスフィルタを階調反転したものをオーバーレイでマスク合成する
 
-^ 実際にやってみましょう
+^ 私が見つけたチュートリアル記事を要約するとこんな感じです
+^ よく分からないですが、実際にやってみましょう
 
 ---
 
@@ -385,6 +390,8 @@ transformedStickerImage.composited(over: inputImage)
 ・オーバーレイ
 ・マスク合成
 
+^ 簡単に解説します
+
 ---
 
 # ハイパスフィルタ
@@ -396,11 +403,14 @@ transformedStickerImage.composited(over: inputImage)
 ![right fit](IMG_0047.PNG)
 
 ^ 画像の周波数というのは、近辺のピクセルとの色の違いを指します。
+^ ※詳しい話は次ページ
 
 ---
 
 ![fill](IMG_0047.PNG)
 
+^ 例えば、白から黒は大きい、グレーが少し薄くなるなら小さい
+^ 画像でも輪郭は大きく異なるので強調されている
 ^ 右がハイパス画像ですが、輪郭が強調されているのは境目で色が大きく変わるからです。
 
 ---
@@ -418,19 +428,23 @@ transformedStickerImage.composited(over: inputImage)
 
 
 [.code-highlight: all]
-[.code-highlight: 2]
+[.code-highlight: 3]
 
 ```cpp
 float4 highpass(sample_t image, sample_t blurredImage) {
+
     float3 rgb = float3(image.rgb - blurredImage.rgb);
+
     return float4(rgb + 0.5, image.a);
+
 }
 ```
 
-^ この処理をMetal Shader languageで書いてみましょう。
+^ なぜこの解説をしたかというと、CIFilterにはハイパスフィルタは無いからです
+^ なのでこの処理をMetal Shader languageで書いてみましょう。
 ^ 非常に簡単な式になります
 ^ 見た通りrgbをオリジナルからブラー分引くだけです。
-
+^ ブラー画像はCIFilterで作ることができるので、自前で書く必要はありません
 
 ---
 
@@ -447,7 +461,13 @@ let kernel = try! CIColorKernel(
     functionName: "highpass",
     fromMetalLibraryData: data
 )
+
+kernel.apply(image ~~)
 ```
+
+^ MSLでシェーダを書いたら、CIKernelとして読み込みます。
+^ CIKernelはCIFilter同様に、画像を渡すと処理結果を吐くインターフェイスを持っています。
+^ これでハイパスフィルタが出来上がりました
 
 ---
 
@@ -461,6 +481,8 @@ let kernel = try! CIColorKernel(
 
 - つまりはネガポジにすること
 
+- CIColorInvert
+
 ![right fit](CIColorInvert_2x.png)
 
 ---
@@ -472,6 +494,7 @@ let kernel = try! CIColorKernel(
 
 - 乗算とスクリーン合成を基本色で切り替える合成方法
 - 明るく鮮やかになる
+- CIOverlayBlendMode
 
 ![right fit](CIOverlayBlendMode_2x.png)
 
@@ -483,14 +506,27 @@ let kernel = try! CIColorKernel(
 [.footer: [Image by Core Image Filter Reference](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html#//apple_ref/doc/filter/ci/CIOverlayBlendMode)]
 
 - 白黒のマスク画像を使い、黒い部分を描画しないようにして合成
+- CIBlendWithMask
 
 ![right fit](CIBlendWithMask_2x.png)
 
 ---
 
+# マスク画像
+
+- 綺麗にしたいところは白、そのままにしたいところは黒の画像
+
+- 身体との境界ならARConfiguration.FrameSemanticsを使うと楽
+
+- 肌の部分だけ抽出するには工夫が必要
+
+![right fill](IMG_0131.PNG)
+
+---
+
 # 実装
 
-ハイパス: 自作
+ハイパス: CIColorKernel
 反転：CIColorInvert
 オーバーレイ：CIOverlayBlendMode
 マスク画像：ARFrame.segmentationBuffer
@@ -512,6 +548,23 @@ let kernel = try! CIColorKernel(
 
 - 反転ハイパスによる化粧フィルタをCIFilterで提供
 - 60fps
+- CIFilter互換
+
+---
+
+# noppefoxwolf/SkinSmoothingFilter
+
+```swift
+let filter = SkinSmoothingFilter()
+
+filter.setValue(inputImage, forKey: kCIInputImageKey)
+
+filter.setValue(maskImage, forKey: kCIInputMaskImageKey)
+
+filter.setValue(10.0, forKey: kCIInputAmountKey)
+
+self.imageView.image = UIImage(ciImage: filter.outputImage)
+```
 
 ---
 
