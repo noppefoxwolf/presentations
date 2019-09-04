@@ -11,10 +11,10 @@ autoscale: true
 
 # noppe
 
+- @noppefoxwolf
 - DeNA inc
 - **Pococha**
 - 💖🦊
-- Github: noppefoxwolf
 
 ![right fill](profile.png)
 
@@ -29,8 +29,12 @@ autoscale: true
 # Pococha
 
 - **ソーシャルライブサービス**
-- アイテムによる動画演出 ( iOSDC 2018 )
-- デジタル化粧による映像補正　←　今日の話
+- Metalを使った動画演出実装
+  ↑　iOSDC 2018
+- デジタル化粧による映像補正
+  ↑　今日の話
+
+![right fit autoplay loop](item_movie.mov)
 
 ^ 生放送を通してコミュニケーションをする
 
@@ -48,10 +52,30 @@ autoscale: true
 
 - 主にセルフィーアプリや、ライブアプリで採用されることが多い
 
+- PocochaではSenseME®を利用
+
 ![right fit autoplay loop](preview.mov)
 
 ^ デジタル化粧という言葉に明確な定義がないので本トークでは、「映像を加工する事でリアルタイムに補正をかける技術」と定義します。
 ^ セルフィーアプリや、ライブアプリで採用されることが多いので見たことがある方も多いのでは無いでしょうか？
+^ 右側に出ているのはPocochaのフィルタ調整画面です。
+^ 極端にならないようにしているのでよくみてください
+^ そもそもPocochaはどうしているかというと、SenseMEというSDKを利用しています。
+
+---
+
+# SenseME®
+
+- SenseTime Group Ltd
+- **Pocochaで利用中**
+- 有料
+
+![right fit](senseME.png)
+
+^ SenseMEについてはDeNAとSenseTime社の業務提携の記事があるので詳細はそちらをご覧ください。
+
+[.slidenumbers: false]
+[.footer: [DeNAとSenseTimeが業務提携 | 株式会社ディー・エヌ・エー【DeNA】](https://dena.com/jp/press/004432)]
 
 ---
 
@@ -63,28 +87,36 @@ autoscale: true
 
 - 現実では出来ないメイクが出来る
 
-^ 実際にメイクせずに撮影を開始することができるので、利用までのハードルが低い
 ^ デジタル化粧にはどんな利点があるでしょうか
+^ 実際にメイクせずに撮影を開始することができるので、利用までのハードルが低い
+^ また、Undo/Redoや細かな調整ができる
 ^ では、具体的にどのような機能が世の中にはあるでしょうか？
 
 ---
 
 # デジタル化粧の機能種別
 
-- コスプレ
-- メイク
-- 整形
+^ では、具体的にどのような機能が世の中にはあるでしょうか？
+
+---
+
+![fill](types.png)
 
 ^ 今日は大きく３つに分けてみました。
+^ 他にもありますが。
+^ コスプレは、顔にステッカーを貼ったりして仮装する機能
+^ メイクは、顔のトーンやシミなどを消す機能
+^ 整形は、輪郭などを補正する機能です
 ^ そして、今日はこの３つの実装方法を紹介します。
 ^ それぞれの実装をしていく前に共通する技術の選定をします。
 
 ---
 
-# 実装に必要な技術
+# デジタル化粧に必要な基礎技術
 
-- 顔認識
+- 顔の位置推定
 - シェーディング
+- センス
 
 ^ これらは、顔認識とシェーダーによる処理によって実現できます。
 ^ そこで、まずはiOSにおける顔認識をどのように行うかを決めましょう。
@@ -93,8 +125,11 @@ autoscale: true
 
 # 顔認識技術の選定
 
-・ CIDetector　・Vision
-・ ARKit　・MLKit ・SenseMe ...etc
+・CIDetector
+・Vision.framework
+・ARKit
+・MLKit
+・others ...
 
 ^ iOSでは、標準でいくつかの顔認識をすることができるフレームワークがあります。
 ^ また、サードパーティのライブラリも存在します。
@@ -106,7 +141,9 @@ autoscale: true
 
 - iOS 5.0+
 - 10fps (iPhoneX)
-- 鼻や目の位置は取れるが輪郭は取れない
+- 簡単な鼻や目の位置は取れるが輪郭は取れない
+
+![right fill autoplay loop](IMG_4631.TRIM.MOV)
 
 ^ 笑っているか
 
@@ -116,8 +153,10 @@ autoscale: true
 
 - iOS 11.0+
 - 10fps (iPhone X)
-- 特徴点 72 points
+- 特徴点 65, 76 points
 - 各部位の輪郭と位置が取れる
+
+![right fill autoplay loop](IMG_4637.TRIM.MOV)
 
 ^ つまり、口なら口の位置だけで無く唇の輪郭も取ることもできます。
 
@@ -127,30 +166,17 @@ autoscale: true
 
 - Firebase
 - 無料
-- 15fps (iPhone X)　若干遅延があり
+- 15fps (iPhone X)
 - 特徴点 132 points
 - 各部位の輪郭と位置が取れる
 
-![right fit](mlkit.png)
+![right fit](mlkit_preview.png)
 
-^ https://firebase.google.com/docs/ml-kit/detect-faces?hl=ja
-^ https://firebase.google.com/docs/ml-kit/face-detection-concepts
+[.slidenumbers: false]
 
----
+[.footer: [Face Detection | Firebase](https://firebase.google.com/docs/ml-kit/detect-faces)]
 
-# SenseMe
-
-- SenseTime Group Ltd
-- **Pocochaで利用中**
-- 有料
-- 60fps
-- 特徴点 106 points
-- メイクや整形なども出来る全部乗せ
-
-![right fit](senseme.jpg)
-
-^ https://dena.com/jp/press/004432
-^ 類似のSDKもあるので、興味がある人はask the speakerで
+^ 若干遅延があり
 
 ---
 
@@ -160,10 +186,12 @@ autoscale: true
 - 60fps
 - 1220 points
 - 三次元空間の特徴点しか取れない
+- **輪郭や位置は取れない**
 
+![right fill autoplay loop](IMG_4633.TRIM.MOV)
+
+^ ３次元空間の特徴点だけなので、画面上のどこかは取れない
 ^ 口とか鼻の位置は分からない。シミュレータで使えない
-
-![right fit](arkithero_1280x960.jpg)
 
 ---
 
@@ -173,14 +201,14 @@ autoscale: true
 
 # 比較
 
-|名称|価格|fps|landmark|
-|---|---|---|---|
-|CIDetector|**無料**|10|△|
-|Vision|**無料**|10|⭕|
-|MLKit|**無料**|15|⭕|
-|SenseMe|有料|**60**|⭕|
-|ARKit|**無料**|**60**|×|
+|名称|fps|landmark|対応機種|
+|---|---|---|---|---|
+|CIDetector|10|△|◎|
+|Vision|10|⭕|○|
+|MLKit|15|⭕|○|
+|ARKit|**60**|×|△|
 
+^ 処理時間が短いほどライブなどのリアルタイム処理に向いています
 ^ 全部どりというのは無いというのが現実
 ^ ここにさらに対応機種などの縛りを入れていくと中々難しくなるのですが、未来の話をしましょう。
 ^ 有料で良いならSenseMeなどのSDKを購入するのが手早い
@@ -210,11 +238,24 @@ autoscale: true
 
 # シェーディング
 
+---
+
+# シェーディング
+
+- CoreImage
+- MetalKit
+- GLKit
+- GPUImage
+- MetalPetal
+
+---
+
 **CoreImage.framework**
 
-Metal Shader Languageを使ってフィルタが書けるフレームワーク
-CIFilter使えば重ねがけが楽
-標準フィルタも充実している(200種類くらい)
+- Metal Shader Languageを使ってフィルタが書ける
+- 標準フレームワーク
+- CIFilter使えば重ねがけが楽
+- 標準フィルタも充実している(200種類くらい)
 
 ^ 今回はなるべく標準フィルタ使いながら実装していく
 
@@ -234,7 +275,7 @@ CIFilter使えば重ねがけが楽
 
 - 今回は動物のスタンプを顔に表示してみましょう。
 
-<!-- ビデオ -->
+![right fill autoplay loop](IMG_4642.TRIM.MOV)
 
 ---
 
@@ -242,11 +283,38 @@ CIFilter使えば重ねがけが楽
 
 ---
 
+# ARKitのカメラ映像を受け取る
+
+```swift
+
+extension ViewController: ARSessionDelegate {
+
+  func session(_ session: ARSession, didUpdate frame: ARFrame) {
+
+    let pixelBuffer: CVPixelBuffer =  frame.capturedImage
+
+    let ciImage: CIImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+    // Do something
+
+  }
+  
+}
+```
+
+^ ARSessionDelegateからCVPixelBufferを受け取ることができる
+
+---
+
+[.background-color: #000000]
+
 ![fit](IMG_0048.PNG)
 
 ^ 映像と位置を調整したスタンプ画像を合成する
 
 ---
+
+[.background-color: #000000]
 
 ![fit](IMG_0049.PNG)
 
@@ -254,9 +322,13 @@ CIFilter使えば重ねがけが楽
 
 ---
 
+[.background-color: #000000]
+
 ![fit](IMG_0050.PNG)
 
 ---
+
+[.background-color: #000000]
 
 ![fit](IMG_0051.PNG)
 
@@ -526,6 +598,8 @@ warpGeometryOutput = warpGeometryFilter.outputImage!
 ```
 
 ---
+
+[.background-color: #000000]
 
 ![fit](IMG_0056.PNG)
 
