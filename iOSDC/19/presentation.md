@@ -172,10 +172,6 @@ autoscale: true
 
 ![right fit](mlkit_preview.png)
 
-[.slidenumbers: false]
-
-[.footer: [Face Detection | Firebase](https://firebase.google.com/docs/ml-kit/detect-faces)]
-
 ^ 若干遅延があり
 
 ---
