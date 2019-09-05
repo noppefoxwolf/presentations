@@ -363,6 +363,7 @@ transformedStickerImage.composited(over: inputImage)
 - 肌質を滑らかにするフィルタを書いてみましょう
 - Photoshopのチュートリアルを探すのがオススメ
 
+![right fit](result.png)
 
 ^ これ系の処理はPhotoshopのチュートリアルが参考になります。
 ^ https://www.creativebloq.com/tutorial/high-pass-skin-smoothing-photoshop-812591
@@ -536,7 +537,28 @@ kernel.apply(image ~~)
 
 ---
 
-![](IMG_0043.PNG)
+[.background-color: #000000]
+![fit](pipeline.png)
+
+---
+
+[.background-color: #000000]
+![fit](pipeline2.png)
+
+---
+
+[.background-color: #000000]
+![fit](pipeline3.png)
+
+---
+
+[.background-color: #000000]
+![fit](pipeline4.png)
+
+---
+
+[.background-color: #000000]
+![fit](pipeline5.png)
 
 ---
 
@@ -582,13 +604,22 @@ self.imageView.image = UIImage(ciImage: filter.outputImage)
 
 # 処理の過程
 
-- 顔認識で輪郭を取得
+- 顔の位置を取得
 - 頬の周辺のピクセル**だけ**を引き寄せる
 
 ![right fill](IMG_0053.PNG)
 
-^ 歪ませることをWarpやDistortionというCIFilterは無い
-^ 自作してたけど、結構難しい
+---
+
+# 画像を歪ませる方法
+
+- CICategoryDistortionEffect
+- CIWarpKernel
+
+^ CIFilterにはいくつかの歪みフィルタが用意されています。
+^ ただ、今回の用途には合わない
+^ CIWarpKernelは自分でMSLを書くことで、歪みフィルタを書くことができる。
+^ ただし、自分で計算しないといけない。
 
 ---
 
@@ -664,6 +695,7 @@ warpGeometryOutput = warpGeometryFilter.outputImage!
 # noppefoxwolf/iOSDC19-Example
 
 - 今日のデモで使ったもの
+- 各フィルタと顔検出のサンプル
 
 ---
 
@@ -672,13 +704,34 @@ warpGeometryOutput = warpGeometryFilter.outputImage!
 - 特殊な知識が無くても、デジタル化粧は作れるようになってきた
 - 3つのOSSを公開しました
 
+---
+
+# プロダクトへの応用ヒント
 
 ---
 
-# プロダクトへの応用難易度
+# リアルタイムに処理する必要があるか否か
 
-ソーシャルライブにおけるデジタル化粧は、自然さや外れないことも重要
-その瞬間に映像は配信されるので求められる品質は非常に高い
+- リアルタイムに処理する必要がなければVision.frameworkやMLKitは向いている
+
 
 ---
 
+# アルバムから選んだメディアを処理する必要があるか
+
+- ARKitは物理空間で測定するので、記録されたメディアからは顔検出できない
+
+---
+
+# 録画する必要があるか
+
+- 最終的にSampleBufferとして書き出すかに注意。ステッカーなどは見た目だけなら重ねるだけでも実現できる。
+
+---
+
+# ご清聴ありがとうございました
+
+|||
+|---|---|
+| Ask the speaker | この後 |
+| DeNA ブース | この後 |
