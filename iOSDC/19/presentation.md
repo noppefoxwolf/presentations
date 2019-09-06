@@ -712,8 +712,9 @@ warpGeometryOutput = warpGeometryFilter.outputImage!
 
 # リアルタイムに処理する必要があるか否か
 
-- リアルタイムに処理する必要がなければVision.frameworkやMLKitは向いている
+- リアルタイムに処理する必要がなければVision.frameworkやMLKitは向いている場合がある
 
+^ 取れる情報量が違うので
 
 ---
 
@@ -729,9 +730,11 @@ warpGeometryOutput = warpGeometryFilter.outputImage!
 
 ---
 
-# ご清聴ありがとうございました
+# 関連トーク
 
 |||
 |---|---|
-| Ask the speaker | この後 |
-| DeNA ブース | この後 |
+| Ask the speaker | 14:00 ~ |
+| DeNA ブース | - |
+
+^ iOSDCではシェーダやCIImageのトークもあるので合わせて見てみてください
