@@ -1,6 +1,35 @@
 slidenumbers: true
 autoscale: true
 
+---
+
+# 確認用スライド
+
+- iPad接続
+- iPadスクリーンに出るか
+- iPadの通信OFF(Bluetoothはオン)
+- 明るさ
+- 端切れしないか
+
+---
+
+# 確認用スライド２
+
+test
+
+![right fill](profile.png)
+
+---
+
+
+# 確認用スライド３
+
+test
+
+![autoplay loop right fill](item_movie.mov)
+
+---
+
 # ソーシャルライブサービスにおけるデジタル化粧の仕組みと実装
 
 ## noppe at DeNA
@@ -685,6 +714,7 @@ warpGeometryOutput = warpGeometryFilter.outputImage!
 
 ^ これを使って整形するわけですが、顔の角度とかを考え始めると大変なので一回顔を切り抜きます。
 ^ ここの座標はAR2DFaceDetectorが提供しているので渡すだけです。
+^ ※：実演ROMはデフォが有効！！
 
 ---
 
