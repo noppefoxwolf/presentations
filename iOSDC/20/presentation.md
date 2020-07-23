@@ -1,14 +1,138 @@
 # google/mediapipe で始めるARアプリ開発
 
+<!-- 
+mediapipeって何？何ができるの？
+もしかしてMLとかいうやつ？難しそう
+デモ
+他にもこんなことができます。
+これからこんな解説をします。
+・ビルドの仕方
+・使ってみる
+・ARKitとの連携
+・できること、できないこと
+ゴール
+mediapipeとARKitを使ってアプリを作る
+ -->
+
 ## レギュラートーク（20分）
 
 ### noppe
 
+<!-- 今日はgoogle/mediapipeを使ったARアプリの開発についてトークをします。 -->
+<!-- 私はnoppeという名前で、DeNAでライブ配信アプリのエンジニアをしていたり、個人でVTuber向けの自撮りアプリを開発しています。 -->
 ---
 
-自己紹介
-DeNA/Pococha
-vear
+# What's mediapipe
+
+---
+
+# google/mediapipe
+
+- クロスプラットフォームのMLパイプライン構築ソリューション
+
+![inline](mediapipe_small.png)
+
+<!-- これ自体はiOSのフレームワークだったりするわけではなく、mediapipeを使って構築したパイプラインをビルドしてiosのフレームワークを作る事になります。 -->
+
+---
+
+# google/mediapipe
+
+ML推論は１つで完結しないため、前後の処理を繋げる必要がある。
+これらを簡単に記述できる。
+
+---
+
+# MLって難しいやつでしょ👋
+
+<!-- こう思うと思います。 -->
+
+---
+
+# google/mediapipe
+
+すぐに使えるパイプラインが実装されている
+
+---
+
+# デモ
+
+---
+
+# 豊富な実装
+
+![inline](solutions.png)
+
+---
+
+# アジェンダ
+
+- mediapipeでのビルド方法
+    - ハンドトラッカーのフレームワークを作る
+- ARKitとの連携
+- できる事・できない事
+
+---
+
+# mediapipeのビルド方法
+
+- bazelbuild/bazel
+ビルドツール
+
+- bazelbuild/tulsi
+xcodeproj生成ツール
+
+<!-- bazel自体はmediapipe専用のツールというわけではなく、汎用的なビルドツール -->
+<!-- bazelを実行するRunScriptを持つxcodeprojを生成する -->
+
+---
+
+# ハンドトラッカーフレームワークを作る
+
+---
+
+# bazelの簡単な使い方
+
+- コードを書く
+- BUILDファイルに成果物の情報や依存性などを記述する
+- bazel buildする
+- ipaやframeworkが出来上がる
+
+---
+
+# コードを書く
+
+- HandTracker.h,mm
+
+---
+
+# BUILDファイル書く
+
+---
+
+# bazel buildする
+
+---
+
+# frameworkが出来上がる
+
+- githubに置いておきました
+
+---
+
+# ARKitとの連携
+
+- RealityKit
+
+---
+
+<!-- mediapipeはgoogleによる、ternsorflowのパイプラインを提供するOSSプロジェクトです。 -->
+
+<!-- mediapipeを使う事で、複雑なパイプライン処理を簡潔に記述することが出来ます。 -->
+
+---
+
+<!-- またmediapipeは一般的な課題を解決するためのパイプラインが事前に実装されており、次のような機能をすぐに利用することができます。 -->
 
 ---
 
