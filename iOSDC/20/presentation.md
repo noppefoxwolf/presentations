@@ -122,7 +122,21 @@ xcodeproj生成ツール
 
 # ARKitとの連携
 
-- RealityKit
+RealityKitで
+
+- arView.sessionを使ってcaptureImageを取り出す
+- PixelFormatを変換
+- HandTrackerの推論を利用する
+
+---
+
+# できる事出来ない事かまとめ
+
+
+---
+---
+
+以下めも
 
 ---
 
