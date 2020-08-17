@@ -1,3 +1,5 @@
+slidenumbers: true
+
 # google/mediapipe で始めるARアプリ開発
 
 <!-- 
@@ -18,40 +20,51 @@ mediapipeとARKitを使ってアプリを作る
 
 ### noppe
 
-<!-- 今日はgoogle/mediapipeを使ったARアプリの開発についてトークをします。 -->
+^ 今日はmediapipeを使ったARアプリの開発についてトークをします
+
+
+---
+
+# noppe
+
+- DeNA
+- vear
+  ReplayKitでスマホから配信できるVTuberアプリ
+
+![right fit](profile.png)
+
 <!-- 私はnoppeという名前で、DeNAでライブ配信アプリのエンジニアをしていたり、個人でVTuber向けの自撮りアプリを開発しています。 -->
----
-
-# What's mediapipe
 
 ---
 
-# google/mediapipe
+# mediapipe とは？
 
-- クロスプラットフォームのMLパイプライン構築ソリューション
-
-![inline](mediapipe_small.png)
-
-<!-- これ自体はiOSのフレームワークだったりするわけではなく、mediapipeを使って構築したパイプラインをビルドしてiosのフレームワークを作る事になります。 -->
+<!-- そもそもmediapipeとは何でしょうか -->
 
 ---
 
-# google/mediapipe
+# github.com/google/mediapipe
 
-ML推論は１つで完結しないため、前後の処理を繋げる必要がある。
-これらを簡単に記述できる。
+ブロックのようにMLの処理を繋げてパイプライン（Graph）を構築するツール
 
----
+- 手のトラッキングであれば
+  "手のひらを見つける"→"指の関節を見つける"
 
-# MLって難しいやつでしょ👋
-
-<!-- こう思うと思います。 -->
+![right](graph.png)
 
 ---
 
-# google/mediapipe
+# github.com/google/mediapipe
 
-すぐに使えるパイプラインが実装されている
+繋げる処理（Culculator）は、実装済みの物が使える
+
+---
+
+# github.com/google/mediapipe
+
+構築したGraphはフレームワークとしてビルドすることができる
+
+→自分のアプリに組み込むことができる
 
 ---
 
@@ -59,50 +72,146 @@ ML推論は１つで完結しないため、前後の処理を繋げる必要が
 
 ---
 
-# 豊富な実装
+# 実装済みのGraph
 
-![inline](solutions.png)
+これらの実装はすぐに使える
+
+今日はこれを使う流れを解説
+
+![right fit](solutions.png)
 
 ---
 
 # アジェンダ
 
-- mediapipeでのビルド方法
-    - ハンドトラッカーのフレームワークを作る
+- フレームワークのビルド
 - ARKitとの連携
 - できる事・できない事
 
 ---
 
-# mediapipeのビルド方法
+# フレームワークのビルド
+
+---
+
+# フレームワークのビルド
+
+デモで紹介したハンドトラッカーをフレームワークとしてビルド
+後半はこのフレームワークを使ってARKitと連携します
+
+---
+
+# フレームワークのビルド
+
+ビルドツールを使ってビルドを行う
 
 - bazelbuild/bazel
-ビルドツール
 
+---
+
+# フレームワークのビルド
+
+Xcodeでもビルドができる[^tulsi]
 - bazelbuild/tulsi
-xcodeproj生成ツール
+
+[^tulsi]:BuildPhaseScriptでbazelを叩くだけなので、必須ではない
 
 <!-- bazel自体はmediapipe専用のツールというわけではなく、汎用的なビルドツール -->
 <!-- bazelを実行するRunScriptを持つxcodeprojを生成する -->
 
 ---
 
-# ハンドトラッカーフレームワークを作る
+# ビルドの流れ
 
----
-
-# bazelの簡単な使い方
-
-- コードを書く
+- ObjCでコードを書く
 - BUILDファイルに成果物の情報や依存性などを記述する
-- bazel buildする
+- bazelでbuildする
 - ipaやframeworkが出来上がる
 
 ---
 
-# コードを書く
+# ObjCでコードを書く
 
-- HandTracker.h,mm
+---
+
+# ObjCでコードを書く
+
+1. binarypbを読み込んでMPPGraphを作る
+2. MPPGraphを開始する
+3. MPPGraphに画像を送る
+4. delegateで結果を受け取る
+
+^ binarypbって何？
+
+---
+
+# binarypbを読み込んでMPPGraphを作る
+
+```objc
+NSURL* url = [NSURL ...@"hand_landmarks.binarypb"];
+
+NSData* data = [NSData dataWithContentsOfURL:url options:0 error:nil];
+
+mediapipe::CalculatorGraphConfig config;
+
+config.ParseFromArray(data.bytes, data.length);
+
+MPPGraph* graph = [[MPPGraph alloc] initWithGraphConfig:config];
+```
+
+---
+
+# MPPGraphを開始する
+
+Graph内で利用する各種コンポーネントの初期化が行われる
+
+```objc
+[graph startWithError: nil];
+```
+
+---
+
+# MPPGraphに画像を送る
+
+```objc
+- (void)sendPixelBuffer:(CVPixelBufferRef)pixelBuffer {
+    [self.mediapipeGraph sendPixelBuffer:pixelBuffer
+                              intoStream:@"input_video"
+                              packetType:MPPPacketTypePixelBuffer];
+}
+```
+
+---
+
+# delegateで結果を受け取る
+
+```objc
+- (void)mediapipeGraph:(MPPGraph*)graph
+       didOutputPacket:(const ::mediapipe::Packet&)packet
+            fromStream:(const std::string&)streamName
+{
+    const auto& timestamp = packet.Timestamp().Value();
+
+    const auto& landmarks = packet.Get<::mediapipe::NormalizedLandmarkList>();
+}
+```
+
+---
+
+# NormalizedLandmarkListの構造
+
+```
+message NormalizedLandmarkList {
+  repeated NormalizedLandmark landmark = 1;
+}
+
+message NormalizedLandmark {
+  optional float x = 1;
+  optional float y = 2;
+  optional float z = 3;
+  optional float visibility = 4;
+}
+```
 
 ---
 
@@ -110,88 +219,219 @@ xcodeproj生成ツール
 
 ---
 
-# bazel buildする
+# BUILDファイルとは
+
+bazelでビルドするファイルや依存関係を記述したファイル
+
+---
+
+```
+objc_library(
+    name = "HandTrackerLibrary",
+    hdrs = ["HandTracker.h"],
+    srcs = ["HandTracker.mm"],
+    data = [
+      hand_tracking:hand_tracking_mobile_gpu_binary_graph",
+      ...
+    ],
+    deps = [
+        "//mediapipe/objc:mediapipe_framework_ios",
+        "//mediapipe/objc:mediapipe_input_sources_ios",
+        "//mediapipe/graphs/hand_tracking:mobile_calculators",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+    ],
+    ),
+)
+```
+
+---
+
+# bazelでビルドする
+
+```
+$ bazel build mediapipe/iosdc:HandTracker
+```
 
 ---
 
 # frameworkが出来上がる
 
-- githubに置いておきました
+githubに置いておきました
+
+https://github.com/noppefoxwolf/HandTracker
 
 ---
 
 # ARKitとの連携
 
-RealityKitで
+---
 
-- arView.sessionを使ってcaptureImageを取り出す
+# ARKitとの連携
+
+ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解放できる
+
+- ARKit非対応アプリも対応させる
+- AR空間上のオブジェクトを手で操作する
+- 検出したオブジェクトの横にキャラクターを配置する
+- 顔の骨格を補正しながら髪色を変える[^hair]
+
+[^hair]:Hair Segmentationは現状iOS非対応ですが
+
+---
+
+# ARKitとの連携アプリ開発
+
+こんなものを作ります
+
+---
+
+# 動画
+
+---
+
+# ARKit連携の流れ
+
+- ARSessionDelegateを使ってcaptureImageを取り出す
 - PixelFormatを変換
-- HandTrackerの推論を利用する
+- Trackerへ送る
+- Delegateで結果を受け取って何かする
 
 ---
 
-# できる事出来ない事かまとめ
+# ARSessionDelegateを使ってcaptureImageを取り出す
 
+ARKitでカメラから取り込まれた映像を取り出すことができます
 
----
----
-
-以下めも
-
----
-
-<!-- mediapipeはgoogleによる、ternsorflowのパイプラインを提供するOSSプロジェクトです。 -->
-
-<!-- mediapipeを使う事で、複雑なパイプライン処理を簡潔に記述することが出来ます。 -->
+```swift
+// ARSessionDelegate
+func session(_ session: ARSession, didUpdate frame: ARFrame) {
+  let captureImage = frame.capturedImage
+}
+```
 
 ---
 
-<!-- またmediapipeは一般的な課題を解決するためのパイプラインが事前に実装されており、次のような機能をすぐに利用することができます。 -->
+# PixelFormatを変換
+
+pixelformatとは、画像データがどのように格納されているかを表している。
+
+ARKitではYUV420形式
+mediapipeはBGRAのみを受け取れる
+→変換の必要がある
 
 ---
 
-# mediapipeで出来ること
-- basic
-普通のやつ
-- advance
-頑張ればこういうのも出来る
-- technicue
-応用すればARKitとも…
+# BGRA
+
+1ピクセル32bitで表現するフォーマット
+
+B:FF G:FF R:FF A:FF -> 白
 
 ---
 
-# mediapipeのセットアップ
-- bazel
-- tulsi
-- 実行まで
+# YUV420
+
+２枚のY, CbCrの組み合わせで１フレームを表現するフォーマット
+
 
 ---
 
-# arkitとのインテグレーション
-- ARKitの抜け道
-- argbの変換
-- mediapipeとの連結
+# YUV420からBGRAへの変換
+
+- vImage
+- Metal Shader
+
+GPUを使う分Metalの方が高速
 
 ---
 
-# ハンドトラッキングの連携
+# YUV420からBGRAへの変換
 
-x,y,zの説明
-https://github.com/google/mediapipe/issues/742
-全て正規化されている
+次の計算式で変換ができる
 
-landmarkの意味
-
-問題点
-    zが厄介、これ自体は手首の位置を表しているため
-    回転も取れない
-デプスを利用して解決出来る？
+![画像]()
 
 ---
 
-# OSSを公開します
-終わり
+# BlueDress
+
+YUV420からBGRAに高速コンバートするライブラリ
+
+https://github.com/noppefoxwolf/BlueDress
 
 ---
 
-https://fortee.jp/iosdc-japan-2020/proposal/10e8ee31-d3b9-493f-87a8-4cf6169dad5d
+# Trackerへ送る
+
+```swift
+let captureImage = frame.capturedImage
+let bgraCaptureImage = try! converter.convertToBGRA(imageBuffer: captureImage)
+handTracker.send(bgraCaptureImage)
+```
+
+---
+
+# Delegateで結果を受け取って何かする
+
+関節の位置はX,Y,Zで取れます…が、世界座標系では無く
+X,Y: Screen座標系
+Z: 手首からの奥行き
+しか取れません。残念！
+
+---
+
+# Delegateで結果を受け取って何かする
+
+今回はx,yの位置にEntityがあれば、isPressをtrueにする
+
+```swift
+func handTracker(_ handTracker: HandTracker!, didOutputLandmarks landmarks: [Landmark]!) {
+  let indexFinderPosition = landmarks[8]
+  let screenLocation: CGPoint = ...(indexFinderPosition)
+  self.isPress = arView
+    .entities(at: screenLocation)
+    .contains(where: { $0.id == self.buttonEntity.id })
+}
+```
+
+---
+
+あとRealityKitに設定
+
+![]()
+
+---
+
+# Delegateで結果を受け取って何かする
+
+```swift
+private func press() {
+  self.scene.notifications.press.post()
+  count += 1
+  changeText("\(count)")
+}
+```
+
+---
+
+![]()
+
+---
+
+# できる事できない事
+
+---
+
+# HandTracker
+
+世界座標系で取れるわけではない事に注意
+
+各関節の回転も取れない
+
+---
+
+# Links
+
+mediapipe
+
+awesome mediapipe
