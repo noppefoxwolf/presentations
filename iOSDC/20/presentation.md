@@ -439,7 +439,6 @@ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解
 ^ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解放することが出来る
 ^ やってること自体はvision.frameworkなどでARKitのサポートをするというのと変わらないのですが、やっぱりmediapipeの構築済みgraphがとにかく強力なので、やり方を知っておいて損はないかなと思います。
 
-
 ---
 
 # ARKitとの連携アプリ開発
@@ -454,7 +453,7 @@ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解
 
 # ARKit連携の流れ
 
-- ARSessionDelegateを使ってcaptureImageを取り出す
+- ARFrameからcaptureImageを取り出す
 - PixelFormatを変換
 - Trackerへ送る
 - Delegateで結果を受け取って何かする
@@ -463,66 +462,98 @@ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解
 
 ---
 
-# ARSessionDelegateを使ってcaptureImageを取り出す
+# ARFrameからcaptureImageを取り出す
 
-ARKitでカメラから取り込まれた映像を取り出すことができます
+ARSessionDelegateでカメラから取り込まれた映像を取り出せる
 
 ```swift
+arSession.delegate = self
+...
 // ARSessionDelegate
 func session(_ session: ARSession, didUpdate frame: ARFrame) {
-  let captureImage = frame.capturedImage
+  let captureImage: CVPixelBuffer = frame.capturedImage
 }
 ```
+
+^ ARSessionのDelegateを使うことで、カメラから取得した画像を取り出すことができます。
 
 ---
 
 # PixelFormatを変換
 
-pixelformatとは、画像データがどのように格納されているかを表している。
+画像データがどのように格納されているかを表している
 
-ARKitではYUV420形式
-mediapipeはBGRAのみを受け取れる
+- ARKitでは**YCbCr**形式
+- mediapipeは**BGRA**のみを受け取れる
 →変換の必要がある
+
+^ このARKitから取り出したPixelBufferはYCbCrというpixelFormatで返ってきます。
+^ PixelFormatは画像データがどのように格納されているのかを表しているのですが
+^ mediapipeはBGRAのみを受け取れるようになっているので、画像を変換する必要があります。
 
 ---
 
-# BGRA
+# kCVPixelFormatType_32BGRA
 
 1ピクセル32bitで表現するフォーマット
 
-B:FF G:FF R:FF A:FF -> 白
+B:FF G:00 R:00 A:FF → 赤
+
+^ BGRAは１ピクセルを32bitで表現するフォーマット
 
 ---
 
-# YUV420
+# kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
 
-２枚のY, CbCrの組み合わせで１フレームを表現するフォーマット
+2枚のY+CbCrの組み合わせで1フレームを表現するフォーマット
 
+軽量なのでビデオデータで使われることが多い
+
+<!-- Yが8bit、CbCrが半分のサイズの16bitなので軽量 -->
+
+^ YCbCrはこの場で解説すると長くなるので割愛しますが、ビデオ向けのフォーマットみたいなものです。
 
 ---
 
-# YUV420からBGRAへの変換
+# YCbCrからBGRAへの変換
 
-- vImage
-- Metal Shader
+- Accelerate
+  - vImage
+- Metal
+  - MSL
 
 GPUを使う分Metalの方が高速
 
+^ iOSでこれらを変換する場合、２つ方法があってAccelerateのvImageを使う方法とMetalを使う方法があります。
+^ 多分検索するとvImageの方が上に出てくるんですけど、これはCPUで計算するのであんまり早くないはずです。
+^ 今回はMetalで実装しました
+
 ---
 
-# YUV420からBGRAへの変換
+# YCbCrからBGRAへの変換
 
 次の計算式で変換ができる
 
-![画像]()
+```
+R = Y + 1.402 × Cr
+G = Y - 0.344136 × Cb - 0.714136 × Cr
+B = Y + 1.772 × Cb
+```
+
+^ YCbCrからRGBへの変換はこの計算式でできます。
+^ AlphaはYCbCrにはないので1を渡します。
 
 ---
 
 # BlueDress
 
-YUV420からBGRAに高速コンバートするライブラリ
+YCbCrからBGRAに高速コンバートするライブラリ
 
 https://github.com/noppefoxwolf/BlueDress
+
+^ 変換処理自体はそんなに難しくないのですが、Metalを使ったりするのでハードルを感じるかもしれません。
+^ ライブラリを作っておいたのでさくっと変換したいだけの人は使ってみてください。
+^ Xcode12以上でSwiftPMを使って導入できます。
 
 ---
 
@@ -534,6 +565,8 @@ let bgraCaptureImage = try! converter.convertToBGRA(imageBuffer: captureImage)
 handTracker.send(bgraCaptureImage)
 ```
 
+^ 変換したpixelBufferをトラッカーに送ります。
+
 ---
 
 # Delegateで結果を受け取って何かする
@@ -543,11 +576,16 @@ X,Y: Screen座標系
 Z: 手首からの奥行き
 しか取れません。残念！
 
+^ 最後にdelegateからmediapipeから推定された関節位置を取るのですが、ここではまりどころがあります。
+^ 位置はx,y,zを取ることが出来るのですが、これが所謂世界座標系ではありません。
+^ x,yはそれぞれスクリーン座標系で、zは手首からの奥行きを表しています。
+^ つまりカメラからどれくらいの距離に手があるのかというのは取れないわけです。
+
 ---
 
 # Delegateで結果を受け取って何かする
 
-今回はx,yの位置にEntityがあれば、isPressをtrueにする
+今回は人差し指の延長線上にEntityがあれば、isPressをtrueにする
 
 ```swift
 func handTracker(_ handTracker: HandTracker!, didOutputLandmarks landmarks: [Landmark]!) {
@@ -558,6 +596,11 @@ func handTracker(_ handTracker: HandTracker!, didOutputLandmarks landmarks: [Lan
     .contains(where: { $0.id == self.buttonEntity.id })
 }
 ```
+
+^ なので今回は人差し指の位置にentityがあるかどうかでタップ判定を出しています。
+^ 極論めっちゃ手前に手があってボタンが凄い奥にあっても押せてしまいますが、今回はデモなのでよしとします。
+^ あとさらっとentityと言ったのですが、今回はRealityKitを使って書いています。
+^ SceneKitやUnityでも同じ仕組みで同じことができます。
 
 ---
 
@@ -571,13 +614,21 @@ private func press() {
 }
 ```
 
+^ 人差し指の位置がentityに重なったら、RealityKitのpressを呼んでボタンを少し下に移動するアニメーションを実行します。
+^ あとカウンターをインクリメントしてテキストを更新します。
+
 ---
 
 ![](reality.png)
 
+^ RealityComposerはこんな感じで設定してます。
+^ おそらくあんまり使ったことないと思いますが、ここで設定したpressという文字列が直接Xcodeから補完して呼ぶことができます。
+
 ---
 
 ![]()
+
+^ このような流れで、RealityKitを使いながらmediapipeのハンドトラッキングを合わせて、指で操作するカウンターアプリを作ることができました。
 
 ---
 
@@ -585,18 +636,34 @@ private func press() {
 
 ---
 
-# HandTracker
+# 気になるところ
 
 世界座標系で取れるわけではない事に注意
+→Irisでは奥行きが取れる
 
 各関節の回転も取れない
+→自分で計算して自然に見せる工夫が必要
 
 フレームワークサイズがまぁまぁでかい
+→100MBくらい
 
 ---
 
-# Links
+# いいところ
 
-mediapipe
+OSS
+  質の良いモデルや処理が公開されている
+  処理に関する記事も公開されている
 
-awesome mediapipe
+マルチプラットフォーム
+
+^ やっぱりfpsがしっかり出たりこれだけ追従するのは、いろいろ似たようなものを漁っているけどmediapipeが一番なのでは
+
+---
+
+# やってみたいこと
+
+HairSegmentationなどをiOSに対応していないのは何故なのか調べたい
+リソースの問題なら自分で対応させてみたい
+
+---
