@@ -6,8 +6,8 @@ slidenumbers: true
 
 ### noppe
 
-^ はいこんにちは、こんばんはnoppeです
-^ 今日はmediapipeというツールを使ったARアプリの開発についてトークをします
+^ はいこんにちは、こんばんはnoppeと言います。
+^ 今日はgoogleのmediapipeというツールを使ったARアプリの開発についてトークをします
 
 ---
 
@@ -15,10 +15,11 @@ slidenumbers: true
 
 - ARアプリに興味がある
 - トラッキングに興味がある
-- 機械学習分からない人も大歓迎
+- 機械学習分からなくても問題ありません。
 
-^ 今日のトークはARアプリに興味がある人、オブジェクトのトラッキングに興味がある人大歓迎です
-^ そして、機械学習分からない人も大歓迎です。ちなみに機械学習は自分も分かってないです。
+^ 今日のトークの対象ですが
+^ ARアプリに興味がある人やオブジェクトのトラッキングに興味が方は是非聞いていただければと思います。
+^ また、mediapipeが機械学習に関するものだと知っている方は、難しい話をするのでは？と思っているかもしれませんが、今日は機械学習に関する話はしないので全く問題ありません。
 
 ---
 
@@ -33,10 +34,47 @@ slidenumbers: true
 
 - iOSDC18,19
 
+- きつねが好き
+
 ![right fill](profile.png)
 
-^ 株式会社DeNAでiOSアプリエンジニアをしているnoppeです
+^ 最初に自己紹介をさせてください。
+^ 株式会社DeNAでiOSアプリエンジニアをしているnoppeと言います。
 
+---
+
+![fit](pococha.png)
+
+^ 普段はソーシャルライブアプリのPocochaというアプリを開発しています。
+^ Pocochaでは、今回紹介するmediapipeは利用していませんが類似のMLエンジンを利用しています。
+^ 興味のある方は是非トークのあとでお聞きいただければと思います。
+
+---
+
+![fit](vear.png)
+
+^ また、個人開発でアバターを使ったVTuberアプリのvearを開発しています。
+^ 今回のトークはこのvearでmediapipeが使えないかと試した際の共有になります。
+
+---
+
+# noppe
+
+- 株式会社ディー・エヌ・エー
+  - ソーシャルライブアプリ Pococha
+
+- 個人開発者
+  - vear
+  ReplayKitでスマホから配信できるVTuberアプリ
+
+- iOSDC18,19
+
+- きつねが好き
+
+![right fill](profile.png)
+
+^ あとはiOSDC18,19で透過動画の再生手法やデジタル化粧に関するトークをしました。
+^ そしてきつねがとても好きで、今回は狐の姿で登壇します。
 
 ---
 
@@ -52,24 +90,34 @@ slidenumbers: true
 
 - 処理(Culculator)を繋げてパイプライン（Graph）を構築するツール
 
-- MLの処理も連結出来る
+- 主に画像処理のパイプライン構築に使われる
 
-- 手のトラッキングであれば
-  "手のひらを見つける"→"指の関節を見つける"
+- ML処理を混ぜ込む事が出来る
 
-![right](graph.png)
+^ mediapipeは画像処理を繋げてパイプラインを構築するツールです。
+^ 画像処理の部分をmediapipeではCulculator、パイプラインをGraphと言います。
+^ 似たようなライブラリにGPUImageやCIFilterがありますが、mediapipeは中間処理としてMLのCulculatorを混ぜ込むことができるのが特徴です。
 
-^ 処理を繋げてパイプラインを構築するツールです。
-^ CulculatorにはMLの処理を混ぜることもできます。
-^ 例えばハンドトラッキングを作る場合に、いきなり画像の中から親指の位置を見つけるのは大変なので手のひらを見つけるモデルで推定して、その位置から親指を探したりします。
-^ そういうのが完結に簡単にかけるっていうのがmediapipeの魅力です。
-^ 構築したグラフはvisualizerに食わせることができて、右手の画像みたいに出力することもできます。
+---
+
+![](pipeline.png)
+
+^ この図は顔の位置に赤い四角を描画するパイプラインを図解したものです。
+^ このように、MLによる顔の位置推定を画像処理の間に挟み込むことで入力から出力までを完結に書く事ができます。
+
+
+---
+
+![fit](graph.png)
+
+^ オブジェクト検出によっては複雑な処理分岐や合流、リトライなどが必要になります。
+^ mediapipeのグラフはvisualizerを使う事でこのような図として出力する事ができ、処理の流れを把握しやすく出来る点も利点と言えます。
 
 ---
 
 # mediapipe
 
-繋げる処理（Culculator）は、実装済みの物も使える
+Culculatorは、実装済みの物も使える
 
 - LuminanceCalculator
 RGBを受け取り、輝度画像を出力する
@@ -79,7 +127,7 @@ Sobelフィルタをかけた画像を出力する
 
 ...etc
 
-^ で、組み合わせていくCulculatorは自分で書くことも当然できるんですけど、既に結構mediapipeのリポジトリに実装済みのものがあります。
+^ 組み合わせていくCulculatorは自分で書くことも当然出来ますが、mediapipeのリポジトリには実装済みのCulculatorがいくつかあります。
 ^ 例えばLuminanceCalculatorは...
 ^ ソーベルは1次微分フィルタともいって画像のエッジを際立たせるんですけど、そういったフィルタもリポジトリに入ってます。
 ^ ソーベルだけだとエッジ抽出微妙だなぁって時にその前段で輝度上げて補正するみたいなことができるわけですね
@@ -106,7 +154,7 @@ Sobelフィルタをかけた画像を出力する
 
 [^ios]:一部iOSでは実装がないものもある
 
-^ さっきのは自分がGraphを組んだわけじゃなくて、mediapipeに含まれている実装です。
+^ さっきのは自分がGraphを組んだわけじゃなくて、mediapipeに含まれているグラフ実装です。
 ^ さっきの２つ以外にも構築済みのGraphがあるので、これらを使って入門するのがおすすめです。
 ^ 今日はこの構築済みGraphを使ってARアプリを作っていきます。
 
@@ -114,41 +162,43 @@ Sobelフィルタをかけた画像を出力する
 
 # アジェンダ
 
-- フレームワークのビルド
+- グラフのビルド
 - ARKitとの連携
 - できる事・できない事
 
 ^ 今日のアジェンダです。
-^ フレームワークのビルド方法が少し特殊なので、順を追って説明します。
+^ mediapipeをフレームワークとしてビルド際の方法が少し特殊なので、順を追って説明します。
 ^ 次に作ったフレームワークをARKitと連携する方法を解説
-^ 最後にまとめて終わろうと思います
+^ 最後にmediapipeで出来る事、出来ないことをまとめて終わろうと思います
 
 ---
 
-# フレームワークのビルド
+# グラフのビルド
 
 ---
 
-# github.com/noppefoxwolf/HandTracker/
+## github.com/noppefoxwolf/HandTracker
 
 今回使うソースコード
 
-^ 今回使うソースコードはここに置いているので、保管しながら聞いてもらえればと思います。
+![inline fit](handtracker_qr.png)
+
+^ 今回使うソースコードはgithubのnoppefoxwolf/HandTrackerに置いているので、是非コードをみながらトークを聞いてもらえればと思います。
 
 ---
 
-# mediapipe
+# Graph
 
-- 構築したGraphはフレームワークとしてビルドすることができる
+- 構築したGraphはバイナリとしてビルドすることができる
 
-→ 自分のアプリに組み込むことができる
+- バイナリをObjCから使う実装があるので、それらを使ってフレームワークを作る事ができる。
 
 - 今日はデモで紹介したハンドトラッカーをフレームワークとしてビルド
 
 ![right fit](framework.png)
 
-^ そして構築したGraphはビルドすることができます。
-^ mediapipeのサンプルはアプリ自体をビルドするものしかないので、勘違いしがちなんですけど、ちゃんと設定すればフレームワークとしてビルドできます。
+^ 最初にmediapipeのGraphについて触れましたが、Graphはバイナリとしてビルドすることができます。
+^ そして、そのバイナリをObjCから使う実装がmediapipeにはあるので、それらを使ってcocoaフレームワークを作る事ができます。
 ^ 今日はさっきデモしたハンドトラッカーをフレームワークとしてビルドしていきます。
 
 ---
@@ -159,7 +209,7 @@ Sobelフィルタをかけた画像を出力する
 
 ---
 
-# フレームワークのビルド
+# グラフのビルド
 
 ビルドツールを使ってビルドを行う
 
@@ -178,20 +228,23 @@ Track E - Ryo Aoyama
 
 ---
 
-# フレームワークのビルド
+# グラフのビルド
 
 bazelのインストールはスクリプト落としてきて実行するだけ
 
 ```sh
 curl -LO "https://.../bazel-3.2.0-installer-darwin-x86_64.sh"
+
 chmod +x "bazel-3.2.0-installer-darwin-x86_64.sh"
+
+./bazel-3.2.0-installer-darwin-x86_64.sh
 ```
 
-^ インストールは簡単で~
+^ インストールは簡単でbazelのスクリプト落としてきて実行するだけです
 
 ---
 
-# フレームワークのビルド
+# グラフのビルド
 
 Xcodeでもビルドができる[^tulsi]
 - bazelbuild/tulsi
@@ -204,9 +257,9 @@ Xcodeでもビルドができる[^tulsi]
 
 ---
 
-# フレームワークのビルド
+# グラフのビルド
 
-tulsiはビルドスクリプト叩くだけでインストールできる
+tulsiはビルドスクリプト叩くだけでインストールできる（要bazel）
 
 ```sh
 git clone git@github.com:bazelbuild/tulsi.git
@@ -223,59 +276,71 @@ git clone git@github.com:bazelbuild/tulsi.git
 - 時間
 - ネットワーク
 
-^ あとはXcodeと時間があれば大丈夫です、bazelはビルドのタイミングで依存性を取得してきたり、サブモジュールのビルドをしたりするので余裕を持って作業にかかりましょう
+^ あとはXcodeと時間があれば大丈夫です、bazelはビルドのタイミングで依存性を取得してきたり、サブモジュールのビルドをしたりするので時間に余裕を持って作業にかかりましょう
 
 ---
 
 # ビルドの流れ
 
-- ObjCでコードを書く
-- BUILDファイルに成果物の情報や依存性などを記述する
-- bazelでbuildする
-- ipaやframeworkが出来上がる
+1. フレームワークのコードを書く
+2. BUILDファイルに成果物の情報や依存性などを記述する
+3. bazelでbuildする
+4. frameworkが出来上がる
 
 ^ 準備ができたら、ビルドの流れを確認します。
-^ ObjCでコードを書きます、mediapipeが定義している構造体がC++のものだったりするので、これはしょうがないです。
-^ 次にBUILDファイルっていうのを書きます。bazelの設定ファイルみたいなやつです。
-^ 最後にビルドして、アプリとかフレームワークが出来上がっておしまい
+^ まずObjCでフレームワークのコードを書きます。グラフのバイナリを読み込んだり、画像を渡したりと言ったほとんどmediapipeのラッパーのような実装になりますが、mediapieはC++で書かれているため、ここでSwiftでも扱えるようにObjCの層を挟みます。
+^ 次にBUILDファイルを書きます。BUILDファイルはbazelの設定ファイルみたいなやつです。
+^ 最後にビルドしてフレームワークを生成します。
 
 ---
 
-# ObjCでコードを書く
+# フレームワークのコードを書く
 
 ---
 
-# ObjCでコードを書く
+# フレームワークのコードを書く
 
 1. binarypbを読み込んでMPPGraphを作る
 2. MPPGraphを開始する
 3. MPPGraphに画像を送る
 4. delegateで結果を受け取る
 
-^ こんな感じのコードを書いていきます。
-^ 構築したmediapipeのGraphはbinarypbという形式でバンドルされるので
+^ フレームワークはこんな感じのコードを書いていきます。
+^ 構築したmediapipeのGraphはbinarypbという形式でフレームワークバンドルされるので
 ^ これを読み込んでMPPGraphクラスのインスタンスを作ります
 ^ あとはMPPGraphを初期化して、画像を渡して推定結果を受け取るという流れになってます。
 
 ---
 
+![fit](framework_graph.png)
+
+^ これによって出来上がったフレームワークは図解するとこんな感じになります。
+^ mediapipeのラッパーを書く事でC++を隠蔽出来るので、Swiftから使ったりアプリの開発からbazelを切り離す事ができます。
+^ mediapipeのサンプルではアプリ自体もbazelで管理しているため、そのような開発方法が主流と思われがちですが、このようにフレームワークとしてビルドする事で通常のアプリに組み込みやすくなります。
+
+---
+
 # binarypbを読み込んでMPPGraphを作る
 
-[.code-highlight: 1]
-[.code-highlight: 2-4]
-[.code-highlight: 5]
+[.code-highlight: 2]
+[.code-highlight: 3-5]
+[.code-highlight: 6]
 
 ```objc
-NSURL* url = [NSURL ...@"hand_landmarks.binarypb"];
-NSData* data = [NSData dataWithContentsOfURL:url options:0 error:nil];
-mediapipe::CalculatorGraphConfig config;
-config.ParseFromArray(data.bytes, data.length);
-MPPGraph* graph = [[MPPGraph alloc] initWithGraphConfig:config];
++ (instanceType) init {
+  NSURL* url = [NSURL ...@"hand_landmarks.binarypb"];
+  NSData* data = [NSData dataWithContentsOfURL:url options:0 error:nil];
+  mediapipe::CalculatorGraphConfig config;
+  config.ParseFromArray(data.bytes, data.length);
+  self.graph = [[MPPGraph alloc] initWithGraphConfig:config];
+}
+
 ```
 
-^ まずはGraphを読み込んでいきます。
-^ urlのコードは適当ですが、実際はBundle.mainとかから取ってくる感じになると思います。
-^ そしてNSDataとして読み込んで、CalculatorGraphConfigにデータ配列を読ませます。
+^ ではまずはGraphを読み込んでいきます。
+^ このコードはフレームワークのクラスの初期化のタイミングに行うと良いかと思います。
+^ 手の検出に使われるhand_landmarkのグラフを読み込みます。グラフはbinarupb形式でバンドルされているのでBundle.mainなどから取り出します。
+^ そしてNSDataとして読み込み、CalculatorGraphConfigにデータ配列を読ませます。
 ^ 最後にCalculatorGraphConfigを使ってMPPGraphのインスタンスを作ります。
 
 ---
@@ -285,10 +350,13 @@ MPPGraph* graph = [[MPPGraph alloc] initWithGraphConfig:config];
 Graph内で利用する各種コンポーネントの初期化が行われる
 
 ```objc
-[graph startWithError: nil];
+- (void)start {
+  [graph startWithError: nil];
+}
+
 ```
 
-^ 実はMPPGraphはインスタンス作っただけだと、内部の処理が初期化されてなかったりするのでstartWithErrorというメソッドを呼んで初期化します。
+^ MPPGraphはインスタンス作っただけだと、内部の処理が初期化されないのでstartWithErrorというメソッドを呼んで初期化します。
 
 ---
 
@@ -302,10 +370,10 @@ Graph内で利用する各種コンポーネントの初期化が行われる
 }
 ```
 
-^ 次に画像を渡すメソッドを定義します。今はフレームワークを作っているので、Swiftから見えるように、こんな感じで定義しました。
+^ 次に画像を渡すメソッドを定義します。
 ^ 画像と言ったんですけど、ここで使うのはUIImageではなくてCVPixelBufferです。
 ^ CVPixelBufferはカメラとかでよく使う画像のクラスです。
-^ ヘッダにメソッドを書いておくのも忘れないようにしましょう。
+^ ここまで定義したメソッドは外部から呼べるようにヘッダにも書いておきましょう。
 
 ---
 
@@ -320,32 +388,15 @@ Graph内で利用する各種コンポーネントの初期化が行われる
 
     const auto& landmarks = packet.Get<::mediapipe::NormalizedLandmarkList>();
 
-    
+    NSArray *landmarkObjects = [self toObject: landmarks];
+
+    [delegate didOutputLandmarks: landmarkObjects];
 }
 ```
 
 ^ 最後にMPPGraphのDelegateで推論結果を受け取ります。
 ^ packetという型からタイムスタンプや推定結果の手の位置などが取れます。
 ^ ここで取れるのはC++の構造体なので、ここで一旦NSObjectを継承したクラスに詰め直したりして、Delegateで返してあげます。
-
----
-
-# NormalizedLandmarkListの構造
-
-```protobuf
-message NormalizedLandmarkList {
-  repeated NormalizedLandmark landmark = 1;
-}
-
-message NormalizedLandmark {
-  optional float x = 1;
-  optional float y = 2;
-  optional float z = 3;
-  optional float visibility = 4;
-}
-```
-
-^ ちなみにpacketから取れるNormalizedLandmarkListはこんな感じの構造になってます。
 
 ---
 
@@ -391,7 +442,7 @@ objc_library(
 
 ![fit](buildtree.png)
 
-^ ファイルの配置ですが、こんな感じでmediapipeの中に配置します。
+^ ファイルの配置ですが、BUILDファイル、ObjCのファイルをこんな感じでmediapipeの中に配置します。
 ^ 別々にすることも出来るのですが、今回は書くものを減らしたいので依存先を取りに行きやすいようにこう言った構造にしています。
 
 ---
@@ -413,8 +464,9 @@ githubに置いておきました
 
 https://github.com/noppefoxwolf/HandTracker
 
-^ 成功するとフレームワークをzipで固めたものが出来上がるのですが、今回は作っておいたものを事前にあげておきました。
-^ Carthageで簡単に入れられるので是非試してみてください。機能を足したり改造したい場合は先ほどの解説を参考にしてもらえればと思います。
+^ 成功するとフレームワークをzipで固めたものが生成されます。
+^ 今回は生成されたフレームワークをアップロードしておきました。Carthageで簡単に入れられるので是非試してみてください。
+^ 機能を足したり改造したい場合は先ほどの解説を参考にしてもらえればと思います。
 
 ---
 
@@ -428,7 +480,6 @@ https://github.com/noppefoxwolf/HandTracker
 
 ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解放できる
 
-- ARKit非対応アプリも対応させる
 - AR空間上のオブジェクトを手で操作する
 - 検出したオブジェクトの横にキャラクターを配置する
 - 顔の骨格を補正しながら髪色を変える[^hair]
@@ -436,8 +487,8 @@ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解
 [^hair]:Hair Segmentationは現状iOS非対応ですが
 
 ^ そもそも、ARKitとmediapipeを一緒に使うと何が嬉しいのかということですが
-^ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解放することが出来る
-^ やってること自体はvision.frameworkなどでARKitのサポートをするというのと変わらないのですが、やっぱりmediapipeの構築済みgraphがとにかく強力なので、やり方を知っておいて損はないかなと思います。
+^ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解放することが出来ます。
+^ やってること自体はvision.frameworkなどでARKitの補助をするというのと変わらないのですが、mediapipeの構築済みgraphがとにかく強力なので特に自分で学習モデルを作るのが難しい人にはおすすめの方法です。
 
 ---
 
@@ -447,16 +498,21 @@ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解
 
 ---
 
-# 動画
+![fit](demo2.gif)
+
+^ AR空間上にボタンを配置して、指で押すとカウントが増えるアプリを作ります。
 
 ---
 
 # ARKit連携の流れ
 
-- ARFrameからcaptureImageを取り出す
-- PixelFormatを変換
-- Trackerへ送る
-- Delegateで結果を受け取って何かする
+1. ARFrameからcaptureImageを取り出す
+2. PixelFormatを変換
+3. Trackerへ送る
+4. Delegateで結果を受け取る
+5. RealityKitのボタンを上下・カウントを表示
+
+![right fit](demo2.gif)
 
 ^ 連携の流れですが、こんな感じになります。
 
@@ -464,7 +520,7 @@ ARKitの仕様上出来ない事をmediapipeで補うことで、表現力を解
 
 # ARFrameからcaptureImageを取り出す
 
-ARSessionDelegateでカメラから取り込まれた映像を取り出せる
+- captureImage = カメラからの映像
 
 ```swift
 arSession.delegate = self
@@ -505,13 +561,13 @@ B:FF G:00 R:00 A:FF → 赤
 
 # kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
 
-2枚のY+CbCrの組み合わせで1フレームを表現するフォーマット
+- 2枚のY(8bit)+CbCr(16bit)の組み合わせで1フレームを表現するフォーマット
 
-軽量なのでビデオデータで使われることが多い
+- 軽量なのでビデオデータで使われることが多い
 
 <!-- Yが8bit、CbCrが半分のサイズの16bitなので軽量 -->
 
-^ YCbCrはこの場で解説すると長くなるので割愛しますが、ビデオ向けのフォーマットみたいなものです。
+^ YCbCrは2枚のY+CbCrの組み合わせで1フレームを表現するフォーマットです。軽量なのでビデオデータで使われることが多いです。
 
 ---
 
@@ -525,7 +581,7 @@ B:FF G:00 R:00 A:FF → 赤
 GPUを使う分Metalの方が高速
 
 ^ iOSでこれらを変換する場合、２つ方法があってAccelerateのvImageを使う方法とMetalを使う方法があります。
-^ 多分検索するとvImageの方が上に出てくるんですけど、これはCPUで計算するのであんまり早くないはずです。
+^ 多分検索するとvImageの方も上に出てくるんですけど、これはCPUで計算するのであんまり早くないはずです。
 ^ 今回はMetalで実装しました
 
 ---
@@ -538,6 +594,7 @@ GPUを使う分Metalの方が高速
 R = Y + 1.402 × Cr
 G = Y - 0.344136 × Cb - 0.714136 × Cr
 B = Y + 1.772 × Cb
+A = 1
 ```
 
 ^ YCbCrからRGBへの変換はこの計算式でできます。
@@ -552,7 +609,7 @@ YCbCrからBGRAに高速コンバートするライブラリ
 https://github.com/noppefoxwolf/BlueDress
 
 ^ 変換処理自体はそんなに難しくないのですが、Metalを使ったりするのでハードルを感じるかもしれません。
-^ ライブラリを作っておいたのでさくっと変換したいだけの人は使ってみてください。
+^ BlueDressというライブラリを作っておいたのでさくっと変換したいだけの人は使ってみてください。
 ^ Xcode12以上でSwiftPMを使って導入できます。
 
 ---
@@ -561,29 +618,38 @@ https://github.com/noppefoxwolf/BlueDress
 
 ```swift
 let captureImage = frame.capturedImage
-let bgraCaptureImage = try! converter.convertToBGRA(imageBuffer: captureImage)
+let bgraCaptureImage = converter.convertToBGRA(captureImage)
 handTracker.send(bgraCaptureImage)
 ```
 
-^ 変換したpixelBufferをトラッカーに送ります。
+^ 先ほどのBlueDressを使ってbgraのImageBufferを作り、トラッカーに送ります。
 
 ---
 
-# Delegateで結果を受け取って何かする
+# Delegateで結果を受け取る
 
 関節の位置はX,Y,Zで取れます…が、世界座標系では無く
 X,Y: Screen座標系
 Z: 手首からの奥行き
 しか取れません。残念！
 
-^ 最後にdelegateからmediapipeから推定された関節位置を取るのですが、ここではまりどころがあります。
+^ 最後にtrackerのdelegateからmediapipeから推定された関節位置を取るのですが、ここではまりどころがあります。
 ^ 位置はx,y,zを取ることが出来るのですが、これが所謂世界座標系ではありません。
 ^ x,yはそれぞれスクリーン座標系で、zは手首からの奥行きを表しています。
 ^ つまりカメラからどれくらいの距離に手があるのかというのは取れないわけです。
 
 ---
 
-# Delegateで結果を受け取って何かする
+![left fit](on.jpg)
+
+![right fit](out.jpg)
+
+^ そのため、映像の中で指がボタンに重なっているか否かで判定を行うことにしました。
+^ 極論とても手前に手があってボタンが凄い奥にあっても押せてしまいますが、今回はデモなのでよしとします。
+
+---
+
+# RealityKitのボタンを上下・カウントを表示
 
 今回は人差し指の延長線上にEntityがあれば、isPressをtrueにする
 
@@ -597,14 +663,13 @@ func handTracker(_ handTracker: HandTracker!, didOutputLandmarks landmarks: [Lan
 }
 ```
 
-^ なので今回は人差し指の位置にentityがあるかどうかでタップ判定を出しています。
-^ 極論めっちゃ手前に手があってボタンが凄い奥にあっても押せてしまいますが、今回はデモなのでよしとします。
-^ あとさらっとentityと言ったのですが、今回はRealityKitを使って書いています。
-^ SceneKitやUnityでも同じ仕組みで同じことができます。
+^ 重なりの判定は人差し指のx,yにentityがあるかどうかで判定します。
+^ これはARViewのentities(at:Point)を使うと簡単に実装できます。
+^ 今回はRealityKitを使っていますがSceneKitやUnityでも同じ仕組みで同じことができます。
 
 ---
 
-# Delegateで結果を受け取って何かする
+# RealityKitのボタンを上下・カウントを表示
 
 ```swift
 private func press() {
@@ -622,11 +687,13 @@ private func press() {
 ![](reality.png)
 
 ^ RealityComposerはこんな感じで設定してます。
-^ おそらくあんまり使ったことないと思いますが、ここで設定したpressという文字列が直接Xcodeから補完して呼ぶことができます。
+^ ここで設定したpressというメソッドをswiftから呼ぶ事ができます。
 
 ---
 
-![]()
+![left fit](demo.gif)
+
+![right fit](demo2.gif)
 
 ^ このような流れで、RealityKitを使いながらmediapipeのハンドトラッキングを合わせて、指で操作するカウンターアプリを作ることができました。
 
@@ -634,36 +701,58 @@ private func press() {
 
 # できる事できない事
 
+^ 最後に今回mediapipeを使ってみて感じた箇所を共有します。
+
 ---
 
 # 気になるところ
 
-世界座標系で取れるわけではない事に注意
+- HandTrackerはカメラからの距離が取れるわけではない事に注意
 →Irisでは奥行きが取れる
 
-各関節の回転も取れない
+- 各関節の回転も取れない
 →自分で計算して自然に見せる工夫が必要
 
-フレームワークサイズがまぁまぁでかい
+- フレームワークサイズがまぁまぁでかい
 →100MBくらい
+
+^ まず気になる点ですが、先ほど解説した通り手までの距離は取れない点には注意です。
+^ しかし、この点はirisという目の位置を推定するグラフでは取得できていたので今後のアップデートで取れるようになるかもしれません。
+
+^ 二つ目は各関節の回転が取れないという点。
+^ 例えばアバターなどに適用する場合に、微妙な関節の回転が必要になりますがこれは各関節の位置から自分で計算する必要があります。
+
+^ またフレームワークのサイズにも注意する必要があります。
+^ 今回の方法でビルドして100MB程度あったので、アプリサイズに対して大きなインパクトがあります。
 
 ---
 
 # いいところ
 
-OSS
-  質の良いモデルや処理が公開されている
-  処理に関する記事も公開されている
+- 実装済みのグラフが非常に質が高い
 
-マルチプラットフォーム
+- OSS
 
-^ やっぱりfpsがしっかり出たりこれだけ追従するのは、いろいろ似たようなものを漁っているけどmediapipeが一番なのでは
+- マルチプラットフォーム
+
+^ 次にmeidapipeの良い点ですが、今回のトークを通して分かったように実装済みのグラフが非常に高い品質である事が挙げられます。
+^ ハンドトラッカーSDKは世の中にいくつか存在しますが、その中でも精度が高く、fpsのスコアも良いと感じました。
+^ また、OSSである点から自分の用途にあった処理を構築しやすいところも魅力的です。
+^ mediapipeのブログでは、処理に関する記事も公開されているので非常に入門ハードルが低いとも言えます。
+^ そして今回は紹介しませんでしたが、androidやwebでも同じグラフを動作させる事ができます。
+^ firebaseのMLKitでも内部的に使われているようなので、安心して使う事ができるかと思います。
 
 ---
 
 # やってみたいこと
 
-HairSegmentationなどをiOSに対応していないのは何故なのか調べたい
-リソースの問題なら自分で対応させてみたい
+- HairSegmentationなどをiOSに対応していないのは何故なのか調べたい
+- NSObjectを経由しなければ高速化が望めるのでは
+- ランドマークだけを出力するグラフを作ってみたい
+
+^ 今後やってみたい事ですが、一部iOSに対応していないグラフがなぜ対応しないのかや、
+^ フレームワークにした際のパフォーマンスを最適化すると言ったことをしてみたいと考えています。
 
 ---
+
+# ご清聴ありがとうございました
