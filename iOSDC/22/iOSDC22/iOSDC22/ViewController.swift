@@ -6,63 +6,61 @@
 //
 
 import UIKit
-import SwiftUI
-import Combine
+import SnapKit
 
-class ViewController: UIViewController {
-    
+class SimplePixelArtEditViewController: UIViewController {
     let imageView: UIImageView = .init(frame: .null)
-    var cancellables: Set<AnyCancellable> = []
+    let context: CGContext = CGContext(data: nil, width: 16, height: 16, bitsPerComponent: 8, bytesPerRow: 16, space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)!
     
-    override func loadView() {
-        view = imageView
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        // 1
-//        imageView.backgroundColor = .systemBackground
-//        imageView.contentMode = .center
-//        imageView.image = UIImage(named: "watch")
         
-        // 2
-        imageView.backgroundColor = .systemBackground
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.magnificationFilter = .nearest
-        imageView.image = UIImage(named: "watch")
-        
-        let tapGesture = UITapGestureRecognizer()
-        imageView.isUserInteractionEnabled = true
-        imageView.addGestureRecognizer(tapGesture)
-        
-        func onTap() {
-            let imageSize = CGSize(width: 16, height: 16)
-            let targetView = tapGesture.view!
-            let location = tapGesture.location(in: targetView)
-            let x = Int(location.x * (imageSize.width / targetView.bounds.width))
-            let y = Int(location.y * (imageSize.height / targetView.bounds.height))
-            let point = CGPoint(x: x, y: y)
-            print(point)
+        view.backgroundColor = .secondarySystemBackground
+        view.addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(512)
         }
         
-        tapGesture.publisher(for: \.state).filter({ $0 == .ended }).sink { _ in
-            onTap()
-        }.store(in: &cancellables)
         
         
+        imageView.backgroundColor = .systemBackground
+        imageView.contentMode = .scaleToFill
+        imageView.layer.magnificationFilter = .nearest
+        imageView.isUserInteractionEnabled = true
         
+        let tapGesture = UITapGestureRecognizer()
+        tapGesture.addTarget(self, action: #selector(onTap))
+        imageView.addGestureRecognizer(tapGesture)
         
-        let context = CGContext(
-            data: nil,
-            width: 16,
-            height: 16,
-            bitsPerComponent: 8,
-            bytesPerRow: 1 * 16,
-            space: CGColorSpaceCreateDeviceGray(),
-            bitmapInfo: CGImageAlphaInfo.none.rawValue
-        )!
-        context.setFillColor(gray: 1, alpha: 1)
-        context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        context.setFillColor(CGColor(gray: 1, alpha: 1))
+        context.fill(CGRect(origin: .zero, size: CGSize(width: 16, height: 16)))
+    }
+    
+    @objc func onTap(_ tapGesture: UITapGestureRecognizer) {
+        let imageSize = CGSize(width: 16, height: 16)
+        let targetView = tapGesture.view!
+        let location = tapGesture.location(in: targetView)
+        let x = Int(location.x * (imageSize.width / targetView.bounds.width))
+        let y = Int(location.y * (imageSize.height / targetView.bounds.height))
+        let point = CGPoint(x: x, y: y)
+        context.setFillColor(CGColor(gray: 0, alpha: 1))
+        context.fill(CGRect(origin: point, size: CGSize(width: 1, height: 1)))
+        imageView.image = UIImage(cgImage: context.makeImage()!, scale: 1, orientation: .downMirrored)
+    }
+}
+        
+//        let context = CGContext(
+//            data: nil,
+//            width: 16,
+//            height: 16,
+//            bitsPerComponent: 8,
+//            bytesPerRow: 1 * 16,
+//            space: CGColorSpaceCreateDeviceGray(),
+//            bitmapInfo: CGImageAlphaInfo.none.rawValue
+//        )!
+//        context.setFillColor(gray: 1, alpha: 1)
+//        context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
         
 //
 //        CGContext(
@@ -74,8 +72,6 @@ class ViewController: UIViewController {
 //            space: CGColorSpaceCreateDeviceRGB(),
 //            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
 //        )!
-    }
-}
 
 extension CGContext {
     func fillEllipseLine(in rect: CGRect) {

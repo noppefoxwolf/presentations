@@ -1,28 +1,53 @@
 slidenumbers: true
 
-^ こんにちは、noppeです。株式会社ディー・エヌ・エーでiOSアプリエンジニアをしています。
-また、個人ではEditormodeというドット絵向けのデジタルイラストレーションアプリを開発しています。
-^ このアプリはCoreGraphicsとUIKitで作られています。
+# CoreGraphicsでドット絵を描こう
+## Track C レギュラートーク（20分）
+
+---
+
+# noppe
+
+![right](profile.png)
+
+- 株式会社ディー・エヌ・エー
+    - Pococha
+- 個人アプリ開発者
+    - vear
+    - **Editormode**
+- iOSDC18~21 登壇
+- きつねが好き
+
+^ こんにちは、noppeです。株式会社ディー・エヌ・エーでソーシャルライブアプリPocochaのiOSアプリエンジニアをしています。
+^ また、個人ではvearというバーチャル自撮りアプリや、Editormodeというドット絵向けのデジタルイラストレーションアプリを開発しています。
+^ 今回でiOSDC４年目の登壇になります。
+
+---
+
+![](editormode.png)
+
+^ EditormodeはCoreGraphicsとUIKitで作られています。
 ^ デジタルイラストレーションのアプリは、一般的にメモリ上にキャンバスのデータを展開し、それを編集する作業を繰り返します。
 ^ CoreGraphicsは、画像データをメモリに展開・編集するAPIを提供しています。iOS2.0から存在する歴史の長いフレームワークですが一方で当初から非常にシンプルで使いやすいインターフェイスが提供されています。
 ^ 今日はこのようなドット絵を描くためのアプリを、CoreGraphicsのAPIでどのように実現しているのかを紹介します。
 
 ---
 
-1. ドット絵とは
+# Agenda
+
+1. ドット絵エディタとは
 2. シンプルなドット絵エディタを作る
 3. CoreGraphicsの拡張
 4. パフォーマンスの改善
 
-^ まずは、ドット絵についての歴史やトレンドを確認してこれから扱うドット絵とはどんなものなのかを理解します。
-^ 続いて、実際にCoreGraphicsとUIKitを使ってシンプルなドット絵お絵描きアプリを開発して、お絵描きアプリのプロセスやCoreGraphicsのベーシックな使い方を説明します。
+^ まずは、ドット絵についての歴史やトレンドを確認してこれから扱うドット絵エディタとはどんなものなのかを理解します。
+^ 続いて、実際にCoreGraphicsとUIKitを使ってシンプルなドット絵エディタを開発して、ワークフローやCoreGraphicsのベーシックな使い方を説明します。
 ^ その後、CoreGraphicsに存在しないAPIやよりドット絵を扱うアプリとしての完成度を上げるための方法を学びます。
 ^ 最後にMetalやCoreImageを使って、ドット絵アプリのパフォーマンスを向上させるコツについてお話しします。
-^ それでは、ドット絵について見ていきましょう
+^ それでは、ドット絵エディタについて見ていきましょう
 
 ---
 
-# ドット絵とは
+# ドット絵エディタとは
 
 ![](wwdc.jpeg)
 
@@ -32,22 +57,36 @@ slidenumbers: true
 
 ![](wwdc.jpeg)
 
-^ 今年はモノクロームピクセルアートチャレンジが開催されて、現代のアプリアイコンを白と黒の２色のアイコンに描き直すというチャレンジが開催されました。
-^ これらはWWDCのデイリーダイジェストで見ることが出来る作品です。
-^ 薄い色を白と黒のチェック模様で再現したり、重要で無い要素を省いたりと、有限なリソースの中で最大限表現するための工夫が散りばめられています。
+^ 今年はデジタルラウンジでモノクロームピクセルアートチャレンジが開催されて、現代のアプリアイコンを白と黒の２色のアイコンに描き直すというチャレンジが開催されました。
+^ 実際に私もEditormodeを使って参加しました。右上のマップアイコンがそれですね。
+^ これらの作品はWWDCのデイリーダイジェストで見ることが出来ます。
+^ これらの作品を観察すると分かるとおり、薄い色を白と黒のチェック模様で再現したり、重要で無い要素を省いたりと、有限なリソースの中で最大限表現するための工夫が散りばめられています。
 ^ こういったいくつかのドット絵の工夫をツールとして提供することも、ドット絵専用アプリの価値と言えるでしょう。
 
 ---
 
 ![center fit](moof.jpg)
 
-^ ドット絵は、このような小さな解像度の中で絵を描く表現方法です。
-^ 描画に割けるメモリが小さいコンピューターや解像度の小さいゲーム機などで2000年台までに広く使われていました。
+^ またドット絵は、このような小さな解像度の中で絵を描く表現方法です。
+^ 描画に割けるメモリが小さいコンピューターや解像度の小さいゲーム機などで使われていました。
+
+---
+
+![center fit](trash.png)
+
+<!-- https://oldwindowsicons.tumblr.com/tagged/windows%2098 -->
+
 ^ デバイスの進化とともに、ドット絵は使われる色が増えたり、細かくなっていきます。
+
+---
+
+![center fit](stickers.jpg)
+
 ^ 現代で使われる画像のほとんどはベクターや写真といった画像が一般的になり、手作業で描かれたドット絵はアートの側面で使われることが多くなりました。
-^ このように、ドット絵はデバイスのスペックに合わせて徐々に姿を変えたこともあり、どれほど小さければドット絵なのか定義が難しい表現方法でもあります。
-^ 解像度の制約の強い環境ほど、自然にドット絵らしく見えるため、ドット絵を扱うアプリは、この制約を再実装し再現しているのも面白いところです。
-^ Editormodeのようなドット絵専用のアプリの意義とは、こういった制約を付けた環境を提供して、ユーザーが自然にドット絵をかけるような環境を用意することにあると考えています。
+^ このように、ドット絵は地続きに姿を変えたこともあり、どれほど小さければドット絵なのか、色が少ないならドット絵なのか、定義が難しい表現方法でもあります。
+^ しかし、解像度の制約の強い環境ほど、自然にドット絵らしく見えるので、ドット絵を扱うアプリは、この制約を再実装し再現することでドット絵であることに説得力を持たせようとします。
+^ Editormodeのようなドット絵エディタの意義とは、こういった制約を付けた環境をユーザーに提供して、自然にドット絵をかけるような環境を用意することにあるとも考えられます。
+^ では、実際にiPadにドット絵を表示して本来の解像度よりも低い解像度のように表示してみましょう。
 
 ---
 
@@ -58,6 +97,10 @@ imageView.image = UIImage(named: "watch")
 
 ![right fit](scale00.png)
 
+^ これは、iPadに16x16のドット絵を等倍で表示した状態です。
+^ UIImageViewを使って表示しています。
+^ 現代のディスプレイは非常に高解像度なので非常に小さく表示されます。
+
 ---
 
 ```swift
@@ -67,9 +110,14 @@ imageView.image = UIImage(named: "watch")
 
 ![right fit](scale01.png)
 
+^ 次にUIImageViewのcontentModeをscaleAspectFitにして、画面いっぱいに表示してみます。
+^ これで時計のアイコンが映っていることは分かりましたが、ぼやけてしまっています。
+^ UIImageViewにはこのように、小さい画像を拡大する際にスムーズに補完する機能がデフォルトで設定されています。
+
 ---
 
 ```swift
+// Use nearest magnificationFilter
 imageView.contentMode = .scaleAspectFit
 imageView.layer.magnificationFilter = .nearest
 imageView.image = UIImage(named: "watch")
@@ -80,61 +128,72 @@ imageView.image = UIImage(named: "watch")
 Image(...).interpolation(.none)
 ```
 
+❌　画像自体のリサイズは重いのでNG
+
 ![right fit](scale02.png)
 
-
-^ 解像度の低いデバイスでドット絵を描画するには、メモリ内にあるドット絵をそのまま画面に描画すれば良いです。
-^ しかし、現代のような高い解像度のデバイスではユーザーインターフェイスに合わせて拡大して表示する必要があります。
-^ UIImageViewはcontentModeによって自身のビューサイズに拡大して描画をしてくれますが、同時に画像の補完も行なってしまいます。
 ^ 拡大時の補完のアルゴリズムはCALayerのmagnificationFilterが担っており、これをnearestにすることでドット絵をクッキリと描画することができます。
 ^ SwiftUIではinterpolationをnoneにすることで同じ結果を得ることができます。
-間違っても自分で画像をリサイズしないようにしましょう。
+^ このように表示目的で拡大する際はUIImageViewやSwiftUIを利用します。
+^ 実際の表示サイズにリサイズする処理は非常に重いので避けましょう。
 
 ---
 
 # シンプルなドット絵エディタを作る
 
-![fit](simple-workflow.png)
-
 ---
 
-![fit](simple-workflow.png)
+![autoplay fit](simple-editor.mp4)
 
 ^ では、シンプルなアプリの開発に移りましょう。
-^ ドット絵を描くには、ただ描画するだけでは成り立ちません。
-^ タップした位置を塗りつぶし、それを描画するには仮想的なキャンバスが必要になります。
-^ ここではキャンバスにあたるCGContextを紹介します。
+^ ドット絵エディタは、ただ描画するだけでは成り立ちません。
+^ タップした位置を塗りつぶすといった編集の機能も必要になります。
+^ これらの一連の流れは非常にシンプルで、タップした位置を塗りつぶし、それを表示する繰り返しです。
 
 ---
+
+![autoplay loop fit left](simple-editor.mp4)
+
+![fit right](simple-workflow.png)
+
+^ この処理をCoreGraphicsとUIKitで実現するには、CGContextとUIImageViewを使います。
+^ CGContextとは、絵を描くためのキャンバスのようなもので、このクラスに塗りつぶす領域を渡すことで塗りつぶしたり、イメージとして取り出すことが出来ます。
+
+---
+
+[.code-highlight: all]
+[.code-highlight: 5]
+[.code-highlight: 6]
+[.code-highlight: 7]
+[.code-highlight: 8]
+[.code-highlight: all]
 
 ```swift
 let imageView = UIImageView()
-let tapGesture = UITapGestureRecognizer()
 let context = CGContext()
 
 func setup() {
-
-	imageView.addGesture(tapGesture) // 1
-
-	tapGesture.onTap = { point in
+	imageView.onTap = { point in // 1
 		context.fill(point) // 2
-		imageView.image = context.makeImage() // 3
+        let image =  context.makeImage() // 3
+		imageView.image = image // 4
 	}
 }
 ```
 
-^ 疑似的なUIKitのコードにすると次のようになります。
-^ まずは、ImageViewにタップジェスチャーを追加します。
-^ 次にタップのハンドラで、contextにタップされた位置のピクセルを塗りつぶすことを要求します。
+![fit right](simple-workflow.png)
+
+^ 疑似的なUIKitのコードにするとこのようになります。
+^ ImageViewがタップされると
+^ contextにタップした位置のピクセルを塗りつぶすことを要求します。
 ^ 最後にcontextから画像を取り出してImageViewに描画します。
+^ 非常にシンプルですね。
 
 ---
 
-![](simple-app-preview.mov)
-
-^ このようにCGContextを使うことで、簡単に画像を操作することができます。
-
----
+[.code-highlight: all]
+[.code-highlight: 2]
+[.code-highlight: 3-4]
 
 ```swift
 let context = CGContext(
@@ -148,19 +207,67 @@ let context = CGContext(
 )
 ```
 
-^ 先ほどは疑似的なコードで省略しましたが、実際には次のようにしてCGContextを生成します。
-^ dataは、CGContextが扱う画像のメモリ領域です。nilを与えると自動で生成されるためnilを与えています。
+^ 疑似的なコードで省略しましたが、実際には次のようにしてCGContextを生成します。
+^ 複雑なようですが、実は簡単なので１つづつ見てみましょう。
+^ dataは、CGContextが扱う画像のメモリ領域です。nilを与えると他のパラメータを元に自動で領域を確保します。
 ^ width, heightは画像のサイズです。
 
 ---
 
-![right](learn-bits-per-component)
+## bitsPerComponent
 
-^ bitsPerComponentは、一つの色が何階調なのかを指定します。
+- 1色を分解した時の1コンポーネントあたりのビット数
+
+例
+
+- フルカラー = 4コンポーネント（R,G,B,A）
+- グレー = 1コンポーネント
+- 256階調 = 8ビット
+
+^ bitsPerComponentは、1色を分解した時の1コンポーネントあたりのビット数を指定します。
+^ 例えばフルカラーならRGBAの４つのコンポーネントを、グレーならグレースケールの１つのコンポーネントを持っています。
 ^ 今回は256階調のグレースケールにするので、8ビットを指定します。
+
+---
+
+## bytesPerRow
+
+- 画像の横一列が何バイトになるか
+
+例
+
+- 8 Bit = 1Byte
+- フルカラー64x64 = 1Byte x 4Component x 64pixels = 256
+- グレー16x16 = 1Byte x 1Component x 16 = 16
+
 ^ bytesPerRowは、画像の横一列が何バイトになるのかを指定します。
 ^ 今回は１ピクセルが１バイトになるので、横のピクセル分16をかけて、1x16で16を指定します。
-^ spaceは色空間の指定です。グレースケールなのでCGColorSpaceCreateDeviceGrayを指定します。
+
+---
+
+## space
+
+- カラースペース
+
+例
+
+- `CGColorSpaceCreateDeviceRGB()`
+- `CGColorSpaceCreateDeviceGray()`
+
+
+^ spaceは色空間の指定です。今回はグレースケールなのでCGColorSpaceCreateDeviceGrayを指定します。
+
+---
+
+## bitmapInfo
+
+- アルファチャンネルの場所 | バイトオーダー | フォーマット　のビットマスク
+
+例
+
+- CGImageAlphaInfo.noneSkipLast.rawValue | CGImageByteOrderInfo.order32Little.rawValue | CGImagePixelFormatInfo.packed.rawValue
+- CGImageAlphaInfo.none.rawValue
+
 ^ bitmapInfoには、アルファの位置やバイトオーダーなどを指定します。今回は透過度は無いのでnoneを指定します。
 
 ---
