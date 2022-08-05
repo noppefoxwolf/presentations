@@ -161,6 +161,8 @@ Image(...).interpolation(.none)
 
 ---
 
+## ドット絵エディタのワークフロー
+
 [.code-highlight: all]
 [.code-highlight: 5]
 [.code-highlight: 6]
@@ -190,6 +192,8 @@ func setup() {
 ^ 非常にシンプルですね。
 
 ---
+
+## グレースケールのCGContextの初期化
 
 [.code-highlight: all]
 [.code-highlight: 2]
@@ -279,8 +283,10 @@ let context = CGContext(
 
 ---
 
+## フルカラーのCGContextの初期化
+
 ```swift
-CGContext(
+let context = CGContext(
     data: nil,
     width: 16,
     height: 16,
@@ -299,34 +305,42 @@ CGContext(
 
 ![fit](fullcolor.png)
 
-^ 
+^ これでフルカラーのCGContextを作ることが出来ました。
 
 ---
 
-![fit left](fullcolor.png)
-
-![fit right](grayscale.png)
-
----
+## contextの画像を描画する
 
 ```swift
-let cgImage = context.makeImage()!
-let uiImage = UIImage(cgImage: cgImage)
+let cgImage: CGImage = context.makeImage()!
+let uiImage: UIImage = UIImage(
+    cgImage: cgImage,
+    scale: 1,
+    orientation: .downMirrored
+)
+
+// UIKit
 imageView.image = uiImage
+// SwiftUI
+Image(uiImage: uiImage)
 ```
 
-^ contextからUIImageViewにイメージを渡すには、makeImage関数によって生成されたCGImageを経由します。
+^ 作ったcontextが持つ画像を描画するには、makeImage関数によって生成されたCGImageを経由します。
 ^ CGImageは実際のメモリ上の画像を参照するイメージクラスです。
 ^ そして、普段意識することはありませんが、UIImageはCGImageを始めとした様々な画像データをそのデータ構造を意識せずに使えるようにしたラッパークラスです。
-^ 今回のように既にメモリ上に展開された画像を扱うこともあれば、ベクターデータを受け取って内部で展開することもあります。
+^ UIImageは今回のように既にメモリ上に展開された画像を扱うこともあれば、ベクターデータを受け取って内部で展開することもあります。
 ^ UIImageにさえ出来てしまえば、UIImageViewやSwiftUIで簡単に描画することができます。
 
 ---
 
+## タップ位置 → ドット絵の座標への変換
+
 ```swift
 let imageSize = CGSize(width: 16, height: 16)
 let targetView = tapGesture.view!
+// ビューのタップ位置を取得
 let location = tapGesture.location(in: targetView)
+// 👍 UIImageViewとドット絵のアス比は揃えておくと計算しやすい
 let x = Int(location.x * (imageSize.width / targetView.bounds.width))
 let y = Int(location.y * (imageSize.height / targetView.bounds.height))
 let point = CGPoint(x: x, y: y)
@@ -337,15 +351,30 @@ let point = CGPoint(x: x, y: y)
 
 ---
 
+# 色の塗りつぶし
+
 ```swift
-context.setFillColor(gray: 1, alpha: 1)
-context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+let color = CGColor(gray: 0, alpha: 1)
+context.setFillColor(color)
+let rect = CGRect(origin: point, size: CGSize(width: 1, height: 1))
+context.addRect(rect) // Pathの追加
+context.fillPath()
+```
+
+```swift
+// 他にも...
+context.addArc(...) // 円
+context.addEllipse(in: CGRect) //楕円
+context.addLines(between: [CGPoint]) //線
+context.path = UIBezierPath(...).cgPath //任意のパス
 ```
 
 ^ 最後にcontextで色を塗る処理を紹介します。
-^ contextのsetFillColorで塗りつぶしの色を指定し、fillで塗りつぶします。
+^ contextのsetFillColorを呼ぶと、それ以後の塗りつぶし色が指定した色になります。
+^ 次に塗りつぶすパスを指定します。今回は1ドットを塗り潰したいのでaddRectで1x1の矩形を指定しました。
+^ 最後にcontextのfillPathメソッドを呼ぶと、contextに追加されたpathが塗りつぶされます。
 ^ これでドット絵を描くアプリを作ることが出来ました。
-^ それでは、このアプリの完成度を上げていきましょう。
+^ それでは、次はこのアプリの完成度を上げていきましょう。
 
 ---
 
@@ -353,23 +382,27 @@ context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
 
 ---
 
-// code
+![autoplay loop fit](ellipse.mp4)
 
 ^ 先ほど作ったアプリの続きです
-^ UIPanGestureRecognizerとCGContextのellipseメソッドを使って、楕円を描画する機能を追加してみました。
+^ UIPanGestureRecognizerと楕円のパスを使って、楕円を描画する機能を追加してみました。
 
 ---
 
-// 動画
+![fit](ellipse-dot.png)
 
 ^ しかし、実行してみると違和感があることに気が付きます。
 ^ 円の縁に小さなドットが描画されてしまうのです。
-^ これが、ドット絵のアプリを作る上で厄介なところです。
 
 ---
 
-// Editormodeと比較
+![fit left](editormode-ellipse.png)
 
+![fit right](ellipse-dot.png)
+
+^ Editormodeの円ツールと見比べると違和感が分かりやすいです。
+^ これはcontextのアンチエイリアスを無効にすると発生する問題です。
+^ これが、ドット絵のアプリを作る上で厄介なところです。
 ^ CGContextの描画関数は補完処理がかかることを前提として実装されています。
 ^ そのため、特に曲線部分では補完を無効にすると違和感のある見た目になることがあります。
 ^ これを防ぐには、独自に描画関数を実装する必要があります。
@@ -477,6 +510,12 @@ data.storeBytes(of: color, toByteOffset: offset, as: RGBAColor.self)
 # パフォーマンスの改善
 
 ---
+
+
+![fit left](fullcolor.png)
+
+![fit right](grayscale.png)
+
 
 ^ ドット絵は一般的に全体で使用する色数が少なくなります。
 ^ この特徴を利用して、メモリ上の画像サイズを減らす工夫をしてみます。
