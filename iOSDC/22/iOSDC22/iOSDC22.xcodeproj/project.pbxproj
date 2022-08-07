@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		372227EE289D685A00BDC6CE /* EllipsePixelArtEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372227ED289D685A00BDC6CE /* EllipsePixelArtEditViewController.swift */; };
 		372227F0289D701500BDC6CE /* SimplePixelArtEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372227EF289D701500BDC6CE /* SimplePixelArtEditViewController.swift */; };
+		372227F228A01EA100BDC6CE /* GetColorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372227F128A01EA100BDC6CE /* GetColorViewController.swift */; };
 		3764641528984A6B0095228E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3764641428984A6B0095228E /* AppDelegate.swift */; };
 		3764641728984A6B0095228E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3764641628984A6B0095228E /* SceneDelegate.swift */; };
 		3764641928984A6B0095228E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3764641828984A6B0095228E /* ViewController.swift */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		372227ED289D685A00BDC6CE /* EllipsePixelArtEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EllipsePixelArtEditViewController.swift; sourceTree = "<group>"; };
 		372227EF289D701500BDC6CE /* SimplePixelArtEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePixelArtEditViewController.swift; sourceTree = "<group>"; };
+		372227F128A01EA100BDC6CE /* GetColorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetColorViewController.swift; sourceTree = "<group>"; };
 		3764641128984A6B0095228E /* iOSDC22.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSDC22.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3764641428984A6B0095228E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3764641628984A6B0095228E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 				37646428289850430095228E /* watch.png */,
 				3764641F28984A6C0095228E /* LaunchScreen.storyboard */,
 				3764642228984A6C0095228E /* Info.plist */,
+				372227F128A01EA100BDC6CE /* GetColorViewController.swift */,
 			);
 			path = iOSDC22;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 				3764641528984A6B0095228E /* AppDelegate.swift in Sources */,
 				372227F0289D701500BDC6CE /* SimplePixelArtEditViewController.swift in Sources */,
 				3764641728984A6B0095228E /* SceneDelegate.swift in Sources */,
+				372227F228A01EA100BDC6CE /* GetColorViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

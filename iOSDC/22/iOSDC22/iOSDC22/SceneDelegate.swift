@@ -20,7 +20,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
 //        window!.rootViewController = SimplePixelArtEditViewController()
-        window!.rootViewController = EllipsePixelArtEditViewController()
+//        window!.rootViewController = EllipsePixelArtEditViewController()
+        window!.rootViewController = GetColorViewController()
 //        window!.rootViewController = UIHostingController(
 //            rootView: Image(uiImage: UIImage(named: "watch")!)
 //                .interpolation(.none)

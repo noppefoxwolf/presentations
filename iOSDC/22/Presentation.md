@@ -401,49 +401,51 @@ context.path = UIBezierPath(...).cgPath //任意のパス
 ![fit right](ellipse-dot.png)
 
 ^ Editormodeの円ツールと見比べると違和感が分かりやすいです。
-^ これはcontextのアンチエイリアスを無効にすると発生する問題です。
-^ これが、ドット絵のアプリを作る上で厄介なところです。
-^ CGContextの描画関数は補完処理がかかることを前提として実装されています。
-^ そのため、特に曲線部分では補完を無効にすると違和感のある見た目になることがあります。
+^ CGContextで線を書く場合、アンチエイリアスを無効化しますが、それをするとこのように小さい図形は不恰好になってしまいます。
 ^ これを防ぐには、独自に描画関数を実装する必要があります。
 
 ---
 
+## CGContextに自作関数を生やす
+
 ```swift
 extension CGContext {
     func fillEllipseLine(in rect: CGRect) {
-				let points = plotEllipse(in: rect)
+        // 塗りつぶす全ての座標を取得
+		let points = plotEllipse(in: rect)
         for point in points {
             let rect = CGRect(origin: point, size: CGSize(width: 1, height: 1))
+            // CGPathにしてContextに追加
             let path = UIBezierPath(rect: rect).cgPath
             addPath(path)
         }
+        // 追加したパスを塗りつぶす
         fillPath()
     }
 }
 ```
 
-^ CGContextに独自の関数を生やすのは難しいことではありません。
-^ CGContextには、CGPathを塗り潰すfillPath関数が生えています。
-^ なので、アルゴリズムを使って塗り潰すpointの配列さえ手に入ればそれらをaddPathすることで簡単に自作の描画関数を生やすことが出来ます。
+^ CGContextに綺麗なドット絵楕円を描画するfillEllipseLineを実装します。
+^ この中で、塗りつぶす線の座標を全てCGPathとして追加し、fillPathを呼びます。
+^ これは単純に１ドットづつ塗りつぶす処理を自動化しているのと同義です。
 
 ---
 
-// ブレゼンハム
+## Bresenham's line algorithm[^2]
 
-^ ドット絵の円や線は、ブレゼンハムの線分描画アルゴリズムを使うことで綺麗に描くことが出来ます。
-^ ここではアルゴリズムの詳しい説明は省きますが、このアルゴリズムはコンピュータの最初期に生まれたもので、多くの低解像度なモニターで使われてきた実績のあるアルゴリズムです。
-^ 今回、このトークをするにあたってこのアルゴリズムをCGContextで扱えるようにしたライブラリを用意しました。
+- 1962年、IBMのジャック・ブレゼンハムが開発
+- 直線から最短距離にある画素を並べる
+- 円を描画する発展系のアルゴリズムがある
+- noppefoxwolf/swift-line-algorithms
 
----
+![right fit](Midpoint_circle_algorithm_animation.gif)
 
-```diff
-- context.fillEllipse(in: rect)
-+ context.fillEllipsePlotLine(in: rect)
-```
+[^2]: https://ja.wikipedia.org/wiki/ブレゼンハムのアルゴリズム
 
-^ このように書き換えることで、ブレゼンハムの線分描画アルゴリズムに則った線を描くことが出来ます。
-^ swift-bresenham-line-algorithmは、他にも単純な線や正円もサポートしています。
+^ 肝心の塗りつぶす座標の求め方ですが、ブレゼンハムの線分描画アルゴリズムを使うことで綺麗に描くことが出来ます。
+^ このアルゴリズムは、このアルゴリズムはコンピュータの最初期に生まれたもので、多くの低解像度なモニターで使われてきた実績のあるアルゴリズムです。
+^ 基本は線を描くアルゴリズムですが、円や曲線を描くために発展させたものもありそれらを利用することで楕円を描くことが出来ます。
+^ Swiftでの実装はnoppefoxwolf/swift-line-algorithmsを確認してみてください。
 
 ---
 
@@ -451,17 +453,25 @@ extension CGContext {
 
 ---
 
+## バケツツール
+
+- 閉じられた範囲内を塗りつぶす機能
+- Flood Fillというアルゴリズム
+- 選択した色を同じ色かどうかを探しながら色を置き換えていく
+    → CGContextから色を取得する必要がある
+
+![right fit autoplay loop](floodfill.mp4)
 
 ^ 続いて、同じ色を塗り潰すバケツ機能を作ってみましょう。
-^ CGContextは矩形に塗り潰すことしか出来ないため、これも自作の関数を作る必要があります。
-^ フラッドフィルと呼ばれる方法で塗るポイントを探していきます。
+^ フラッドフィルと呼ばれるアルゴリズムを使って自作の関数を作る必要があります。
+^ このアルゴリズムは選択した位置にある色と同じ色を探しながら処理するため、CGContextから色を取得する必要があります。
 
 ---
 
-^ フラッドフィルでは、横方向に同じ色が存在すれば指定した色で塗り、指定した色で塗り尽くしたら次の行に移動します。
-^ そのため、この探索を実現するにはCGContextから指定した座標の色を取得・反映する処理が必要になります。
+## CGContextから色を取り出す
 
----
+- self.dataからメモリに直接アクセスできる
+- ポインタの位置を合わせてstructで取り出す
 
 ^ CGContextから色を取り出すAPIは生えていませんが、CGContext内のメモリを直接参照するためのdataというプロパティが生えています。
 ^ これを使って色を取り出すAPIを自作していきます。
@@ -469,14 +479,63 @@ extension CGContext {
 
 ---
 
+## CGContextのdataの配置を確認する
+
+2x2のCGContextを
+
+- 17.0 / 255.0 (0x11)
+- 34.0 / 255.0 (0x22)
+- 51.0 / 255.0 (0x33)
+- 68.0 / 255.0 (0x44)
+
+のグレー値４色で着色
+
+![fit right](colors.png)
+
+^ まず、2x2のCGContextに４色のグレーを付けます。
+^ 分かりやすいように、色はそれぞれ１６進数で11,22,33,44となる色をつけます
+
+---
+
+## CGContextのdataの配置を確認する
+
+lldbでdataのアドレスを確認します
+
+```swift
+// Swift Code
+let ctxData = context.data
 ```
+
+```
+// LLDB
 (lldb) frame var -L ctxData
 0x000000016d5379e8: (UnsafeMutableRawPointer) ctxData = 0x600000c51670
 ```
 
-^ 2x2のCGContextに４色のグレーを付けて、lldbでメモリのアドレスを確認します。
-^ Debug > Debug Workflow > View Memory
-^ から、メモリ内を参照すると次のように色が並んでいることがわかります。
+**0x600000c51670**がCGContextのdataが格納されているアドレス
+
+^ 次にlldbでCGContextのdataが格納されているメモリのアドレスを確認します。
+
+---
+
+## CGContextのdataの配置を確認する
+
+- Debug > Debug Workflow > View Memory
+- メモリアドレスを入力する
+
+![fit right](debugger1.png)
+
+^ そして、Debug > Debug Workflow > View Memoryからメモリビューアを開くと、メモリ内をビューアで見ることが出来ます。
+
+---
+
+## CGContextのdataの配置を確認する
+
+単純に順番に配置されている
+
+![fit right](memory.png)
+
+^ 参照すると次のように色が並んでいることがわかります。
 ^ つまり、シンプルに左下から右上にかけての色が格納されていることが分かりました。
 ^ フルカラーの場合も同様に、RGBAの値が並んでいます。
 
