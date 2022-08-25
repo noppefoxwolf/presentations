@@ -1,4 +1,5 @@
 slidenumbers: true
+slide-transition: true
 
 # CoreGraphicsでドット絵を描こう
 ## Track C レギュラートーク（20分）
@@ -9,26 +10,47 @@ slidenumbers: true
 
 ![right](profile.png)
 
+- Twitter: noppefoxwolf
 - 株式会社ディー・エヌ・エー
-    - Pococha
 - 個人アプリ開発者
-    - vear
-    - **Editormode**
 - iOSDC18~21 登壇
 - きつねが好き
 
-^ こんにちは、noppeです。株式会社ディー・エヌ・エーでソーシャルライブアプリPocochaのiOSアプリエンジニアをしています。
-^ また、個人ではvearというバーチャル自撮りアプリや、今日お話しするEditormodeというドット絵向けのデジタルイラストレーションアプリを開発しています。
-^ 今回でiOSDC４年目の登壇になります。よろしくお願いします。
+
+^ こんにちは、株式会社ディー・エヌ・エーでiOSアプリエンジニアをしているnoppeです。
+^ 今日は個人で開発しているアプリを例に、ドット絵を描くアプリを作るために必要なテクニックを紹介します。
+^ SNSでは、このきつねのアイコンで活動しているので見かけた際はぜひ声をかけてください。
+^ では、初めて行きたいのですが少し、自分の活動について紹介させていただきます。
 
 ---
 
-![](editormode.png)
+![](pococha.png)
 
-^ TODO: Editormodeとは何か
-^ EditormodeはCoreGraphicsとUIKitで作られています。
-^ デジタルイラストレーションのアプリは、一般的にメモリ上にキャンバスのデータを展開し、それを編集する作業を繰り返します。
-^ CoreGraphicsは、画像データをメモリに展開・編集するAPIを提供しています。iOS2.0から存在する歴史の長いフレームワークですが一方で当初から非常にシンプルで使いやすいインターフェイスが提供されています。
+^ まず、株式会社ディー・エヌ・エーでは、Pocochaというソーシャルライブアプリの開発をしています。
+^ ライブ配信というiPhoneの要素をフルに使うサービス開発はとても楽しいので、興味のある方はぜひ一緒に働きましょう！
+
+---
+
+![](vear.png)
+
+^ また、個人ではvearというVTuber向けの自撮りアプリの開発をしています。
+^ 移動中や、外出先でもトラッカーなしでバーチャルの撮影が出来る画期的なアプリです。
+
+---
+
+![inline](editormode_logo.png)
+
+## Editormode
+
+^ そして、今日お話しするEditormodeというドット絵クリエイター向けのデジタルイラストレーションアプリを開発しています。
+
+---
+
+![autoplay loop](editormode.mov)
+
+^ Editormodeはこの映像のように、「ドット絵」を描くためのアプリでUIやツールをドット絵クリエイター向けに最適化しています。
+^ 一般的なアプリと異なるのは、このアプリはOpenCVやUnityに頼らずにUIKitとCoreGraphicsといった標準フレームワークのみで構築されているところです。
+^ そうすることで、UIKitの高いパフォーマンスを使って使い心地の良い体験を実現しています。
 ^ 今日はこのようなドット絵を描くためのアプリを、CoreGraphicsのAPIでどのように実現しているのかを紹介します。
 
 ---
@@ -40,10 +62,10 @@ slidenumbers: true
 3. CoreGraphicsの拡張
 4. パフォーマンスの改善
 
-^ まずは、ドット絵についての歴史やトレンドを確認してこれから扱うドット絵エディタとはどんなものなのかを理解します。
+^ まず今日お話しするのは、ドット絵についての歴史やトレンドを確認してこれから扱うドット絵エディタとはどんなものなのかを理解します。
 ^ 続いて、実際にCoreGraphicsとUIKitを使ってシンプルなドット絵エディタを開発して、ワークフローやCoreGraphicsのベーシックな使い方を説明します。
 ^ その後、CoreGraphicsに存在しないAPIやよりドット絵を扱うアプリとしての完成度を上げるための方法を学びます。
-^ 最後にMetalやCoreImageを使って、ドット絵アプリのパフォーマンスを向上させるコツについてお話しします。
+^ 最後にMetalやCoreImageといったフレームワークを使って、ドット絵アプリのパフォーマンスを向上させるコツについてお話しします。
 ^ それでは、ドット絵エディタについて見ていきましょう
 
 ---
@@ -52,7 +74,7 @@ slidenumbers: true
 
 ![](wwdc.jpeg)
 
-^ 最近ドット絵が話題になった例として、今年のWWDCがあります。
+^ 最近ドット絵が話題になった例として、今年のWWDC22があります。
 
 ---
 
@@ -66,7 +88,9 @@ slidenumbers: true
 
 ---
 
-![center fit](moof.jpg)
+![center fit inline](moof.jpg)
+
+## 32x32
 
 ^ またドット絵は、このように小さな解像度の中で絵を描く表現方法です。
 ^ 描画に割けるメモリが小さいコンピューターやおもちゃのような解像度の小さいゲーム機などで使われていました。
@@ -138,9 +162,9 @@ Image(...).interpolation(.none)
 
 ![right fit](scale02.png)
 
-^ 拡大時の補完のアルゴリズムはlayerのmagnificationFilterが担っており、これをnearestにすることでドット絵をクッキリと描画することができます。
-^ SwiftUIではinterpolationをnoneにすることで同じ結果を得ることができます。
-^ このように表示目的で拡大する際も、普通のアプリと同じようにUIImageViewやSwiftUIを利用します。
+^ 拡大時の補完のアルゴリズムはlayerのmagnificationFilterが担っていて、これをnearestにすることでドット絵をクッキリと描画することができます。
+^ SwiftUIでもinterpolationをnoneにすることで同じ結果を得ることができます。
+^ このようにドット絵を表示する際は、普通のアプリと同じようにUIImageViewやSwiftUIが使えます。
 ^ 注意点として拡大するために、実際のイメージをリサイズすることは避けましょう。
 ^ リサイズは非常に時間がかかる上に、大量のメモリを消費します。
 
@@ -160,11 +184,10 @@ Image(...).interpolation(.none)
 
 ![autoplay loop fit left](simple-editor.mp4)
 
-![fit right](simple-workflow.png)
+![fit right](simple-workflow2.png)
 
 ^ これらの一連の流れは非常にシンプルで、タップした位置を塗りつぶし、それを表示する繰り返しです。
-^ この処理をCoreGraphicsとUIKitで実現するには、CGContextとUIImageViewとUITapGestureRecognizerを使います。
-^ CGContextとは、絵を描くためのキャンバスのようなもので、このクラスに塗りつぶす領域を渡すことで塗りつぶしたり、イメージとして取り出すことが出来ます。
+^ この処理をCoreGraphicsとUIKitで実現するには、タップを検知するためのUITapGestureRecognizer、絵を描くためのキャンバスのCGContext、表示をするUIImageView・といった登場人物が必要になります。
 
 ---
 
@@ -193,10 +216,10 @@ func setup() {
 ![fit right](simple-workflow.png)
 
 ^ 疑似的なUIKitのコードにするとこのようになります。
-^ ImageViewがタップされると
+^ まず、ImageViewがタップされると
 ^ contextにタップした位置のピクセルを塗りつぶすことを要求します。
 ^ 最後にcontextから画像を取り出してImageViewにセットして描画します。
-^ 非常にシンプルですね。
+^ 非常にシンプルですね。これの繰り返しです。
 ^ それでは省略している部分を詳しく説明していきます。
 
 ---
@@ -220,9 +243,9 @@ let context = CGContext(
 )
 ```
 
-^ CGContextは実際にはこのようなイニシャライザを使って生成しています。
-^ このコードは、白黒の濃淡だけが使えるグレースケースのCGContextを作るコードになっています。
-^ 引数が多くて複雑に見えますが、実は簡単なので１つづつ見てみましょう。
+^ 先ほどの解説でキャンバスにあたるのが、このCGContextです。
+^ これだけ引数があると、見ただけでうっとなりますが１つづつ噛み砕いて見ていきましょう。
+^ このコードは、256階調の白黒だけが使える16x16のCGContextを作るコードになっています。
 ^ 第一引数のdataは、CGContextが扱う画像のメモリ領域です。nilを与えると他のパラメータを元に自動で領域を確保します。画像のデータを渡すことで最初から書き込まれたCGContextを作ることもできます。
 ^ width, heightは画像のサイズです。
 
@@ -232,11 +255,10 @@ let context = CGContext(
 
 - 1色を分解した時の1コンポーネントあたりのビット数
 
-例
-
-- フルカラー = 4コンポーネント（Red,Green,Blue,Alpha）
-- グレー = 1コンポーネント（Gray）
-- 256階調 = 8ビット
+|色空間|コンポーネント数|ビット数|
+|---|---|---|
+|グレー| 1<br>Gray | 8 |
+|フルカラーRGB| 4<br>Red,Green,Blue,Alpha | 8 |
 
 ^ bitsPerComponentは、1色を分解した時の1コンポーネントあたりのビット数を指定します。
 ^ 例えばフルカラーならRGBAの４つのコンポーネントを、グレーならグレースケールの１つのコンポーネントを持っています。
@@ -248,13 +270,15 @@ let context = CGContext(
 
 - 画像の横一列が何バイトになるか
 
-例
+- 8bitなら 横のピクセル数 x コンポーネント数
 
-- 8 Bit = 1Byte
-- フルカラー64x64 = 1Byte x 4Component x 64pixels = 256
-- グレー16x16 = 1Byte x 1Component x 16 = 16
+|色空間|横幅のバイト数|
+|---|---|
+|グレー| 1 * width = 16 |
+|フルカラーRGB| 4 * width = 256 |
 
-^ bytesPerRowは、画像の横一列が何バイトになるのかを指定します。
+^ 続いてbytesPerRowは、画像の横一列が何バイトになるのかを指定します。
+^ 8bitのコンポーネントなら横のピクセル数xコンポーネント数で計算することができます。
 ^ 今回は１ピクセルが１バイトになるので、横のピクセル分16をかけて、1x16で16を指定します。
 
 ---
@@ -263,10 +287,10 @@ let context = CGContext(
 
 - カラースペース
 
-例
-
-- `CGColorSpaceCreateDeviceRGB()`
-- `CGColorSpaceCreateDeviceGray()`
+|色空間|クラス|
+|---|---|
+|グレー|`CGColorSpaceCreateDeviceGray()`|
+|フルカラーRGB|`CGColorSpaceCreateDeviceRGB()`|
 
 
 ^ spaceは色空間の指定です。今回はグレースケールなのでCGColorSpaceCreateDeviceGrayを指定します。
@@ -286,36 +310,9 @@ let context = CGContext(
 
 ---
 
-![fit](grayscale.png)
+![inline](grayscale.png)
 
 ^ これで256色の色が使えるCGContextを作ることができました。
-^ フルカラーのCGContextが使いたい場合は、次のように指定します。
-
----
-
-## フルカラーのCGContextの初期化
-
-```swift
-let context = CGContext(
-    data: nil,
-    width: 16,
-    height: 16,
-    bitsPerComponent: 8,
-    bytesPerRow: 4 * 16,
-    space: CGColorSpaceCreateDeviceRGB(),
-    bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
-)
-```
-
-^ フルカラーの場合、４つのコンポーネントで構成されるのでbytesPerRowは4 * 16で64を指定します。
-^ 色空間もRGBを指定します。
-^ bitmapInfoは、不透明度が無い場合はskipLastを指定して４つ目のコンポーネントを無視するようにします。
-
----
-
-![fit](fullcolor.png)
-
-^ これでフルカラーのCGContextを作ることが出来ました。
 
 ---
 
@@ -326,7 +323,7 @@ let cgImage: CGImage = context.makeImage()!
 let uiImage: UIImage = UIImage(
     cgImage: cgImage,
     scale: 1,
-    orientation: .downMirrored
+    orientation: .downMirrored // UIImageの座標系に変換
 )
 
 // UIKit
@@ -335,53 +332,34 @@ imageView.image = uiImage
 Image(uiImage: uiImage)
 ```
 
-^ 作ったcontextが持つ画像を描画するには、makeImage関数によって生成されたCGImageを経由します。
-^ CGImageは実際のメモリ上の画像を参照するイメージクラスです。
-^ そして、普段意識することはありませんが、UIImageはCGImageを始めとした様々な画像データをそのデータ構造を意識せずに使えるようにしたラッパークラスです。
-^ UIImageは今回のように既にメモリ上に展開された画像を扱うこともあれば、ベクターデータを受け取って内部で展開することもあります。
-^ UIImageにさえ出来てしまえば、UIImageViewやSwiftUIで簡単に描画することができます。
+^ 作ったcontextが持つ画像を描画するには、まずはmakeImage関数で画像を取り出します。
+^ 取り出された画像はCGImageの形式なので、UIImageで包みます。
+^ ここでの注意点として、UIImageが左上を起点としているのに対して、CGImageは左下を起点としているため、orientationを指定する必要があります。
+^ こうして作られたUIImageは、みなさんご存知の通り、UIImageViewやSwiftUIのImageで描画することができます。
 
 ---
 
-## タップ位置 → ドット絵の座標への変換
-
-```swift
-let imageSize = CGSize(width: 16, height: 16)
-let targetView = tapGesture.view!
-// ビューのタップ位置を取得
-let location = tapGesture.location(in: targetView)
-// 👍 UIImageViewとドット絵のアス比は揃えておくと計算しやすい
-let x = Int(location.x * (imageSize.width / targetView.bounds.width))
-let y = Int(location.y * (imageSize.height / targetView.bounds.height))
-let point = CGPoint(x: x, y: y)
-```
-
-^ 画面上のタップ位置はUIGestureRecognizerのlocationInViewから得ることが出来ます。
-^ それがドット絵上のどのポイントを指しているかを計算しやすくするために、UIImageViewのサイズは描画する画像と同じアスペクト比にしておくと良いでしょう。
-
----
+[.code-highlight: all]
+[.code-highlight: 1-2]
+[.code-highlight: 3-6]
+[.code-highlight: 7]
+[.code-highlight: all]
 
 # 色の塗りつぶし
 
 ```swift
 let color = CGColor(gray: 0, alpha: 1)
 context.setFillColor(color)
-let rect = CGRect(origin: point, size: CGSize(width: 1, height: 1))
-context.addRect(rect) // Pathの追加
+let path = CGPath(
+    rect: CGRect(origin: point, size: CGSize(width: 1, height: 1))
+)
+context.addPath(path) // Pathの追加
 context.fillPath()
 ```
 
-```swift
-// 他にも...
-context.addArc(...) // 円
-context.addEllipse(in: CGRect) //楕円
-context.addLines(between: [CGPoint]) //線
-context.path = UIBezierPath(...).cgPath //任意のパス
-```
-
-^ 最後にcontextで色を塗る処理を紹介します。
+^ 最後にcontextに色を塗る処理を紹介します。
 ^ contextのsetFillColorを呼ぶと、それ以後の塗りつぶし色が指定した色になります。
-^ 次に塗りつぶすパスを指定します。今回は1ドットを塗り潰したいのでaddRectで1x1の矩形を指定しました。
+^ 次に塗りつぶすパスを指定します。今回は1ピクセルを塗り潰したいのでaddRectで1x1の矩形を指定しました。
 ^ 最後にcontextのfillPathメソッドを呼ぶと、contextに追加されたpathが塗りつぶされます。
 ^ これでドット絵を描くアプリを作ることが出来ました。
 ^ それでは、次はこのアプリの完成度を上げていきましょう。
@@ -450,7 +428,7 @@ extension CGContext {
 ^ 肝心の塗りつぶすパスの求め方ですが、ブレゼンハムの線分描画アルゴリズムを使うことで得ることが出来ます。
 ^ このアルゴリズムはコンピュータの最初期に生まれたもので、多くの低解像度なモニターで使われてきた実績のあるアルゴリズムです。
 ^ 基本は線を描くアルゴリズムですが、円や曲線を描くために発展させたものもありそれらを利用することで楕円を描くことが出来ます。
-^ Swiftでの実装はnoppefoxwolf/swift-line-algorithmsを確認してみてください。
+^ Swiftでの実装はnoppefoxwolf/swift-line-algorithmsで公開しているので、ぜひ確認してみてください。
 
 ---
 
@@ -476,12 +454,13 @@ extension CGContext {
 ## CGContextから色を取り出す
 
 - 特定の座標の色を取得するAPIはない
-- self.dataからメモリに直接アクセスできる
-- メモリレイアウトを確認して、取り出す
+- `cgContext.data`から画像が格納されているポインタを知れる
+- メモリレイアウトを確認し、任意の座標の色を取り出すAPIを作る
 
-^ CGContextから色を取り出すAPIは生えていませんが、メモリのポインタをdataというプロパティから取得できます
-^ これを使って色を取り出すAPIを自作していきます。
-^ 色を取り出す前に、CGContextの内部でどのように画像が配置されているかを見てみましょう。
+^ しかし、実はCGContextに色を取り出すAPIはありません。
+^ ただし、画像データが保存されているポインタを得ることはできます。
+^ 画像データがどのようにメモリ上に格納されているかさえ分かれば、そこから色を取り出すAPIを作ることができます。
+^ では、色を取り出す前に、CGContextの内部でどのように画像が格納されているかを見てみましょう。
 
 ---
 
@@ -489,14 +468,16 @@ extension CGContext {
 
 2x2のCGContextを
 
-- 17.0 / 255.0 (0x11)　左下
-- 34.0 / 255.0 (0x22)　右下
-- 51.0 / 255.0 (0x33)　左上
-- 68.0 / 255.0 (0x44)　右上
+| 色 |　色（Hex）　| 位置 |
+|---|---|---|
+| 17.0 / 255.0 | 0x11 |　左下 |
+| 34.0 / 255.0 | 0x22 |　右下 |
+| 51.0 / 255.0 | 0x33 |　左上 |
+| 68.0 / 255.0 | 0x44 |　右上 |
 
 のグレー値４色で着色
 
-![fit right](colors.png)
+![fit right 50%](colors.png)
 
 ^ まず、2x2のCGContextに４色のグレーを付けます。
 ^ 分かりやすいように、色はそれぞれ１６進数で11,22,33,44となる色をつけます
@@ -505,22 +486,16 @@ extension CGContext {
 
 ## メモリレイアウトを確認する
 
-lldbでdataのアドレスを確認します
-
-```swift
-// Swift Code
-let ctxData = context.data
-```
+lldbで`cgContext.data`のアドレスを確認する
 
 ```
-// LLDB
 (lldb) frame var -L ctxData
 0x000000016d5379e8: (UnsafeMutableRawPointer) ctxData = 0x600000c51670
 ```
 
-**0x600000c51670**がCGContextのdataが格納されているアドレス
+→ **0x600000c51670**がCGContextのdataが格納されているアドレス
 
-^ 次にlldbでCGContextのdataが格納されているメモリのアドレスを確認します。
+^ 次に実行中のアプリを停止して、lldbでCGContextのdataが格納されているメモリのアドレスを確認します。
 
 ---
 
@@ -531,7 +506,8 @@ let ctxData = context.data
 
 ![fit right](debugger1.png)
 
-^ そして、Debug > Debug Workflow > View Memoryからメモリビューアを開くと、メモリ内をビューアで見ることが出来ます。
+^ そして、Xcodeのメモリビューアにアドレスを入力して中身を確認します。
+^ メモリビューアは、Debug > Debug Workflow > View Memoryから開くことができます。
 
 ---
 
@@ -542,35 +518,32 @@ let ctxData = context.data
 
 ![fit inline](memory.png)
 
-^ 参照すると次のように色が並んでいることがわかります。
+^ メモリビューアを参照するとメモリ上は次のようになっていることがわかりました。
+^ グレースケールの場合、１ピクセルが１バイトになるためこの４つのバイトはそれぞれ１ピクセルに対応していることがわかります。
 ^ つまり、シンプルに左下から右上にかけての色が格納されていることが分かりました。
-
----
-
-## フルカラーのメモリレイアウト
-
-- RGBAの順番で配置
-- 1ドット4byteで4ドット分並んでいる
-
-![fit inline](rgba.png)
-
-^ フルカラーの場合も同様に、RGBAの値が並んでいます。
 
 ---
 
 ## CGContextのdataから色を取り出す
 
 ```swift
-// CGContextがフルカラーの場合
-struct RGBAColor {
-  let r, g, b, a: UInt8
+struct GrayColor {
+  let gray: UInt8
 }
-/// ポインタから先頭32bitをRGBAColorとして取り出す
-let color = data.load(as: RGBAColor.self)
+// ポインタから先頭8bitをGrayColorとして取り出す
+let color = data.load(as: GrayColor.self)
+
+// 100ピクセル目の色を取り出す
+let color = data.load(
+    fromByteOffset: MemoryLayout<GrayColor>.size * 100,
+    as: GrayColor.self
+)
 ```
 
-^ メモリレイアウトの通りにstructを作ることで、load関数を使ってポインタから型を指定して値を取り出すことが出来ます。
-^ load関数はoffsetを指定することもできるので、２ピクセル以降はoffsetを使ってポインタを合わせます。
+^ メモリレイアウトが分かったら、Swiftの構造体で同じ構造を再現します。
+^ 今回は１ピクセルを取り出したいので、8bitの構造体を作ります。
+^ そして、ポインタに対してload関数を使ってポインタから型を指定して値を取り出すことが出来ます。
+^ またload関数はoffsetを指定することもできるので、２ピクセル以降はoffsetを使ってポインタを合わせることで取り出すことができます。
 
 ---
 
@@ -580,10 +553,12 @@ let color = data.load(as: RGBAColor.self)
 - 最適なアルゴリズムの選定
 - メモリを直接・書き込みして高速化
     → Swiftなら型安全にできる
+- noppefoxwolf/PixelArtKit
 
-^ ドット絵は解像度の低い画像ですが、フラッドフィルのような処理は反復して多くのfor-loopを行う可能性があります。
+^ ドット絵は解像度の低い画像ですが、塗りつぶしのような処理は反復して多くの処理を行う可能性があります。
 ^ 処理を短時間で終わらせるためには、このようにメモリを直接参照したり余分な計算を減らす必要があります。
-^ Swiftの型のおかげで複雑なコードを書かずにポインタを触ることが出来ました。
+^ Swiftの型システムのおかげで、ポインタを触るコードもモダンに記述することができます。
+^ 塗りつぶしのコードもgithubで公開しているので、ぜひ確認ください。
 ^ 最後にドット絵のパフォーマンスを向上させるための工夫を見てみましょう。
 
 ---
@@ -592,12 +567,15 @@ let color = data.load(as: RGBAColor.self)
 
 ---
 
-## 消費メモリを削減する
+# パフォーマンスの改善
 
-- ドット絵は色数が少ないことを利用する
+- 常にトレードオフがある
+- メモリの消費を抑える工夫をしてみます
+- 何がトレードオフになるのかを考えてみましょう
 
-^ ドット絵は一般的に全体で使用する色数が少なくなります。
-^ この特徴を利用して、メモリ上の画像サイズを減らす工夫をしてみます。
+^ パフォーマンスチューニングというのは、常にトレードオフが伴います。
+^ 今回は例として、メモリの消費量を抑える工夫をしてみます。
+^ これによって、どんなトレードオフがあるか考えてみましょう。
 
 ---
 
@@ -612,14 +590,13 @@ let color = data.load(as: RGBAColor.self)
 
 ![right fit](lut-lesson.png)
 
-
-^ 今回はインデックスカラーという手法を利用します。
+^ ドット絵の消費メモリを抑える工夫に、インデックスカラーという方法があります。
 ^ まず、グレースケールで画像を保持します。
-^ グレースケールは256階調のグレーが使えますが、このグレー１つ１つにフルカラーの色、256色を対応させたインデックスを作ります。
-^ フルカラーは1600万色ほどありますが、実際に使う色に絞れば現実的でしょう。
+^ グレースケールは256階調のグレーが使えますが、このグレー１つ１つにフルカラーの色、256色を対応させたインデックス、つまり対応表を作ります。
+^ フルカラーは1600万色ほどありますが、ドット絵の場合は色数が少ないので、実際に使う色に絞れば現実的でしょう。
 ^ レンダリングのタイミングでこの色を対応表通りに戻してあげることでディスプレイに表示されるタイミングでは色がついて見えるようになります。
 ^ キャンバスが確保するメモリはグレースケールなので、フルカラーの1/4にすることが出来ます。
-^ 昔のゲームの2Pカラーなどがこの仕組みを使って、１つのキャラクターデータで複数の色のキャラクターを作っています。
+^ レトロゲームの2Pカラーなどがこの仕組みを使って、１つのキャラクターデータで複数の色のキャラクターを作っています。
 
 ---
 
@@ -632,8 +609,9 @@ let color = data.load(as: RGBAColor.self)
 ![right fit](lut-workflow.png)
 
 ^ 残念ながらCGContextにはインデックスカラーの機能が無いため、これも自前で実装することになります。
-^ グレースケールのCGImageを取り出してをCIFilterにかけて着色します。
-^ 着色した画像をCIFilterから取り出して、UIImageViewに表示すれば完成です。
+^ このような画像の色を変換するには、CoreImageを使うと簡単に実現できます。
+^ CoreImageのCIFilterを使って、着色したイメージを生成します。
+^ なお、CIFilterにはいくつかビルドインのフィルタがありますが、今回のように特殊なフィルタを使いたい場合はMetalを使ってCIFilterを自作します。
 
 ---
 
@@ -654,9 +632,9 @@ float4 lookupTable(sampler src, sampler lut) {
 
 - noppefoxwolf/PixelArtKit
 
-^ インデックスカラーフィルタはMetalを使ってシェーダを実装します。
-^ 少し難しそうに見えますが、グレースケールの値をindexの位置に変換して色を取り出しています。
-^ 詳しい実装に関しては、noppefoxwolf/PixelArtKitで公開しているのでご覧ください。
+^ これが、今回のフィルタの実装です。
+^ 少し難しそうに見えますが、グレースケール画像の色をindexとして扱い、対応表から色を取り出しています。
+^ 詳しい実装に関しては、Githubで公開しているコードを確認してください。
 
 ---
 
@@ -668,10 +646,11 @@ float4 lookupTable(sampler src, sampler lut) {
 - ブレゼンハムやインデックスカラーなどの知見は今も活かせる
 
 ^ 長くなりましたが、以上になります。
-^ 今回のトークを短く振り返ります。
-^ ドット絵エディタはCoreGraphicsとUIKit(SwiftUI)で実装できる
-^ CGContextはCGPathを使えば自由な描画関数を実装できる
-^ CGContextはメモリを直接参照できる
-^ そして、インデックスカラーやブレゼンハムなど、ドット絵の現役の工夫は今も活かすことが出来ます。
-^ みなさんもドット絵エディタを作る際はぜひ参考にしてみてください！
-^ 以上になります。
+^ 今回のトークを軽く振り返ります。
+^ まず、ドット絵エディタはCoreGraphicsとUIKit、SwiftUIを使えば簡単に実装できることがわかりました。
+^ OpenCVやUnityなどの大きなフレームワークを使わずとも、アプリが構築できます。
+^ そして、CGContextはCGPathを使えば自由な描画関数を実装できることもわかりました。色を取り出して塗りつぶしの判断をするような描画関数でも、メモリを直接参照することで実現できます。
+^ 最後に、パフォーマンスの改善についてインデックスカラーを紹介しました。
+^ インデックスカラーやブレゼンハムのアルゴリズムは、レトロなゲームやコンピュータで培われた歴史のあるものです。そういった創意工夫を現代で活かすことが出来るのは、ドット絵エディタのアプリを作る面白さかもしれません。
+^ みなさんもドット絵エディタを作る際はぜひ参考にしてみてください。今回のトークに関する質問や感想など、ぜひ直接ご質問ください。
+^ それでは以上になります。ありがとうございました。
