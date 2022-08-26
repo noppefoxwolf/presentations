@@ -1,5 +1,4 @@
 slidenumbers: true
-slide-transition: true
 
 # CoreGraphicsでドット絵を描こう
 ## Track C レギュラートーク（20分）
@@ -90,14 +89,16 @@ slide-transition: true
 
 ![center fit inline](moof.jpg)
 
-## 32x32
+## 28x28 2bit
 
 ^ またドット絵は、このように小さな解像度の中で絵を描く表現方法です。
 ^ 描画に割けるメモリが小さいコンピューターやおもちゃのような解像度の小さいゲーム機などで使われていました。
 
 ---
 
-![center fit](trash.png)
+![center fit inline](recycle_bin_full-4.png)
+
+## 48x48 8bit
 
 <!-- https://oldwindowsicons.tumblr.com/tagged/windows%2098 -->
 
@@ -105,7 +106,9 @@ slide-transition: true
 
 ---
 
-![center fit](stickers.jpg)
+![center fit inline](stickers.jpg)
+
+## 300x300 10bit
 
 ^ 現代で使われる画像のほとんどはベクターや写真といった画像が一般的になり、手作業で描かれたドット絵はアートの側面で使われることが多くなりました。
 ^ このように、ドット絵は地続きに姿を変えたこともあり、どれほど小さければドット絵なのか、色が少ないならドット絵なのか、定義が難しい表現方法でもあります。
