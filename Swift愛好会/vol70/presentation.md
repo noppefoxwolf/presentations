@@ -24,8 +24,7 @@ autoscale: true
 
 # 登壇駆動勉強
 
-- 登壇するために、勉強すること
-- 先に登壇を決めて、それを理由に勉強する
+## 先に登壇を決めて、それを理由に勉強する
 
 ---
 
@@ -35,7 +34,7 @@ autoscale: true
 
 # 聴講駆動勉強のススメ
 
-- トークを聞いた上で、手を動かしてみる
+## トークを聞いた上で、手を動かしてみる
 
 ---
 
@@ -56,33 +55,27 @@ autoscale: true
 # PadOSDC
 
 - iOSDC22の非公式アプリ
+- くれいんさんのLT
+- ２日目のLTラスト
+- **crane-hiromu/PadOSDC_Japan_App**
 
 ![right fit](padosdc.png)
 
 ---
 
-# PadOSDC
-
-- くれいんさんのLT
-- ２日目のLTラスト
-- **crane-hiromu/PadOSDC_Japan_App**
-
-![right fit](padosdc2.png)
-
----
-
 # ８件のPR
 
-![inline fit](psdosdc_pr.png)
+- 聴講駆動といいつつ聴講前にやった話
+- １件をピックアップして紹介
+
+![right fit](psdosdc_pr.png)
 
 ---
 
 # Support LightMode
 
-- 元々ダークモード前提だったのでライトモードもサポートした
+- 元々ダークモードのみだったのでライトモードもサポートした
 - 実はSwiftUIはダークモードオンリーは危険
-
-^ ピックアップ
 
 ---
 
@@ -133,6 +126,13 @@ autoscale: true
 
 ---
 
+# Safari Web Extensions
+
+- DOMを変更したりするのは結構簡単
+- iOSでも動作する（はず）
+
+---
+
 # SwiftWasmへのコントリビュート
 
 ---
@@ -140,6 +140,8 @@ autoscale: true
 # SwiftWasmへのコントリビュート
 
 - ２日目kateinoigakukun「The state of Swift for WebAssembly in 2022」
+- Wasmとはブラウザで動作するバイナリの仕様的なもの
+    - ブラウザでSwiftが動作するってこと
 
 ---
 
@@ -214,6 +216,7 @@ TokamakApp.main()
 - XCBBuildService
     - Xcodeの裏側で動いているプロセス
     - 環境変数を指定することで自前のXCBBuildServiceが使える
+- とりあえずExampleを動かしてみる
 
 ---
 
