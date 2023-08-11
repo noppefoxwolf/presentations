@@ -290,19 +290,17 @@ Left: CustomNavigationBar, Right: UINavigationBar
 
 ---
 
-## アニメーションの例
-
-- 表示と非表示のduration
-- 透過度の変わり方
-- アニメーションカーブ
-
-// TODO: Colorの角丸の例
-
-^ アニメーションは難易度に幅があるので、まずは簡単なdurationや透過度の変わり方のお作法を身につけるのがおすすめです。
+# 高度なビジュアルの分析
 
 ---
 
-# 触る
+# Xcode View Hierachy Debugger
+
+
+
+---
+
+# インタラクション
 
 ^ ひとまず見ることで、UIの構造を知ることができました。
 ^ これだけで、だいぶiOSらしいカスタムUIが作れるようになったはずです。
