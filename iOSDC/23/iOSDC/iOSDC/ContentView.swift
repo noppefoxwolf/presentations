@@ -9,13 +9,87 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        Color.red
+            .frame(width: 120, height: 120)
+            .mask {
+                RoundedRectangle(cornerRadius: 16)
+            }
+    }
+}
+struct Health_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack(spacing: 36) {
+            Button {
+                
+            } label: {
+                Label("Link with HealthKit", systemImage: "heart.fill")
+            }.buttonStyle(.borderedProminent)
+            
+            Button {
+                
+            } label: {
+                Label("Link with HealthKit", systemImage: "heart.fill")
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color(uiColor: UIColor(red: 1.00, green: 0.22, blue: 0.28, alpha: 1.00)))
         }
-        .padding()
+
+    }
+}
+
+struct Nav_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            NavigationLink {
+                List {
+                    Text("Hello, World!")
+                    Text("Hello, World!")
+                    Text("Hello, World!")
+                }
+                .navigationTitle("Title")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button(action: {}) {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+            } label: {
+                Text("push")
+            }
+        }
+    }
+}
+
+struct CustomNav_Previews: PreviewProvider {
+    static var previews: some View {
+        ZStack(alignment: .top) {
+            List {
+                Text("Hello, World!")
+                Text("Hello, World!")
+                Text("Hello, World!")
+            }.offset(y: 20)
+            
+            VStack(spacing: 0) {
+                HStack {
+                    Button(action: {}) {
+                        Image(systemName: "chevron.backward").padding()
+                    }
+                    Spacer()
+                    Text("Title").bold()
+                    Spacer()
+                    Button(action: {}) {
+                        Image(systemName: "plus").padding()
+                    }
+                }
+                .frame(height: 44)
+                .background(.white)
+                Divider()
+                
+                Spacer()
+            }
+        }
     }
 }
 
@@ -67,8 +141,39 @@ struct Dasa_Previews: PreviewProvider {
         .cornerRadius(5)
         .shadow(color: .black, radius: 20, x: 0, y: 0)
         .padding(25)
-        
-            
+    }
+}
+
+struct DasaTabBar_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack(spacing: 0) {
+            List {
+                ForEach(0..<100, content: { _ in
+                    Text("Hello, World!")
+                })
+            }
+            Divider()
+            HStack(spacing: 42) {
+                Image(systemName: "house.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                Image(systemName: "magnifyingglass")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                Image(systemName: "bell")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                Image(systemName: "envelope")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+            }
+            .padding()
+            .foregroundColor(.blue)
+        }
     }
 }
     
