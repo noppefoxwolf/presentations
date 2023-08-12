@@ -294,9 +294,54 @@ Left: CustomNavigationBar, Right: UINavigationBar
 
 ---
 
-# Xcode View Hierachy Debugger
+# View Hierachy Debugger
 
+- Lookin, Reveal, Xcode 
+- 直接サイズを確認できる
+- ビュー構造の理解にも役立つ
 
+![right fit](ViewDebugger.png)
+
+---
+
+# Method invoke
+
+- 直接プロパティを確認
+- ビューをhiddenや色付け
+- サイズ変更
+
+単純で無いビューの調査に役立つ
+
+![right fit](LLDB.png)
+
+---
+
+# Run Debugger globally
+
+![right fit](Reveal-App-Store.png)
+
+- rootにRevealやLookinのクライアントをインストールすることでFirst party appでも動かすことができる[^1]
+
+[^1]: https://hackinggate.com/2019/06/11/inspect-the-view-hierarchy-of-any-ios-apps-on-ios-12.html
+
+---
+
+# Breakpoint globally
+
+- Frida
+  - 実行プロセスをフックして、任意のコードを実行することができる
+
+![right fit](Frida.png)
+
+^ Frida（フリーダ）
+
+---
+
+# UIの分析
+
+- ビジュアル􀋭
+- **インタラクション􀬁**
+- フィードバック􀜣
 
 ---
 
@@ -308,13 +353,38 @@ Left: CustomNavigationBar, Right: UINavigationBar
 
 ---
 
-## インタラクション・ジェスチャー
+# ジェスチャー
 
-- タップ、スワイプ、ピンチなどのジェスチャーを実際に試す
-- タップ位置を可視化するツールを使うと、実際のタップ位置や動きからズラしていることもわかる
-- 不可視のジェスチャーもあるので注意
+- ビューがどんなジェスチャーに対応しているか確認する
+- 複数のジェスチャーを同時に使うこともある
+  - 先入観を捨てて触ってみる
+
+---
+
+# Case1. 補助ジェスチャー
+
+- タップでOn,Offの切り替え
+- パンでも補助的に切り替えができる
+
+![right fit autoplay loop](Toggle.mp4)
+
+---
+
+# Case2. 不可視トリガー
+
+![right fit autoplay loop](InvisibleTrigger.mp4)
+
+- ある程度見た目で使い方が分かるものがほとんど
+- しかし、不可視のトリガーもある
   - シェイク、マルチタップ、3Dタッチなど
-- ポインターAPI
+
+---
+
+# Case3. ジェスチャーの閾値
+
+![right fit autoplay loop](KeyboardHitArea.mp4)
+
+- 実際の見た目よりもズレた位置に判定がある場合もある
 
 ^ ほとんどのUIは操作の出来るコントロールとして存在しています。
 ^ そのため、実際に操作してみることで、お作法を知ることができます。

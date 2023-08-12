@@ -16,6 +16,23 @@ struct ContentView: View {
             }
     }
 }
+
+struct Toggle_Previews: PreviewProvider {
+    
+    struct ContentView: View {
+        @State var isOn: Bool = false
+        
+        var body: some View {
+            Toggle("Allows", isOn: $isOn)
+                .padding()
+        }
+    }
+    
+    static var previews: some View {
+        ContentView()
+    }
+}
+
 struct Health_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 36) {
