@@ -17,6 +17,18 @@ struct ContentView: View {
     }
 }
 
+struct Segmented_Previews: PreviewProvider {
+    static var previews: some View {
+        Picker("", selection: .constant(1)) {
+            Text("Home").tag(1)
+            Text("Profile")
+            Text("Settings")
+        }
+        .pickerStyle(.segmented)
+        .padding()
+    }
+}
+
 struct Toggle_Previews: PreviewProvider {
     
     struct ContentView: View {
