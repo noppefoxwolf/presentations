@@ -9,7 +9,15 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        TextField("test", text: .constant(""))
+        NavigationView {
+            List {
+                ForEach(0..<100) { _ in
+                    Text("aa")
+                }
+            }
+            .navigationTitle("hello")
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 
