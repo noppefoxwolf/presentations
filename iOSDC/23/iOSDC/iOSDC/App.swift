@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LookinServer
 
 @main
 struct App: SwiftUI.App {

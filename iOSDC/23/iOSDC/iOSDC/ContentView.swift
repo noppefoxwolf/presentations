@@ -9,6 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
+        TextField("test", text: .constant(""))
+    }
+}
+
+struct RoundedRect_Previews: PreviewProvider {
+    static var previews: some View {
         Color.red
             .frame(width: 120, height: 120)
             .mask {
@@ -16,6 +22,7 @@ struct ContentView: View {
             }
     }
 }
+
 
 struct Segmented_Previews: PreviewProvider {
     static var previews: some View {

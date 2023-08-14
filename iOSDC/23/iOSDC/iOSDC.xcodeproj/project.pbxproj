@@ -11,6 +11,7 @@
 		3720E7512A860CE400E1A4E5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3720E7502A860CE400E1A4E5 /* ContentView.swift */; };
 		3720E7532A860CE500E1A4E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3720E7522A860CE500E1A4E5 /* Assets.xcassets */; };
 		3720E7562A860CE500E1A4E5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3720E7552A860CE500E1A4E5 /* Preview Assets.xcassets */; };
+		3720E77E2A8A643200E1A4E5 /* LookinServer in Frameworks */ = {isa = PBXBuildFile; productRef = 3720E77D2A8A643200E1A4E5 /* LookinServer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3720E77E2A8A643200E1A4E5 /* LookinServer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,9 @@
 			dependencies = (
 			);
 			name = iOSDC;
+			packageProductDependencies = (
+				3720E77D2A8A643200E1A4E5 /* LookinServer */,
+			);
 			productName = iOSDC;
 			productReference = 3720E74B2A860CE400E1A4E5 /* iOSDC.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 3720E7422A860CE400E1A4E5;
+			packageReferences = (
+				3720E77C2A8A643200E1A4E5 /* XCRemoteSwiftPackageReference "LookinServer" */,
+			);
 			productRefGroup = 3720E74C2A860CE400E1A4E5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -339,6 +347,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3720E77C2A8A643200E1A4E5 /* XCRemoteSwiftPackageReference "LookinServer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/QMUI/LookinServer/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3720E77D2A8A643200E1A4E5 /* LookinServer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3720E77C2A8A643200E1A4E5 /* XCRemoteSwiftPackageReference "LookinServer" */;
+			productName = LookinServer;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3720E7432A860CE400E1A4E5 /* Project object */;
 }
