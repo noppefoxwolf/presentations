@@ -9,15 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(0..<100) { _ in
-                    Text("aa")
-                }
-            }
-            .navigationTitle("hello")
-            .navigationBarTitleDisplayMode(.inline)
-        }
+        Button {
+            
+        } label: {
+            Text("Hello, World!")
+        }.buttonStyle(.borderedProminent)
+
+//        NavigationView {
+//            List {
+//                ForEach(0..<100) { _ in
+//                    Text("aa")
+//                }
+//            }
+//            .navigationTitle("hello")
+//            .navigationBarTitleDisplayMode(.inline)
+//        }
     }
 }
 
