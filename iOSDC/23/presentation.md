@@ -332,78 +332,161 @@ slidenumbers: true
 
 # View Hierachy Debugger
 
-- Lookin, Reveal, Xcode 
 - 直接サイズを確認できる
-- ビュー構造の理解にも役立つ
+- Xcode
+- https://lookin.work
+  - OSS
+  - コンソール機能が優秀
+- https://revealapp.com
+  - Paid App
+  - UIViewの構造も見れる
 
 ![right fit](ViewDebugger.png)
 
-^ まずは、View Hierachy Debuggerです。
+^ ビューの分析に欠かせないのが、View Hierachy Debuggerです。
 ^ これは、ビューの階層構造を可視化してくれるデバッグツールです。
 ^ Xcodeにも内蔵されていますが、LookinやRevealといったサードパーティのアプリもあります。
 ^ これらを使うことで、文字サイズや余白などを直接確認することができます。
+^ つまり、ほぼ答えが見れます。
 
 ---
 
-# Run Debugger globally
+# Apple Map UI-Component Clone Challenge
 
-![right fit](Reveal-App-Store.png)
+- AppleのMapアプリを再現してみる
+  - 右上のボタンのところ
+- Revealを使って、UIを分析する
 
-- rootにRevealやLookinのサーバーをインストールすることでFirst party appでも動かすことができる[^1]
+![right fit](AppleMap.png)
 
-[^1]: https://hackinggate.com/2019/06/11/inspect-the-view-hierarchy-of-any-ios-apps-on-ios-12.html
-
-^ さらに、RevealやLookinは、iPhoneのrootにインストールすることで、全てのアプリで動作させることが出来るようになります。
-^ これによって、Apple製のアプリや、システムコンポーネントを分析することができます。
-
----
-
-# Method invoke
-
-- 直接プロパティを確認
-- ビューをhiddenや色付け
-- サイズ変更
-
-複雑なビューの調査に役立つ
-
-![right fit](LLDB.png)
-
-^ ビューデバッガーにはコンソールからアプリの動作中に直接プロパティを確認したり、ビューを隠したり色付けしたり、サイズを変更したりする機能もあります。
-^ 複雑なビューの調査に役立つので、ぜひ使ってみてください。
+^ というわけで、ビューヒエラルキーデバッガーを使って、AppleのMapアプリのUIを再現してみましょう。
+^ といっても、全部やるわけには行かないので、この右上のボタンだけ。
+^ UIの分析には、Revealを使います。
 
 ---
 
-# デモ
+# Revealの仕組み
 
-// TODO
-// NavigationBarの背景ブラーを再現する
+![right fill](RevealServer.png)
 
-^ それでは、このビューデバッガーを使って、実際にカスタムナビゲーションバーの背景ブラーを再現してみましょう。
+- アプリの中で動作するサーバーを立ち上げて、macのアプリと通信する
+- アプリにRevealServer.frameworkを組み込む必要がある
+- Lookinも同様の仕様
+- 自前のアプリでしか動作できない
 
-# クラス名からメソッドリストを探す
-
-- Objective-Cの場合は、クラス名からメソッドリストを探す
-- https://developer.limneos.net/
-
-^ クラス名が分かったのなら、Githubやlimneosなどで検索するとプライベートメソッドを含んだヘッダファイルを見つけることができます。
-^ これによって、API設計などを学ぶことができます。
+^ RevealやLookinは、直接プロセスにアタッチ出来ないので、アプリの中で動作するサーバーを立ち上げて、macのアプリと通信する仕組みになっています。
+^ そのため、アプリにRevealServer.frameworkを組み込む必要があります。
+^ ですが、これだとAppleのMapアプリで使うことができません。
 
 ---
 
-# 高度なビジュアル分析のデモ
+# Reveal runs anywhere
 
-// TODO
-// mapのfloating button
+- アプリ起動中に外からRevealServerをloadする
+  - fridaを使うと簡単
 
+^ そこで、アプリの起動中に外からRevealServerをロードしてみます。
+^ 難しそうですが、fridaを使うと簡単にできます。
 
-# Breakpoint globally
+---
 
-- Frida
-  - 実行プロセスをフックして、任意のコードを実行することができる
+# Frida
 
 ![right fit](Frida.png)
 
-^ Frida（フリーダ）
+https://frida.re
+
+- 汎用的なリサーチツール
+  - スクリプトのインジェクト
+  - メソッドコールの監視
+
+- rootにインストール可能
+  - iPhoneのrootが必要
+
+^ Fridaは汎用的なリサーチツールで、iOSやAndroid、Windowsなど、様々なプラットフォームで動作します。
+^ rootで実行することも出来るので、今回はたまたまroot権限を持っていたiPhoneで実行します。
+
+---
+
+# Frida script
+
+loader.js
+
+```
+let loaderPath = "~/RevealServer.framework/RevealServer"
+Module.load(loaderPath)
+```
+
+^ fridaは、インジェクトする処理をjsで記述できます。
+^ 今回は、RevealServerをロードする簡単なスクリプトを用意しました。
+^ RevealServer.frameworkは、事前にiPhoneに転送しておきます。
+
+---
+
+# Load framework using Frida
+
+```
+# 1. frida-psでUSBで接続したiPhoneからプロセスIDを探す
+$ frida-ps --usb | grep Map
+2537  Maps
+
+# 2. fridaでPIDに対してスクリプトを実行する
+$ frida --usb --load loader.js --attach-pid 2537
+```
+
+^ 次に、iPhoneでマップアプリを立ち上げます。
+^ frida-psを使って、MapアプリのプロセスIDを探します。
+^ そして、fridaコマンドで、プロセスにloader.jsをインジェクトします。
+^ これで、MapアプリでRevealServerが動作するようになりました。
+
+---
+
+![](RevealConnected.png)
+
+^ Revealが接続できるデバイス一覧に、このように表示されていると思います。
+
+---
+
+![fit](RevealMapPreview.png)
+
+^ このように、Xcode View Hierarchy Debuggerと同じように、Mapアプリのビュー階層を見ることができます。
+^ 上の方にある、このボタンにフォーカスします。
+
+---
+
+![fit](RevealCardView.png)
+
+^ 左パネルに、ビュー階層が表示されます。
+^ どうやら、このボタンは、CardViewという名前のビューのようです。
+^ さらに、影の描画用のCardCustomBorderViewがあり、その上にボタンを乗せるUIVisualEffectViewがあるということも分かります。
+
+---
+
+![fit](RevealVisualEffectStyle.png)
+
+^ 右のパネルには、プロパティが表示されます。
+^ このUIVisualEffectは、SystemThickMaterialであることも分かりました。
+
+---
+
+![](CardViewClone.png)
+
+^ そして、これがプロパティやビュー階層を参考にして作ったCardViewです。
+^ かなりそっくりに出来たと思います。
+
+---
+
+# クラス名からメソッドリストを探す
+
+- フレームワークのクラス名からヘッダーを探す
+  - どんなメソッドの生えたビューなのか分かる
+  - https://developer.limneos.net/
+  - FridaやLLDBでメソッドを実行することも
+
+^ また、クラス名が分かったのなら、Githubやリムネosなどで検索することで、プライベートメソッドを含んだヘッダファイルを見つけることができます。
+^ これによって、ビューのAPI設計を学ぶことができます。
+^ また、FridaやLLDBからメソッドを実行することも出来ます。
+^ 再現の難しい状態を作るときなどに役立つかと思います。
 
 ---
 
