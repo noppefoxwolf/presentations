@@ -237,7 +237,7 @@ slidenumbers: true
 - アクセシビリティや「拡大表示」設定によって、サイズが変化するので注意
 - Dynamic Typeは最大最小値が決まっている場合もある
 
-![inline autoplay loop](DynamicType.mp4)
+![inline autoplay loop](DynamicType.gif)
 
 ^ 計測するときは、アクセシビリティや拡大表示でどう変化するのかも見ておきましょう。
 ^ 特にフォントは固定値にしがちです。ちゃんとdynamic fontを使ってサイズを変えられるようにしましょう。
@@ -298,7 +298,7 @@ slidenumbers: true
 
 - ブラー, グラデーション, 透過度
 
-![inline autoplay loop](Blured.mp4)
+![inline autoplay loop](Blured.gif)
 
 ^ また、パッと見単色に見えて、単色でないものもあります。
 ^ 広めに色を取り出して、ムラがないか確かめるのも良いでしょう。
@@ -314,7 +314,7 @@ slidenumbers: true
 - スクリーンレコードをコマ送りして確認
   - iina, QuickTime Player
 
-![right fit autoplay loop](Animation.mp4)
+![right fit autoplay loop](Animation.gif)
 
 ^ 続いて、アニメーションについて。
 ^ アニメーションは、duration, curve, timingを見ておきましょう。
@@ -476,16 +476,19 @@ $ frida --usb --load loader.js --attach-pid 2537
 
 ---
 
-# クラス名からメソッドリストを探す
+# クラス名からヘッダーを探す
 
-- フレームワークのクラス名からヘッダーを探す
-  - どんなメソッドの生えたビューなのか分かる
-  - https://developer.limneos.net/
-  - FridaやLLDBでメソッドを実行することも
+![right fit](Header.png)
 
-^ また、クラス名が分かったのなら、Githubやリムネosなどで検索することで、プライベートメソッドを含んだヘッダファイルを見つけることができます。
+- ktool, DyldExtractor
+  - https://github.com/0cyn/sdk-builder
+- API設計を学ぶ
+- FridaやLLDBでメソッドを実行して実験する
+
+^ また、クラス名が分かったのなら、フレームワークからヘッダーをダンプすることもできます。
+^ Github Actionsで自動化しているプロジェクトがあるので、それを使うと簡単にできることかと思います。
 ^ これによって、ビューのAPI設計を学ぶことができます。
-^ また、FridaやLLDBからメソッドを実行することも出来ます。
+^ また、メソッドが分かってしまえばFridaやLLDBから実行することも出来ます。
 ^ 再現の難しい状態を作るときなどに役立つかと思います。
 
 ---
@@ -541,7 +544,7 @@ $ frida --usb --load loader.js --attach-pid 2537
 - タップでOn,Offの切り替え
 - パンでも補助的に切り替えができる
 
-![right fit autoplay loop](Toggle.mp4)
+![right fit autoplay loop](Toggle.gif)
 
 ^ ケース１、補助ジェスチャー。
 ^ これは、本来の目的に対して補助的なジェスチャーを設定することで、ユーザーの操作を誘導するためのものです。
@@ -552,7 +555,7 @@ $ frida --usb --load loader.js --attach-pid 2537
 
 # Case2. 不可視トリガー
 
-![right fit autoplay loop](InvisibleTrigger.mp4)
+![right fit autoplay loop](InvisibleTrigger.gif)
 
 - ある程度見た目で使い方が分かるものがほとんど
 - しかし、不可視のトリガーもある
@@ -567,7 +570,7 @@ $ frida --usb --load loader.js --attach-pid 2537
 
 # Case3. 閾値
 
-![right fit autoplay loop](KeyboardHitArea.mp4)
+![right fit autoplay loop](KeyboardHitArea.gif)
 
 - 実際の見た目よりもズレた位置に判定がある場合もある
 
