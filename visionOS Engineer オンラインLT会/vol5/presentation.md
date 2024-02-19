@@ -1,8 +1,19 @@
 slidenumbers: true
 
-# 既存アプリのApple Vision Pro対応した話
+# 既存アプリをvisionOS対応してリリースした話
 
 ## visionOS Engineer オンラインLT会 vol.5
+
+---
+
+# 過去の発表
+
+- Yahooのyamakenさんが同じテーマで過去に発表されてます
+- 重複する内容[^1]は飛ばしていきます
+
+[^1]: ref: https://speakerdeck.com/yamakentoc/ji-cun-ahuriwovisionostehirutosurukotu
+
+![right fit](yamakentoc.png)
 
 ---
 
@@ -16,7 +27,7 @@ slidenumbers: true
 
 # 今日のお話
 
-既存アプリのApple Vision Pro対応した話
+既存アプリをvisionOS対応してリリースした話
 
 ---
 
@@ -28,19 +39,25 @@ slidenumbers: true
 
 - iOS, iPadOS, macOS(Catalyst)
 
+- Swift 5.9
+
 - UIKit & SwiftUI
+
+- Swift Package Manager
 
 ![right fit](appstore.jpeg)
 
 ---
 
-# 対応できた！
+# 結論：対応できた
+
+- おめでとう！！
 
 - Apple Vision Proのローンチに間に合った
 
 - 対応期間は１週間くらい
 
-- Susan Prescott(副社長)から感謝のメールが来る
+- Susan Prescott(副社長)から感謝のエモいメールが来た
 
 ![right fit](visionOS.png)
 
@@ -48,30 +65,58 @@ slidenumbers: true
 
 ---
 
-# visionOSへの対応方法
+# 結論：対応できた
 
-1. iPad互換
+- おめでとう！！
 
-2. visionOS向けにビルド
+- Apple Vision Proのローンチに間に合った
+
+- 対応期間は１週間くらい
+
+- Susan Prescott(副社長)から感謝のエモいメールが来た
+
+![right fit](thankyou.png)
 
 ---
 
-# iPad互換
+# visionOS対応の選択肢
 
-- 特に何もしなくても動く
-- ただ、iPadアプリが動くだけ
-    - 奥行きもない
-    - 背景のぼやけもない
+1. iOS SDKでビルド
+
+2. visionOS SDKでビルド
+
+3. 新しく作り直す
+
+---
+
+# iOS SDKでビルド
+
+![right fit](ipad-compatible.png)
+
+- iPadアプリとして動作する
 - 公開設定を変更しなければ自動的にiPadアプリとして公開される
+- ホーム画面には追加されず、Compatible Appsに入る
 
 ---
 
-# visionOS向けにビルド
+# iOS SDKでビルド
+
+![right fit](compatible.jpeg)
+
+- iPadアプリとして動作する
+- 公開設定を変更しなければ自動的にiPadアプリとして公開される
+- ホーム画面には追加されず、Compatible Appsに入る
+
+---
+
+# visionOS SDKでビルド
 
 - ちょっとした修正が必要
     - UIKitが動くので比較的簡単
 - UIの全てがvisionOSに最適化される
 - 今回はこっちに挑戦
+
+![right fit](visionOS.png)
 
 ---
 
@@ -111,8 +156,10 @@ slidenumbers: true
 
 # ColorScheme
 
-- アプリ内のダークモード・ライトモードの切り替えする機能
+- アプリ内のダークモード・ライトモードの切り替えする機能があった
 - `overrideUserInterfaceStyle`で変更は出来るが、ダークモード・ライトモードの見た目が一緒
+
+![right fit](theme.png)
 
 ---
 
@@ -130,7 +177,7 @@ alternativeAppIconButton()
 
 # App Extensions
 
-Widget Extensionなどは実質動かない
+Widget Extensionは動かない
 
 ![inline](widget.png)
 
@@ -144,7 +191,9 @@ Embed Foundation ExtensionのFiltersでWidgetはフィルタする
 
 ---
 
-# App ExtensionsはvisionOS向けにビルドすること
+# App ExtensionsもvisionOS SDKでビルドすること
+
+Designed for iPadになっていると、本体がvisionOS SDKだとコケる
 
 ![inline](extension-error.png)
 
@@ -154,23 +203,25 @@ Embed Foundation ExtensionのFiltersでWidgetはフィルタする
 
 # 対応してないライブラリの対応・除外・置換
 
+PR送ったりした
+
 ![inline](pr.png)
 
 ---
 
 # 対応してないライブラリの対応・除外・置換
 
-![inline](twittereditor.png)
+TwitterTextEditorも自前のコードに置き換え
 
-- TwittertextEditorを使わないように変更
+![inline](twittereditor.png)
 
 ---
 
 # 対応してないライブラリの対応・除外・置換
 
-iOSでは欲しいけど、visionOSでは使わないライブラリは
+対応が難しそうなものは、iOSにだけ入れることもできる
 
-```swift
+```
 .product(
     name: "CropViewController",
     package: "TOCropViewController",
@@ -178,7 +229,7 @@ iOSでは欲しいけど、visionOSでは使わないライブラリは
 ),
 ```
 
-```swift
+```
 #if canImport(CropViewController)
 ...
 #endif
@@ -188,9 +239,10 @@ iOSでは欲しいけど、visionOSでは使わないライブラリは
 
 # UIの修正
 
-`inputAccessoryViewController`がvisionOSでは使えない
+キーボード上のツールバーのAPIである、`inputAccessoryView`がvisionOSでは使えない
 
 - 送信とか諸々詰め込んでいたので困った
+- 代替案を探す
 
 ![right fit](Accessory.png)
 
@@ -198,7 +250,7 @@ iOSでは欲しいけど、visionOSでは使わないライブラリは
 
 # UIの修正
 
-`UIOrnament`に実装を移した
+visionOSは、`UIOrnament`に実装を移した
 
 ![right fit](accessory-vision.png)
 
@@ -207,27 +259,31 @@ iOSでは欲しいけど、visionOSでは使わないライブラリは
 # UIの修正のコツ
 
 ```swift
+// visionOS
 ornaments = [UIHostingOrnament {
     /* SwiftUI ViewBuilder */
 }]
+
+// iOS
+accessoryView = AccessoryHostingView {
+    /* SwiftUI ViewBuilder */
+}
 ```
 
-UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っておくのがおすすめ
+UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っておくと共通化できて便利
 
 ---
 
-# アイコンとストア情報の準備
+# 完成！
 
-- 頑張る
-
----
-
-![](zenn.png)
+![inline](store.jpg)
 
 ---
 
 # まだまだ最適化は続く
 
-- 操作を減らしたい
-
----
+- 実機で触ってみるとどんどん課題ややりたい事が見えてくる
+  - 操作を減らしたい
+  - 画面上のボタンを減らしたい
+  - メディアを3Dで表示したい
+  - なんかパフォーマンス悪い
