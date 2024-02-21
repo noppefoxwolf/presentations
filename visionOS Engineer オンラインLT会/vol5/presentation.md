@@ -45,7 +45,7 @@ slidenumbers: true
 
 - Swift Package Manager
 
-![right fit](appstore.jpeg)
+![right fit](appstore.png)
 
 ---
 
@@ -101,7 +101,7 @@ slidenumbers: true
 
 # iOS SDKでビルド
 
-![right fit](compatible.jpeg)
+![right fit](compatible.png)
 
 - iPadアプリとして動作する
 - 公開設定を変更しなければ自動的にiPadアプリとして公開される
@@ -276,7 +276,7 @@ UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っ�
 
 # 完成！
 
-![inline](store.jpg)
+![inline](store.png)
 
 ---
 
@@ -292,6 +292,6 @@ UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っ�
 
 # おまけ
 
-![inline](spatialbar.jpg)
+![inline](spatialbar.png)
 
 ---
