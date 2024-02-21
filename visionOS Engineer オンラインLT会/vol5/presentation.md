@@ -241,6 +241,7 @@ TwitterTextEditorも自前のコードに置き換え
 
 キーボード上のツールバーのAPIである、`inputAccessoryView`がvisionOSでは使えない
 
+- UIKitで書いてる
 - 送信とか諸々詰め込んでいたので困った
 - 代替案を探す
 
@@ -251,6 +252,9 @@ TwitterTextEditorも自前のコードに置き換え
 # UIの修正
 
 visionOSは、`UIOrnament`に実装を移した
+
+- SwiftUIで書ける
+- 比較的なんでも置ける
 
 ![right fit](accessory-vision.png)
 
@@ -274,7 +278,7 @@ UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っ�
 
 ---
 
-# 完成！
+# 無事リリース
 
 ![inline](store.png)
 
@@ -294,4 +298,3 @@ UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っ�
 
 ![inline](spatialbar.png)
 
----
