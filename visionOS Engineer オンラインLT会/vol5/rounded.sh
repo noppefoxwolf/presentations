@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Loop through all image files in the directory
-for input_image in *.png; do
+for input_image in *.{png,jpeg,jpg}; do
     width=$(identify -format "%w" $input_image)
     height=$(identify -format "%h" $input_image)
     min_side=$(($width < $height ? $width : $height))
-    round_radius=$(($min_side / 5))  # 20% of the shorter side
+    round_radius=$(($min_side / 10))  # 20% of the shorter side
 
     echo "Processing $input_image - Width: $width Height: $height Round Radius: $round_radius"
     
