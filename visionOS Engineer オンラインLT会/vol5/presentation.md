@@ -287,3 +287,11 @@ UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っ�
   - 画面上のボタンを減らしたい
   - メディアを3Dで表示したい
   - なんかパフォーマンス悪い
+
+---
+
+# おまけ
+
+![inline](spatialbar.jpg)
+
+---
