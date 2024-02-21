@@ -23,11 +23,15 @@ slidenumbers: true
 - 𝕏: @noppefoxwolf
 - mastodon: @mstdn.jp@noppefoxwolf
 
+![right fit](profile.png)
+
 ---
 
 # 今日のお話
 
 既存アプリをvisionOS対応してリリースした話
+
+- マイク死んだら誰か𝕏にDMください
 
 ---
 
@@ -287,10 +291,11 @@ UIHostingOrnamentを参考に、bodyをSwiftUIで書けるようなUIを作っ�
 # まだまだ最適化は続く
 
 - 実機で触ってみるとどんどん課題ややりたい事が見えてくる
-  - 操作を減らしたい
-  - 画面上のボタンを減らしたい
+  - 操作・ボタンを減らしたい
   - メディアを3Dで表示したい
   - なんかパフォーマンス悪い
+
+- 皆さんも是非、visionOS対応してみてください！！
 
 ---
 
