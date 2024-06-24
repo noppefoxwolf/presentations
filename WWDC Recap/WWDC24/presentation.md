@@ -46,6 +46,9 @@ noppe
 - App Intentを意識したアプリ開発
 - まとめ
 
+^ 今日は、AppIntentが何だか分からない、ふわっとしか分からない人に向けても分かる内容にしている
+^ コピペで済ませてた人も。
+
 # App Intentの基本
 
 - アプリが出来ること、扱うデータについて表明すること
@@ -54,11 +57,15 @@ noppe
   - このアプリは、コーヒの淹れ方を表示できます
   - このアプリは、
 
+^ AIで使うので全て表明するべき
+
 ## 表明すると、何がいいことがあるの？
 
 - システムが検出して勝手に統合してくれる
   - 表明している機能に応じて、適切な場所から実行できるようにする
   - 表明しているデータに応じて、Siriが検索してくれる
+
+^ 多分、ショートカットとして公開していた部分をAIがいい感じに拾い上げてくれるようになった
 
 ## 適切な場所から実行出来るメリット
 
@@ -71,7 +78,21 @@ noppe
   - コントロールウィジェット
   - ライブアクティビティ
 
+## 基本のまとめ
+
+|||
+|App Intent||
+|App Intent + AppShortcutsProvider||
+|App Intent + WidgetKit||
+|SiriKit Intents||
+
 # WWDC24で何が変わったのか
+
+## Widgetの追加
+
+- Control Widget
+  - Control Center
+  - Lock Screen
 
 ## Intentの追加
 
@@ -81,11 +102,6 @@ noppe
 - SetValueIntent
 
 - ControlConfigurationIntent
-
-## Widgetの追加
-
-- Control Widget
-- Lock Screen Widget
 
 ---
 
