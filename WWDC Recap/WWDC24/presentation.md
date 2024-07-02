@@ -250,26 +250,64 @@ WidgetConfiguration
 
 ^ そして、Apple Intelligenceに対してもAppIntentを最適化することができます。
 
-# Apple Intelligenceについて
-	ユーザー目線では魔法のような動きをする
+# Siri + Apple Intelligence
+
+- 自然な話し方で処理を依頼できる
+- 複雑な処理を依頼できる
+- 画面上のコンテキストを理解できる
+
+^ Siriは、AIによってとても進化しました。
+^ これによってSiriは魔法のような動きをするが、開発者はその仕組みを理解する必要があると思います。
 
 # Apple Intelligenceについて
-	Siri ≠ AppleIntelではない
-	Apple Intelに統合されたSiriはおそらくほとんど何もしない
-	Apple Intelにユーザーリクエストを投げて、スキーマ群をビルドしてもらうだけ
 
-# Apple Intelligenceは魔法ではない
-	1000種類の決められたアクションから選択される
-	App Intentが1000種類のうちどれに当たるのかを教えてあげる必要がある
+![right fit](arch.png)
+
+- Siri ≠ AppleIntelではない
+
+^ 誤解を恐れずに言うなれば、SiriはApple Intelligenceではありません。
+^ SiriはあくまでUIの１つであり、一部の処理をAIに移譲する
+
+# Siriの仕組み
+
+![right fit](siri-workflow.png)
+
+- Apple Intelにユーザーリクエストを投げて、適切なスキーマを見つけて、紐づいたAppIntentを見つけて実行する
+- 前の文脈も引き継いだりしていそう
+- IMO: 要するに、その場限りのショートカットをリアルタイムに構築しているのでは？
+
+^ 要するに、その場限りのショートカットをリアルタイムに構築していると理解していいんじゃないかなぁと思います。予想ですが。
+
+# スキーマ
+
+![right fit](schemas.png)
+
+- 100種類の決められたアクションのこと
+
+- App Intentが100種類のうちどれに当たるのかを教えてあげる必要がある
+
+- 要するに、あまりにトリッキーな命令は出来ないのではないかと思う
+
+例：冷蔵庫の写真から料理のレシピを作って、その材料をamazonで購入して
+
+^ スキーマというのは、Apple Intelligenceが学習しているシナリオに含まれる動作。
 
 # AssistantSchema 🆕
-	
-# App Entity for AI 🆕
-	パラメータはどうやって指定するの？
-	IndexedEntityに対応することでいい感じに探してくれる
-	「昨日撮った娘の写真」とか
+
+- 既存のAppIntentにスキーマを指定できる
+- AssistantEntity 🆕
+
+^ スキーマはAssistantSchemaマクロを使うことで、AppIntentに付与することができます。
 
 # IndexedEntity 🆕
+
+- 検索可能にする
+- attributeSetで情報を付与できる
+- 「昨日撮った娘の写真」とかをAIに見つけさせることが可能になる
+
+# エコシステムの全貌
+
+// 図
 
 # 考察
 	何か
