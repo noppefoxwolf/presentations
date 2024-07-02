@@ -1,18 +1,18 @@
 import AppIntents
 
 
-struct MarkAsReadIntent: ShowInAppSearchResultsIntent {
-    static let title = LocalizedStringResource("全てのメールを既読")
-    
-    var name: String
-    
-    static var isDiscoverable: Bool = false
-    
-    func perform() async throws -> some IntentResult {
-        // process
-        .result()
-    }
-}
+//struct MarkAsReadIntent: ShowInAppSearchResultsIntent {
+//    static let title = LocalizedStringResource("全てのメールを既読")
+//    
+//    var name: String
+//    
+//    static var isDiscoverable: Bool = false
+//    
+//    func perform() async throws -> some IntentResult {
+//        // process
+//        .result()
+//    }
+//}
 
 //
 //// AppIntent -> performのためのIntent

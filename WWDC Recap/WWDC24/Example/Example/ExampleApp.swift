@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import AppIntents
 
 @main
 struct ExampleApp: App {
@@ -26,7 +27,21 @@ struct ExampleApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+            Button(intent: Intent()) {
+                Text("Hello")
+            }
         }
         .modelContainer(sharedModelContainer)
+    }
+}
+
+struct Intent: AppIntent {
+    static let title: LocalizedStringResource = "Hello"
+    
+    static var isDiscoverable: Bool = false
+    
+    func perform() async throws -> some IntentResult {
+        print("OK")
+        return .result()
     }
 }

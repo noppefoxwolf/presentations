@@ -92,49 +92,163 @@ Appに組み込まれたアクションを、外部に公開したもの
 
 ![inline](ok-intent.png)
 
+^ このようなフレキシブルなインテントにするのが良い。
 
+# AppEntity, AppEnum
 
-# App Entity
-	パラメータとして定義するのに必要
+Appに組み込まれた要素や概念を、外部に公開したもの
 
-# App Entity for App 🆕
-	URLRepresentableでUniversal Linkとして扱える
+- App Intentのパラメータを定義するのに必要
+- 例：アルバム・曲・タブのタイプ
+
+^ ここで登場するのが、App EntityとApp Enumです。
+^ これは、App Intentのパラメータとして扱う型が準拠する必要のあるprotocolで
+^ このprotocolに準拠した型は、Intentのようにアプリの外からも扱うことができるようになります。
+
+# ここまでのエコシステムの振り返り
+
+// AppIntent, Entity, Shortcutsの図
+
+^ さて、ここまでのエコシステムを振り返ってみると非常にシンプルです。
+^ アプリは、AppIntentとAppEntityを使って要素やロジックを公開することで、アプリの外にあるショートカットからロジックを実行してもらうことができます。
+
+# AppIntentを作ってみる
+
+```swift
+struct OpenAppIntent: AppIntent {
+  ...
+}
+```
+
+^ 先に進む前に、App Intentを作ってみましょう。
+
+# AppIntentを作ってみる
+
+```swift
+struct TabType: AppEntity {
+  ...
+}
+```
+
+^ AppEntityはこんな感じ
+
+# AppIntentを作ってみる
+
+// ショートカットからの見た目
+
+^ これでショートカットからタブを選べるApp Intentを作ることができました。
+
+# AppIntentを作ってみる
+
+// AppIntentが実行されてAppが動作する図
+
+^ ところで、このAppIntentが実行されたときに実際にタブを選択するにはどうすればいいでしょうか？
+
+# AppIntentを作ってみる
+
+- 🆕 URLRepresentableEntity
+- 🆕 URLRepresentableEnum
+- 🆕 URLRepresentableIntent
+
+^ iOS18では、URLRepresentableIntentが登場しました。
+^ これを使うと、App IntentをURLとして実行することができます。
+^ つまり、Universal LinkとしてアプリはApp Intentをハンドリングすることができます
 
 # Shortcuts
-	App Intent同士を組み合わせることができる
-	違うアプリ同士でやり取りをする必要が出てくる
 
-# App Entity + transferable 🆕
-	App Intent間を一般的なファイル形式でやり取りできる
+- App Intent同士を組み合わせることができる
+- AppEntityを違うアプリ同士でやり取りをする必要が出てくる
 
-# FileEntity
-	ファイルを直接AppEntityにできる
+^ さて、ショートカットに話を戻しましょう。
+^ ショートカットは、複数のインテントを組み合わせることができます。
+^ そのため、自分のApp Intentに他の見知らぬアプリのApp Entityが渡されることがあります。
+^ これまでは（調査）していましたが、iOS18ではある仕組みによって互換性が向上しています。
 
-# App Intentと連携する周辺機能
-	Shortcuts
+# 🆕　Transferable AppEntity
 
-# Shortcutsが自動的に提供する機能
-	Shortcutの作成
-	Shortcuts Widget
-	Action Button
-	Apple Pencil Proのスクイーズ
+- App Entityにエクスポート可能なタイプを
 
-# App Intentと連携する周辺機能
-	各機能向けにラップすることができる
-	Siri
-	Widget
+[^]:https://developer.apple.com/documentation/coretransferable/transferable
+
+^ それが、AppEntityのTransferableサポートです。
+^ Transferableに適合することで、Entityを特定の形式として扱ってもらうことができます。
+
+# 🆕　Transferable AppEntity
+
+```swift
+// transferable
+```
+
+^ このように、SongEntityをTransferableに適合してアートワークやタイトルといった物を取り出してもらえるようにサポートすることもできます。
+
+# ここまでのエコシステムの振り返り
+
+// 複数のApp, AppIntent, Entity, Shortcutsの図
+
+^ 異なるアプリのAppIntentを組み合わせてショートカットを作ることによって、強力な連携ができるようになりました。
+^ ここで、ショートカットを中心としたエコシステムの広がりについて解説します。
+
+# ショートカットを中心としたエコシステム
+
+- Shortcuts
+- オートメーション
+- Shortcuts ウィジェット
+
+^ 作成したショートカットは、ショートカットアプリの他、ショートカットのウィジェットなどでも利用できます。
+
+# ショートカットを中心としたエコシステム
+
+- Siri
+- Action Button
+- Apple Pencil Proのスクイーズ
+- Assistive Touch
+
+^ さらに、ショートカットはOSと密接に連携しており、多くの機能からショートカットを呼び出すことができます。
+
+# ここまでのエコシステムの振り返り
+
+// 複数のApp, AppIntent, Entity, Shortcuts, ショートカットを使う機能たちの図
+
+^ かなり登場人物が増えてきましたが、理解しやすいのではないでしょうか
+
+# 特定の機能に対してApp Intentを最適化して提供する
+
+- Siri (フェーズの追加)
+- ウィジェット (UIの追加)
+- Apple Intelligence (スキーマの追加)
+
+^ ここまでは、ショートカットアプリを中心にエコシステムが広がりを見せていました。
+^ さらに、App Intentの開発者は、特定の機能に対してApp Intentを最適化して提供することもできます。
+^ どのように最適化するのかを見ていきましょう
 
 # Siri
-	AppShortcutsProvider
 
-# Widget
-	WidgetConfiguration
+AppShortcutsProvider
 
-# 新しいWidget
-	Control Widget
+- フェーズの追加
 
-# ここにもう一つ追加された
-	Apple Intelligence + Siri
+^ 先ほど説明した通り、ショートカットのアプリでショートカットを作ることでSiriから呼び出すことが出来ます。
+^ AppShortcutsProviderでラップすることで、インストール直後からSiriでApp Intentを使ったり、自然な表現で呼び出させることができます。
+
+# ウィジェット
+
+WidgetConfiguration
+
+- UIの追加
+
+^ WidgetKitを使うと、App Intentを呼び出すためのウィジェットUIを自分で構築することができます。
+
+# ウィジェットの活用
+
+- 🆕 Control Widget
+  - コントロールセンター
+  - ロック画面
+
+^ 今年は、ウィジェットが表示できる場所が増えました。
+
+# Apple Intelligence
+
+^ そして、Apple Intelligenceに対してもAppIntentを最適化することができます。
 
 # Apple Intelligenceについて
 	ユーザー目線では魔法のような動きをする
