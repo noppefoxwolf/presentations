@@ -44,7 +44,8 @@ class TextAttachmentViewProvider: NSTextAttachmentViewProvider {
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
-
+    let collection = ["2", "1"]
+    
     var body: some View {
         Text("Hello")
     }

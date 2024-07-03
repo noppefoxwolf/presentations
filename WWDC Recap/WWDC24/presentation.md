@@ -3,40 +3,57 @@ slidecount: true
 slide-transition: false
 slide-dividers: #, ##, ###
 autoscale: true
+theme: Inter 2.0, 1
+background-color: #F6F5F7
+header: text-scale(0.6)
 
-# WWDC Recap
-App Intent
+# 今から理解するApp Intentエコシステム
 
-# 自己紹介
+WWDC Recap (30min)
+noppe
+
+# noppe
 
 株式会社ディー・エヌ・エー
-ライブコミュニケーション事業部
-noppe
+ライブコミュニティ事業本部
+
+個人アプリ開発者
+
+![right fit](profile.png)
+
+# WWDC24 行ってきました！
+
+![original](dc.jpeg)
+
+---
+
+![](wwdc-dawn.png)
 
 # Agenda
 
-// ごちゃごちゃの図
+![original](family.png)
 
 ^ 今日はRecapイベントではありますが、30分と長めの時間をいただけたのでAppIntentを０からでも理解できる内容でいこうと思います。
 ^ App Intentのエコシステムは、便利である一方で他のフレームワークに比べてやや複雑で分かりにくいと思います。
 ^ その要因としては、iOS10から始まったSiriKitの歴史的な経緯や、App Intentが万能的に解説されがちであるという点、また、これまではあまり重要視されてこなかったという点にあると思います。
+^ どうやったら、Appleと違う方法でApp Intentを解説できるか考えてみた。
 
 # Agenda
 
-// 小粒になるの図
+![original](intent-central.png)
 
 ^ そこで今日は、これからのAppleプラットフォームにおける重要な要素であるApp Intentのエコシステムを、最小の単位から順に登場人物を徐々に増やして解説していきます。
 ^ このトークの後には、皆さんはApp Intentのエコシステムが頭の中で整理された状態になると思います。
 
 # Agenda
 
-// NEWの図
+![original](wwdc24-logo.png)
 
 ^ もちろん、解説しながら今年のアップデートも紹介していきます。
 
 # App Intent
 
-// App Intentのアイコン
+![original](appintent.png)
 
 ^ では、最初にApp Intentとは何かを端的に説明します。
 
@@ -58,7 +75,7 @@ Appに組み込まれたアクションを、外部に公開したもの
 
 # ショートカット
 
-// ショートカットのアイコン
+![original](shortcuts.png)
 
 ^ ここで、早速２人目の登場人物が現れます。ショートカットです。
 
@@ -72,15 +89,11 @@ Appに組み込まれたアクションを、外部に公開したもの
 ^ ショートカットアプリは、アプリから取り出したApp Intentを実行するショートカットを作ることができます。
 ^ つまり、ショートカット経由でアプリの外からアプリの機能を呼び出せるということです。
 
-# ショートカット
-
-// ?の画像
-
-- 特定のタブを開くショートカットを作るには
+# 特定のタブを開くショートカットを作る
 
 ^ さて、ここで「アプリを開く時に、特定のタブを開く」ショートカットを作るとしましょう。
 
-# ショーカット
+# 特定のタブを開くショートカットを作る
 
 ![inline](ng-intent.png)
 
@@ -88,7 +101,7 @@ Appに組み込まれたアクションを、外部に公開したもの
 
 ^ このように、タブごとにApp Intentを作るのは今年のWWDCの「システムの利便性を高めるApp Intentのデザイン」によると、よくない(補足入れる)
 
-# ショートカット
+# 特定のタブを開くショートカットを作る
 
 ![inline](ok-intent.png)
 
@@ -107,7 +120,7 @@ Appに組み込まれた要素や概念を、外部に公開したもの
 
 # ここまでのエコシステムの振り返り
 
-// AppIntent, Entity, Shortcutsの図
+![original](intent-entity-shortcut.png)
 
 ^ さて、ここまでのエコシステムを振り返ってみると非常にシンプルです。
 ^ アプリは、AppIntentとAppEntityを使って要素やロジックを公開することで、アプリの外にあるショートカットからロジックを実行してもらうことができます。
@@ -181,9 +194,9 @@ struct TabType: AppEntity {
 
 ^ このように、SongEntityをTransferableに適合してアートワークやタイトルといった物を取り出してもらえるようにサポートすることもできます。
 
-# ここまでのエコシステムの振り返り
+---
 
-// 複数のApp, AppIntent, Entity, Shortcutsの図
+![original fit](combine-multi-intent.png)
 
 ^ 異なるアプリのAppIntentを組み合わせてショートカットを作ることによって、強力な連携ができるようになりました。
 ^ ここで、ショートカットを中心としたエコシステムの広がりについて解説します。
@@ -205,9 +218,9 @@ struct TabType: AppEntity {
 
 ^ さらに、ショートカットはOSと密接に連携しており、多くの機能からショートカットを呼び出すことができます。
 
-# ここまでのエコシステムの振り返り
+---
 
-// 複数のApp, AppIntent, Entity, Shortcuts, ショートカットを使う機能たちの図
+![original fit](connected-from-shortcuts.png)
 
 ^ かなり登場人物が増えてきましたが、理解しやすいのではないでしょうか
 
@@ -216,6 +229,8 @@ struct TabType: AppEntity {
 - Siri (フェーズの追加)
 - ウィジェット (UIの追加)
 - Apple Intelligence (スキーマの追加)
+
+![](combine-shortcut.png)
 
 ^ ここまでは、ショートカットアプリを中心にエコシステムが広がりを見せていました。
 ^ さらに、App Intentの開発者は、特定の機能に対してApp Intentを最適化して提供することもできます。
@@ -227,6 +242,8 @@ AppShortcutsProvider
 
 - フェーズの追加
 
+![](combine-swift-shortcut.png)
+
 ^ 先ほど説明した通り、ショートカットのアプリでショートカットを作ることでSiriから呼び出すことが出来ます。
 ^ AppShortcutsProviderでラップすることで、インストール直後からSiriでApp Intentを使ったり、自然な表現で呼び出させることができます。
 
@@ -235,6 +252,8 @@ AppShortcutsProvider
 WidgetConfiguration
 
 - UIの追加
+
+![](combine-widget.png)
 
 ^ WidgetKitを使うと、App Intentを呼び出すためのウィジェットUIを自分で構築することができます。
 
@@ -249,6 +268,8 @@ WidgetConfiguration
 # Apple Intelligence
 
 ^ そして、Apple Intelligenceに対してもAppIntentを最適化することができます。
+
+![](combine-schema.png)
 
 # Siri + Apple Intelligence
 

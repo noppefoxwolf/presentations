@@ -27,9 +27,6 @@ struct ExampleApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-            Button(intent: Intent()) {
-                Text("Hello")
-            }
         }
         .modelContainer(sharedModelContainer)
     }
