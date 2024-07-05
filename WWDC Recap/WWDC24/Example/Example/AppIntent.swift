@@ -1,5 +1,44 @@
 import AppIntents
 
+struct AppOpenIntent: AppIntent {
+    static let title: LocalizedStringResource = "Open App"
+    static var openAppWhenRun: Bool = true
+    
+    @Parameter()
+    var tabType: TabTypeAppEntity?
+    
+    func perform() async throws -> some IntentResult {
+        // select tab
+        .result()
+    }
+}
+
+struct TabTypeAppEntityQuery: EntityQuery {
+    func entities(for identifiers: [TabTypeAppEntity.ID]) async throws -> [TabTypeAppEntity] {
+        try await suggestedEntities().filter({ identifiers.contains($0.id) })
+    }
+
+    func suggestedEntities() async throws -> [TabTypeAppEntity] {
+        [
+            TabTypeAppEntity(id: "home", title: "ホーム"),
+            TabTypeAppEntity(id: "notifications", title: "通知")
+        ]
+    }
+}
+
+struct TabTypeAppEntity: AppEntity {
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Tab type")
+    static var defaultQuery = TabTypeAppEntityQuery()
+    
+    let id: String
+    let title: String
+    
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(title)")
+    }
+}
+
+
 
 //struct MarkAsReadIntent: ShowInAppSearchResultsIntent {
 //    static let title = LocalizedStringResource("全てのメールを既読")

@@ -32,13 +32,3 @@ struct ExampleApp: App {
     }
 }
 
-struct Intent: AppIntent {
-    static let title: LocalizedStringResource = "Hello"
-    
-    static var isDiscoverable: Bool = false
-    
-    func perform() async throws -> some IntentResult {
-        print("OK")
-        return .result()
-    }
-}

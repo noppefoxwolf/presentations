@@ -3,7 +3,7 @@ slidecount: true
 slide-transition: false
 slide-dividers: #, ##, ###
 autoscale: true
-theme: Inter 2.0, 1
+theme: Inter 2.0, 2
 background-color: #F6F5F7
 header: text-scale(0.6)
 
@@ -51,148 +51,239 @@ noppe
 
 ^ もちろん、解説しながら今年のアップデートも紹介していきます。
 
-# App Intent
+# App
 
-![original](appintent.png)
-
-^ では、最初にApp Intentとは何かを端的に説明します。
-
-# App Intent
-
-Appに組み込まれたアクションを、外部に公開したもの
+アプリには、いくつものアクションがある
 
 - ファイルを移動する
 - 画像を回転する
 - コーヒーを注文する
 
-ただし、これ単体で何かが出来るわけではない
+これは人間は理解できるが、システムからは分からない。
 
 ![right fit](appcando.png)
 
-^ App Intentは、Appに組み込まれたアクションを指します。
-^ 例えば、ファイルを移動したり、コーヒーを注文することをApp Intentとして公開することができます。
-^ ただし、これ単体では公開しているだけで、何もすることはできません。
+^ さて、我々が作るアプリは…のように、いくつものアクションで構成されています。
+^ これらは人間にとって使いやすいインターフェースで実装されていて、システムは理解することができません。
+
+# AppIntent
+
+![right](intnt.png)
+
+Appに組み込まれたアクションを、外部に公開したもの
+
+ただし、基本的には単体で何かが出来るわけではない
+
+^ 今回のテーマのAppIntentは、そういったアクションたちをシステムに公開するもの。と捉えておくのが良いかと思います。
+^ ただし、あくまで公開するだけです。
+^ 基本的には、これ単体で何かができるわけではありません。
 
 # ショートカット
 
-![original](shortcuts.png)
+![original](appshortcut.png)
 
 ^ ここで、早速２人目の登場人物が現れます。ショートカットです。
 
 # ショートカット
 
-- App Intentを実行するショートカットを作れる
-  - アプリの外からアプリの機能を呼び出せるということ
+- AppIntentをラップして実行可能にしてくれる
+- ショートカット.appで作ることができる
 
 ![right fit](shortcuts_appintent.png)
 
-^ ショートカットアプリは、アプリから取り出したApp Intentを実行するショートカットを作ることができます。
-^ つまり、ショートカット経由でアプリの外からアプリの機能を呼び出せるということです。
+^ ショートカットは、AppIntentをラップしたものでこれはシステムから実行可能になります。
+^ 画面のスクショはショートカットアプリですが、このアプリが、ショートカットを作ることができます。
 
 # 特定のタブを開くショートカットを作る
 
-^ さて、ここで「アプリを開く時に、特定のタブを開く」ショートカットを作るとしましょう。
+^ さて、ここで「特定のタブを開いた状態でアプリを起動する」ショートカットを作るとしましょう。
 
 # 特定のタブを開くショートカットを作る
 
 ![inline](ng-intent.png)
 
+|||
+|---|---|
+|システムの利便性を高める App Intent のデザイン|WWDC24|
+
 [^]: https://developer.apple.com/wwdc24/10176?time=173
 
-^ このように、タブごとにApp Intentを作るのは今年のWWDCの「システムの利便性を高めるApp Intentのデザイン」によると、よくない(補足入れる)
+^ アプリにはいくつものタブがあるので、タブごとにインテントを作ってみました。
+^ しかし、これは良くないデザインです。
 
 # 特定のタブを開くショートカットを作る
 
 ![inline](ok-intent.png)
 
-^ このようなフレキシブルなインテントにするのが良い。
+^ 代わりに、このようなフレキシブルなインテントにするのが良いと言えます。
+^ ところで、このSmart Listと書かれた部分のように選択肢を提示するにはどうすれば良いのでしょうか？
 
-# AppEntity, AppEnum
+# AppEntity
 
 Appに組み込まれた要素や概念を、外部に公開したもの
 
-- App Intentのパラメータを定義するのに必要
-- 例：アルバム・曲・タブのタイプ
+App Intentのパラメータを定義するのに必要
 
-^ ここで登場するのが、App EntityとApp Enumです。
-^ これは、App Intentのパラメータとして扱う型が準拠する必要のあるprotocolで
-^ このprotocolに準拠した型は、Intentのようにアプリの外からも扱うことができるようになります。
+- アカウント
+- タブのタイプ
+- 曲
+
+![](entity.png)
+
+^ ここで登場するのが、AppEntityです。
+^ AppEntityもAppIntent同様にアプリ内部の実装を外部に公開するためのものになります。
+^ AppIntentと異なるのは、これ自体にロジックは無くアカウントや曲などのオブジェクトを指している点になります。
 
 # ここまでのエコシステムの振り返り
 
 ![original](intent-entity-shortcut.png)
 
 ^ さて、ここまでのエコシステムを振り返ってみると非常にシンプルです。
-^ アプリは、AppIntentとAppEntityを使って要素やロジックを公開することで、アプリの外にあるショートカットからロジックを実行してもらうことができます。
+^ アプリは、IntentとEntityを使って要素やロジックを公開することで、ショートカットの材料にしてもらい、システムからロジックを実行してもらうことができます。
 
 # AppIntentを作ってみる
 
 ```swift
+import AppIntents
+
 struct OpenAppIntent: AppIntent {
-  ...
+    static let title: LocalizedStringResource = "アプリを開く"
+	
+    func perform() async throws -> some IntentResult {
+        // select tab
+        .result()
+    }
+
+	static var openAppWhenRun: Bool = true
+
+	@Parameter()
+    var tabType: TabTypeAppEntity?
 }
 ```
 
 ^ 先に進む前に、App Intentを作ってみましょう。
+^ 指定したタブを選択してアプリを開くIntentです。
+^ AppIntent protocolに準拠した構造体は、titleとperformを最低限持つ必要があります。
+^ このタイトルが、ショートカットアプリからIntentを見た時のタイトルになります。
+^ また今回は省略されていますが、performの中はIntentを実行したときの処理になります。
+^ インテント実行時にアプリを開くにはopenAppWhenRunをtrueにします。
+^ 最後に、今回はタブを指定できるようにするためにTabTypeEntityをパラメータとして持っています。
 
 # AppIntentを作ってみる
 
 ```swift
-struct TabType: AppEntity {
-  ...
+struct TabTypeAppEntity: AppEntity {
+    static var typeDisplayRepresentation = .init(name: "タブの種類")
+    static var defaultQuery = TabTypeAppEntityQuery()
+    
+    let id: String
+    let title: String
+    
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(title)")
+    }
 }
 ```
 
-^ AppEntityはこんな感じ
+^ TabTypeAppEntityは、パラメータなのでAppEntityに準拠しています。
+^ ここでは最低限、AppEntityの表示名と選択肢、各要素の表示名を実装する必要があります。
 
-# AppIntentを作ってみる
+---
 
-// ショートカットからの見た目
+![fit autoplay](run.mp4)
 
 ^ これでショートカットからタブを選べるApp Intentを作ることができました。
+^ ところで、このAppIntentが実行されたときに実際に画面を遷移するにはどうすればいいでしょうか？
 
-# AppIntentを作ってみる
+---
 
-// AppIntentが実行されてAppが動作する図
+## 画面遷移の実装
 
-^ ところで、このAppIntentが実行されたときに実際にタブを選択するにはどうすればいいでしょうか？
+```swift
+func perform() async throws -> some IntentResult {
+	Router.shared.navigate(.home)
+    .result()
+}
+```
 
-# AppIntentを作ってみる
+```swift
+var body: some View {
+	TabView { ... }
+		.onReceived(router) { value in
+			selection = value
+		}
+}
+```
+
+^ // TODO onContinueUserActivityかも
+^ これまでは、この実装のようにperformの中で直接画面遷移を行なっていました。
+
+## 画面遷移の実装 (iOS18)
 
 - 🆕 URLRepresentableEntity
 - 🆕 URLRepresentableEnum
 - 🆕 URLRepresentableIntent
 
-^ iOS18では、URLRepresentableIntentが登場しました。
-^ これを使うと、App IntentをURLとして実行することができます。
-^ つまり、Universal LinkとしてアプリはApp Intentをハンドリングすることができます
+```swift
+extension TabTypeAppEntity: URLRepresentableEntity {
+    static var urlRepresentation: URLRepresentation {
+        "https://example.com/tabs/\(.id)"
+    }
+}
+```
 
-# Shortcuts
+既存のUniversal Linkの実装を使いまわせる
+
+^ iOS18では、URLRepresentableIntentが登場しました。
+^ 試せていないのですが、これを使うとApp IntentをURLとして実行することができるようです。
+^ つまり、Universal Linkを実装しているアプリはその実装を使い回すことができます。
+
+# ショートカット
 
 - App Intent同士を組み合わせることができる
+
 - AppEntityを違うアプリ同士でやり取りをする必要が出てくる
 
+![](send.png)
+
 ^ さて、ショートカットに話を戻しましょう。
-^ ショートカットは、複数のインテントを組み合わせることができます。
+^ ショートカットには、複数のインテントを含めることができます。
+^ 前後のインテントは値を渡したり、受け取ることができます。
 ^ そのため、自分のApp Intentに他の見知らぬアプリのApp Entityが渡されることがあります。
-^ これまでは（調査）していましたが、iOS18ではある仕組みによって互換性が向上しています。
+^ これまではAppEntityに含まれるStringやIntなどのシンプルな表現に対応していましたが、iOS18ではある仕組みによって互換性が向上しています。
 
 # 🆕　Transferable AppEntity
 
-- App Entityにエクスポート可能なタイプを
+- App Entityにエクスポート可能なタイプを指定できるようになった
 
 [^]:https://developer.apple.com/documentation/coretransferable/transferable
 
 ^ それが、AppEntityのTransferableサポートです。
-^ Transferableに適合することで、Entityを特定の形式として扱ってもらうことができます。
+^ Transferableに適合することで、Entityを特定のファイル形式として扱ってもらうことができます。
 
 # 🆕　Transferable AppEntity
 
 ```swift
-// transferable
+extension GreetingAppEntity: Transferable {
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(
+			exportedContentType: .png,
+			exporting: { entity in
+            	entity.pngData()
+        	}
+		)
+    }
+}
 ```
 
-^ このように、SongEntityをTransferableに適合してアートワークやタイトルといった物を取り出してもらえるようにサポートすることもできます。
+^ このように、GreetingAppEntityをTransferableに適合してアートワークやタイトルといった物を取り出してもらえるようにサポートすることもできます。
+
+---
+
+![fit](tranferable.png)
+
+^ これによって、AppEntityを画像として解釈してもらうことが可能になりました。
+^ このような連携の強化によって、自分のアプリのインテントと写真アプリのインテントを連結することができました。
 
 ---
 
@@ -203,18 +294,27 @@ struct TabType: AppEntity {
 
 # ショートカットを中心としたエコシステム
 
-- Shortcuts
-- オートメーション
-- Shortcuts ウィジェット
+作成したショートカットは、ショートカットアプリで活用できる
 
-^ 作成したショートカットは、ショートカットアプリの他、ショートカットのウィジェットなどでも利用できます。
+- ショートカットアプリ
+- オートメーション
+- ショートカットアプリ ウィジェット
+- ...
+
+![](shortcuts.png)
+
+^ 作成したショートカットは、ショートカットアプリの機能で、ショートカットのウィジェットなどでも利用できます。
 
 # ショートカットを中心としたエコシステム
+
+作成したショートカットは、ショートカットアプリ以外でも活用できる
 
 - Siri
 - Action Button
 - Apple Pencil Proのスクイーズ
 - Assistive Touch
+- Spotlight
+- ...
 
 ^ さらに、ショートカットはOSと密接に連携しており、多くの機能からショートカットを呼び出すことができます。
 
@@ -222,82 +322,64 @@ struct TabType: AppEntity {
 
 ![original fit](connected-from-shortcuts.png)
 
-^ かなり登場人物が増えてきましたが、理解しやすいのではないでしょうか
+^ かなり登場人物が増えてきましたが、ショートカットを中心に活用範囲が広がっていると考えると、理解しやすいのではないでしょうか
 
-# 特定の機能に対してApp Intentを最適化して提供する
+# 特定の機能にApp Intentをラップして提供する
 
-- Siri (フェーズの追加)
-- ウィジェット (UIの追加)
-- Apple Intelligence (スキーマの追加)
+![inline](combine-shortcut.png)
 
-![](combine-shortcut.png)
+^ ここまでは、ショートカットを中心にエコシステムが広がりを見せていました。
+^ 言い換えれば、これはインテントをラップしてショートカットアプリで使えるようにしていたわけです。
+^ ここでは、インテントにSiriで呼び出せるようにするタイトルやアイコンが与えられています。
 
-^ ここまでは、ショートカットアプリを中心にエコシステムが広がりを見せていました。
-^ さらに、App Intentの開発者は、特定の機能に対してApp Intentを最適化して提供することもできます。
-^ どのように最適化するのかを見ていきましょう
+# 特定の機能にApp Intentをラップして提供する
 
-# Siri
+![inline](combine-swift-shortcut.png)
 
-AppShortcutsProvider
+^ このショートカットの作成は、アプリ内のインテントだけであれば`AppShortcutsProvider`を使うことでSwiftで記述することもできます。
 
-- フェーズの追加
+# 特定の機能にApp Intentをラップして提供する
 
-![](combine-swift-shortcut.png)
+![inline](combine-widget.png)
 
-^ 先ほど説明した通り、ショートカットのアプリでショートカットを作ることでSiriから呼び出すことが出来ます。
-^ AppShortcutsProviderでラップすることで、インストール直後からSiriでApp Intentを使ったり、自然な表現で呼び出させることができます。
+^ WidgetKitを使うと、App Intentを呼び出すためのウィジェットUIを自分で与えることができます。
+^ これによって、ショートカットを介さずにユーザーにApp Intentを実行する場所を提供できます。
 
-# ウィジェット
+## 🆕 Control Widget
 
-WidgetConfiguration
+- コントロールセンター
+- ロック画面
 
-- UIの追加
-
-![](combine-widget.png)
-
-^ WidgetKitを使うと、App Intentを呼び出すためのウィジェットUIを自分で構築することができます。
-
-# ウィジェットの活用
-
-- 🆕 Control Widget
-  - コントロールセンター
-  - ロック画面
+![right fit](control-widget.jpg)
 
 ^ 今年は、ウィジェットが表示できる場所が増えました。
 
-# Apple Intelligence
+# 特定の機能にApp Intentをラップして提供する
+
+![inline](combine-schema.png)
 
 ^ そして、Apple Intelligenceに対してもAppIntentを最適化することができます。
+^ このケースでは、開発者はApp Intentにスキーマと呼ばれる付加情報を与えてApple IntelligenceがApp Intentを実行するヒントを与えます。
+^ スキーマについての説明の前に一度Apple Intelligenceについて説明します。
 
-![](combine-schema.png)
+# Apple Intelligence
 
-# Siri + Apple Intelligence
+![inline](arch.png)
 
-- 自然な話し方で処理を依頼できる
-- 複雑な処理を依頼できる
-- 画面上のコンテキストを理解できる
-
-^ Siriは、AIによってとても進化しました。
-^ これによってSiriは魔法のような動きをするが、開発者はその仕組みを理解する必要があると思います。
-
-# Apple Intelligenceについて
-
-![right fit](arch.png)
-
-- Siri ≠ AppleIntelではない
-
-^ 誤解を恐れずに言うなれば、SiriはApple Intelligenceではありません。
-^ SiriはあくまでUIの１つであり、一部の処理をAIに移譲する
+^ Apple Intelligenceは、パーソナルな人工知能システムです。
+^ 誤解を恐れずに言うなれば、Siriは直接的にはApple Intelligenceではありません。
+^ SiriはあくまでUIの１つであり、ユーザーからリクエストをAIに伝え、AIからのレスポンスをユーザーに伝える事に使われます。
+^ 特徴的なのは、AIはIntentを直接実行できるtoolboxという仕組みを持っている点です。
+^ これがどのように動作するのか解説します。
 
 # Siriの仕組み
 
-![right fit](siri-workflow.png)
+![inline](siri-workflow.png)
 
-- Apple Intelにユーザーリクエストを投げて、適切なスキーマを見つけて、紐づいたAppIntentを見つけて実行する
-- 前の文脈も引き継いだりしていそう
-- IMO: 要するに、その場限りのショートカットをリアルタイムに構築しているのでは？
-
-^ 要するに、その場限りのショートカットをリアルタイムに構築していると理解していいんじゃないかなぁと思います。予想ですが。
+^ SiriはApple Intelligenceにユーザーリクエストを投げます。
+^ すると、Apple Intelligenceが文脈を理解してスキーマを構築します。
+^ そして、このスキーマに対応するAppIntentの中から最適なものを選んで実行するということです。
+^ これは自分の解釈ですが、その場限りのショートカットをリアルタイムに構築していると理解していいんじゃないかなぁと思います。
 
 # スキーマ
 
@@ -305,35 +387,58 @@ WidgetConfiguration
 
 - 100種類の決められたアクションのこと
 
-- App Intentが100種類のうちどれに当たるのかを教えてあげる必要がある
-
 - 要するに、あまりにトリッキーな命令は出来ないのではないかと思う
 
-例：冷蔵庫の写真から料理のレシピを作って、その材料をamazonで購入して
+例：昨日飲んだ水の量と同じ水を花にあげておいて
 
-^ スキーマというのは、Apple Intelligenceが学習しているシナリオに含まれる動作。
+^ このスキーマというのは、メールを送るとか、写真を保存するという、あらかじめ決められたアクションです。
+^ スキーマ自体は最初から種類が決まっていて、元々決まっているスキーマを組み合わせられるようにAIのモデルが学習されてます。
+^ なので、「昨日飲んだ水の量と同じ水を花にあげておいて」みたいなトリッキーなことはできないと思われます。
 
 # AssistantSchema 🆕
 
-- 既存のAppIntentにスキーマを指定できる
-- AssistantEntity 🆕
+```swift
+@AssistantIntent(schema: .system.search) // Add
+struct ExampleSearchIntent: ShowInAppSearchResultsIntent {
+    static var searchScopes: [StringSearchScope] = [.general]
+    
+    @Parameter()
+    var criteria: StringSearchCriteria
+    
+    func perform() async throws -> some IntentResult {
+        let searchString = criteria.term
+        print("Searching for \(searchString)")
+        // ...
+        return .result()
+    }
+}
+```
 
+^ App IntentをApple Intelligenceに対応させるには、インテントがどのスキーマに合致するかを見つけて関連付けてあげます。
 ^ スキーマはAssistantSchemaマクロを使うことで、AppIntentに付与することができます。
 
 # IndexedEntity 🆕
 
-- 検索可能にする
+- Spotlightから柔軟に検索可能にする
 - attributeSetで情報を付与できる
-- 「昨日撮った娘の写真」とかをAIに見つけさせることが可能になる
+- 多分「昨日撮った娘の写真」とかをAIに見つけさせることが可能になる
 
-# エコシステムの全貌
+^ そして、AppIntentにはパラメータとしてAppEntityがありましたがiOS18でIndexedEntityというタイプが増えました。
+^ これにサポートすると、AppEntityがSpotlightから柔軟に検索可能になるのですが、おそらく「昨日撮った娘の写真をメールで送って」みたいな文脈を処理する時にも使われると思うので対応しておくと良いかと思います。
 
-// 図
+---
 
-# 考察
-	何か
-	
 # まとめ
-	App Intentを中心としたエコシステムについての振り返り
+
+![original fit](ecosystem.png)
+
+^ さて、エコシステムを振り返りましょう。
+^ AppIntentは、アプリのアクションを外部に公開したものでした。
+^ 同じように、AppEntityはアプリの要素を外部に公開したものです。
+^ これらをラップしたショートカットによって、インテントの活用範囲は非常に広がりました。
+^ 一方で、Apple IntelligenceやSpotlightなど、直接インテントやエンティティを活用するものに対して、どのようにデベロッパーが対応すれば良いかもわかりました。
+^ これでApp Intentについて少しでも分かりやすくなったら嬉しいです。
 　	
-	
+---
+
+# 時間があれば考察
