@@ -141,3 +141,9 @@ Regular talk（20 min）
 # References
 
 - Vibrency Effect
+
+
+--- 
+
+# Idea
+
