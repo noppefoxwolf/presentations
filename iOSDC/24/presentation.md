@@ -13,12 +13,10 @@ Regular talk（20 min）
 
 # noppe
 
-- DeNA Co., Ltd.
 - Indie app developer
 
 ^ noppeと言います。
-^ 今回のトークとは関連はありませんが、DeNAという会社でライブストリーミングアプリの開発をしています。
-^ また、個人でアプリを開発しています。
+^ 個人でアプリを開発しています。
 ^ きつねが好きで、このアイコンで活動しています。
 
 # Agenda
@@ -260,45 +258,60 @@ API design factor
 
 ## Testing 
 
+// TBD
 
+## Product Development
 
-### Development case 
+Using hidden API is risky.
 
-- api design
-- For example
-    - UITextView
-- reject risk
+But, You can learn design from hidden API.
 
-### Testing case
+### API Naming, Archtectures. 
 
-- UITesting?
-- For example
-    - XCUIElement
+// codes
 
-# How to find it?
+# What's the best usecase?
 
-- Digging
-- Sharing
+- Hidden API can quicken development cycle
+- But 
 
-## Digging
+# How to find hidden APIs?
 
-- ObjC headers
+- header
 - swiftinterface
-- Stacktrace
+- swift repository
+- stacktrace
+- SNS
 
-### ObjC headers
+## Headers
 
-- perform _methodDescription
+- Use `class-dump`
+- perform `_methodDescription`
+
+[^3]:https://www.developer.limneos.net/
 
 ### swiftinterface
 
-- /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/
-
-- Digging private api is hard and waste time.
+```
+/Applications/
+    Xcode.app/
+        Contents/
+            Developer/
+                Platforms/
+                    iPhoneSimulator.platform/
+                        Developer/
+                            SDKs/
+                                iPhoneSimulator.sdk/
+                                    System/
+                                        Library/
+                                            Frameworks/
+```
 
 ### Stacktrace
 
-- breakpoint
+// Add Image
+
+- Breakpoint, Instruments
 
 ## Sharing
 
@@ -306,16 +319,12 @@ API design factor
 
 # Recap
 
-- Learn API design from APIs (include private)
-- It doesn't mean it'll be there tomorrow
-- If you known api, you can develop faster.
-- If you want to public.
-    - Send your feedback to Apple
+- You can use hidden APIs.
+- Hidden APIs are useful for some development phases.
+- But, using hidden APIs is risky.
+- You can find hidden APIs by header, swiftinterface, swift repository, stacktrace, SNS.
 
 # References
-
-- Vibrency Effect
-
 
 --- 
 
