@@ -217,57 +217,50 @@ API design factor
 ## AppStrore Rejection
 
 - Uncompliance in review guildeline 2.5.1[^2]
-- Don't use private API
 
 [^2]:https://developer.apple.com/jp/app-store/review/guidelines/
 
-^ 最後に、AppStoreの審査基準に違反する可能性があります。
-^ 例えば、2.5.1には「アプリでは公開APIのみ使用する」という項目があります。
-^ これは、非公開APIを使っているアプリはリジェクトされる可能性があるということです。
+^ 最後に、本番のアプリで隠されたAPIを使うとAppStoreの審査基準に違反する可能性があります。
+^ ガイドライン2.5.1には「アプリでは公開APIのみ使用する」と記載されており、Appleのドキュメントページにリンクしてあるところから察するに、アンドキュメントなAPIを使うことは推奨されないと捉えて良いと思います。
 
 # What's the best usecase?
 
-- What's the best usecase?
-- What's the best situation?
+^ それでは、隠されたAPIの最適な使用例について考えてみましょう。
 
-## What's the best usecase?
+# What's the best usecase?
 
-- The private apis are evil?
-    - No. 
+|Development Phase|Suitable|
+|---|---|
+|Concept Development| :+1: |
+|Testing| :warning: |
+|Product Development| :bomb: |
 
-- Production app
-    - No. Uncompliance in review guildeline 2.5.1
+## Concept Development
 
-- Development usage
-    - Yes, but with risk.
-    - Mocking, design
+- Troublesome implementation
+- Difficult implementation
+- Complex visual effect
+- Mocking-up cycle more quickly
 
-- Testing
-    - Yes, but with risk.
+### UITextView._setPlaceholder
 
-## What's the best situation?
+// codes
 
-- Design case
-- Mocking case
-- Development case
-- Testing case
+### UINavigationItem._setWeeTitle
 
-### Design case
+// codes
 
-- figma, Sketch cannot build real material.
-- For example, progressive blur.
+### CIFilter
 
-### Mocking case
+// codes
+
+### _UIHostingView
+
+// codes
+
+## Testing 
 
 
-- private api has some UI.
-- before writing difficult code.
-- speedup to mocking
-- For example
-    - navigation subtitles.
-    - device corner raidus
-    - _UIHostingView
-    - placeholder
 
 ### Development case 
 
