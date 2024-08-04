@@ -2,6 +2,10 @@ slidenumbers: true
 slidecount: true
 slide-transition: false
 slide-dividers: #, ##, ###, ####
+autoscale: true
+theme: Inter 2.0, 2
+background-color: #F6F5F7
+header: text-scale(0.6)
 
 # How to access hidden iOS APIs and enhance development efficacy.
 
@@ -9,92 +13,235 @@ slide-dividers: #, ##, ###, ####
 Track B
 Regular talk（20 min）
 
-^ こんにちは。本日は「iOSの隠されたAPIを解明し、開発効率を向上させる方法」というタイトルでトークをします。
-
 # noppe
 
 - Indie app developer
+    - DAWN for mastodon
+    - vear - VTuber camera app
 
-^ noppeと言います。
-^ 個人でアプリを開発しています。
-^ きつねが好きで、このアイコンで活動しています。
+![right](Alpha.png)
+
+^ こんにちは、noppeと言います。
+^ 個人でmastodonのサードパーティアプリや、Vtuber向けのカメラアプリを開発しています。
+^ きつねが好きで、このアイコンで活動していますのでSNSで見かけた際はぜひ話しかけてください。
+^ なお、トークは日本語で行いますが、日本のエンジニアイベントに興味を持ってくれた海外の方にも楽しんでいただけるように、英語でスライドを表示しています。
+^ 今日のトークでは「iOSの隠されたAPIを解明し、開発効率を向上させる方法」をお話しします。
+
+---
+
+![inline](public.png)
+
+^ 我々が日々アプリ開発をする際には、SwiftやObjCなどのプログラミング言語や、SwiftUIやUIKitなどのフレームワークを使ってアプリを構築しています。
+^ フレームワークは特定の用途に特化していて、それらの開発を快適に進められるようにしたり、開発者が多くを学ばずともプロダクトの開発に集中できるようなAPIを提供しています。
+
+---
+
+![inline](public-and-private.png)
+
+^ 一方で、そういったフレームワークを構築するためのAPIは隠されており、公開されていません。
+^ これらのAPIは非公開APIと呼ばれ、もちろん通常の開発では利用することができません。
+^ しかし、非公開APIを使うことで、開発効率を向上させることができる場合があります。
 
 # Agenda
 
-- What's a hidden api?
-- What's the best usecase?
-- How to find it?
+- Perform
+- Usecase
+- Find
 
-^ 今日のトークでは、「隠されたAPIを解明し、開発効率を向上させる方法」を紹介します。
-^ 当然隠されているものなので、時に便利で、時に危険な手法です。
-^ しかし、そういったものが存在していることを知っておくことや、安全な範囲で活用することは、開発において重要だと思います。
-^ 今日は、まず隠されたAPIとは何かについてや、それらを実行する方法について説明します。
-^ 次に、隠されたAPIの最適な使用例について説明します。
-^ 最後に、隠されたAPIを見つける方法について説明します。
-^ でははじめます。
+![right fit](b04b44a097f4e025f8b6c20c0f1f8838f1fd0612.png)
 
-# What's a hidden api?
+^ まずは、非公開APIを実行するデモンストレーションをしましょう。
+^ 非公開APIには色々な種類があり、それぞれ実行する方法が異なります。
+^ デモンストレーションの後に、非公開APIの最適なユースケースとリスクについて考えてみます。
+^ これが、このトークのメインテーマです。
+^ 最後に、非公開APIを見つける方法についてお話しします。
+^ 全てのトピックに共通するのは、手段とリスクを理解することです。
+^ このトークを通じて、自分なりの手段の使いどころを見つけられればと思います
 
-- non code completion codes
+## Agenda
 
-^ 隠されたAPIとは何でしょうか？
-^ これは今回のトークのためにある程度の余白を持って付けた言葉です。
-^ その意味は曖昧なので、今日はコード補完に表示されないAPIのことを今回は隠されたAPIと呼ぶことにしましょう。
+- **Perform**
+- Usecase
+- Find
 
-# What's a hidden api?
+^ それでは、最初に非公開APIを実行する方法について理解していきましょう。
+^ 非公開APIは、公開されていないAPIなので、通常の方法では呼び出すことができません。
 
-```swift
-private func getAIModel() -> MLModel {
-    let model = try! MyModel(configuration: .init())
-    return model
-}
-```
+### ObjC Private API
 
-^ 例えばこのコードでは、メソッドにprivateが付いているため、外部から呼び出す際にはコード補完が効きません。
-^ このようなメソッドは、外部から見れば隠されたAPIと呼べるかと思います。
+![inline](objc.png)
 
-## What's kind of hidden api?
+^ まずはObjCのAPIについて見ていきましょう。
+^ ObjCでは、ヘッダーファイルと実装ファイルに定義が分かれています。
+^ ヘッダーファイルにメソッドやクラスを書くことで、他のクラスにこのクラスの機能を知らせることができます。
+^ つまり、ヘッダーファイルに書かれていない実装ファイルのメソッドは非公開APIということになります。
 
-^ では、他にどのような隠されたAPIがあるでしょうか？まずは基本的なものを紹介します。
-
-## What's kind of hidden api?
-
-ObjC Private API
+### ObjC Private API
 
 ```ObjC
+Sample *object = [Sample new];
 
--  (void)setForgroundStyle:(Style *)style;
+// Success
+[object send]; 
 
-// Public API
--  (void)setForgroundStyle:(Style *)style {
-    [self _setBackgroudColor:[style getUIColor]];
-}
+// Error
+[object validate]; 
+```
 
-// Private API 💎
--  (void)_setBackgroudColor:(UIColor *)color {
-    // ...
+^ 例えば、先ほどのSampleでは、sendメソッドはヘッダーファイルに書かれているので呼び出すことができます。
+^ しかし、validateメソッドはヘッダーファイルに書かれていないので呼び出すことができません。
+^ このような非公開APIを呼び出すためには、別の方法を使う必要があります。
+
+### ObjC Private API
+
+Add header file.
+
+```ObjC
+@interface Sample (Private)
+- (BOOL)validate;
+@end
+```
+
+```ObjC
+// Success
+[objcect validate];
+```
+
+^ 方法の一つは、自分でヘッダーファイルを拡張し、メソッドの宣言を追加することです。
+^ これにより、実装を公開することができ、他のクラスから呼び出すことができるようになります。
+
+### ObjC Private API
+
+Manually dynamic dispatch
+
+```ObjC
+[object performSelector:NSSelectorFromString(@"validate")];
+```
+
+^ もう一つの方法は、Dynamic Dispatchを使うことです。
+^ ObjCでは、各実装はメソッド名によって識別されるため、メソッド名を文字列で指定することで呼び出すことができます。
+^ これを使うことで、非公開APIでもメソッド名がわかれば呼び出すことができます。
+^ ObjCで一般的に使われているNSObjectには、performSelectorメソッドが用意されているので、これを使うことで文字列からメソッドを簡単に呼び出すことができます。
+
+### ObjC Private API
+
+```ObjC
+object.isValidate = YES;
+```
+
+```ObjC
+object.performSelector(
+    NSSelectorFromString(@"setIsValidate:"), 
+    withObject: @(YES)
+);
+```
+
+^ プロパティの場合も、同様にperformSelectorを使って呼び出すことができます。
+^ ObjCではプロパティは内部的にsetter/getterメソッドが呼び出されるため、これを使ってプロパティを操作することができます。
+^ setterのように引数がある場合は、withObjectを使って引数を渡すことができます。
+
+### Swift Hidden API
+
+- Swift does not have header file
+- Dynamic Link Framework has Swift module data
+
+^ 次にSwiftのAPIについて見ていきましょう。
+^ Swiftにはヘッダーファイルがないため、非公開APIを呼び出す方法限られます。
+^ 現状では、Swiftで書かれたDynamic Link Frameworkに限って、Swiftモジュールの情報が公開されたファイルを持っており、非公開のAPIを見つけることができます。
+
+### Swift Hidden API
+
+- tbd
+    - dynamic library stub for Eager linking [^4]
+    - public and internal api list
+
+- swiftinterface
+    - public api list
+
+[^4]: https://developer.apple.com/jp/videos/play/wwdc2022/110364/
+
+^ モジュールの情報が公開されたファイルは、tbdファイルとswiftinterfaceファイルがあります。
+^ tbdファイルには、publicとinternalのAPIリストが含まれています。
+^ swiftinterfaceファイルには、publicのAPIリストが含まれています。
+
+### Swift Hidden API
+
+```
+/Applications
+    /Xcode.app
+        /Contents
+            /Developer
+                /Platforms
+                    /iPhoneSimulator.platform
+                        /Developer
+                            /SDKs
+                                /iPhoneSimulator.sdk
+                                    /System
+                                        /Library
+                                            /Frameworks
+                                                /SwiftUI.framework
+```
+
+^ 実際にSwiftUIのフレームワークを見てみましょう。
+^ SwiftUIのフレームワークは、XcodeにバンドルされているSDKの中にあります。
+^ 少しパスが長いので、私はクリップボードヒストリーなどに保存して呼び出しています。
+
+### Swift Hidden API
+
+[.code-highlight: all]
+[.code-highlight: 8, 10, 12]
+
+```
+SwiftUI.framework
+├── Headers
+│   ├── SwiftUI.h
+│   └── SwiftUI_Metal.h
+├── Modules
+│   ├── SwiftUI.swiftmodule
+│   │   ├── arm64-apple-ios-simulator.swiftdoc
+│   │   ├── arm64-apple-ios-simulator.swiftinterface
+│   │   ├── x86_64-apple-ios-simulator.swiftdoc
+│   │   └── x86_64-apple-ios-simulator.swiftinterface
+│   └── module.modulemap
+└── SwiftUI.tbd
+```
+
+^ フレームワークは次のような構造になっています。
+^ APIのリストが含まれたファイルは、このswiftinterfaceとtbdファイルです。
+^ まずはswiftinterfaceファイルを見てみましょう。
+
+### Swift Hidden API
+
+```swift
+
+@_Concurrency.MainActor
+open class UIHostingController<Content> : UIKit.UIViewController 
+where Content : SwiftUICore.View {
+
+    @_Concurrency.MainActor @preconcurrency 
+    public var _disableSafeArea: Swift.Bool {
+        get
+        set
+    }
+
 }
 ```
 
-^ ObjCもSwiftと同様に、公開を明示的に指定しなければメソッドを非公開にすることができます。
-^ UIKitやFoundationなどのフレームワークはObjCで書かれているため、非公開APIが多く存在します。
+^ swiftinterfaceファイルは、通常のswiftと同じように読めるテキストファイルです。
+^ 実装は含まれていないので、protocolのようにメソッドの宣言だけが含まれています。
+^ この例では、UIHostingControllerの_disableSafeAreaプロパティが宣言されています。
 
-## What's kind of hidden api?
-
-Xcode hides APIs
+### Swift API
 
 ```swift
 let vc = UIHostingController(rootView: ContentView())
 vc._disableSafeArea = true
 ```
 
-^ そして公開されているAPIでも、Xcodeがコード補完を表示しないことがあります。
-^ 例えば、UIHostingControllerの_disableSafeAreaプロパティは、UIHostingControllerのsafeAreaを無効化するメソッドですが、コード補完に表示されません。
-^ VSCodeのSwift Language Serverでは補完されるので恐らくXcodeが非表示にしているのでしょう。
+^ そして公開されているAPIでも、ドキュメントに載っていないAPIが存在します。
+^ 例えば、UIHostingControllerはセーフエリアを無効化する_disableSafeAreaプロパティを持っているのですが、これはドキュメントには記載されていません。
 
-## What's kind of hidden api?[^1]
-
-Swift Unstable API
+#### UnderscoredAttributes[^1]
 
 ```swift
 extension View {
@@ -107,38 +254,17 @@ extension View {
 
 [^1]:https://github.com/swiftlang/swift/blob/main/docs/ReferenceGuides/UnderscoredAttributes.md
 
-^ 一部のアトリビュートも補完に表示されない隠れたAPIの一つです。
+^ また、Swiftの言語機能にはリポジトリにドキュメントがあるものの、通常の開発では非推奨のAPIも存在します。
 ^ 例えば、@_disfavoredOverloadは同名のメソッドが呼ばれる際の優先度を下げることができます。
 ^ Swiftのリポジトリには、UnderscoredAttributesというドキュメントがありますが、ここに書いてあるAPIはアプリ開発での利用は推奨されていません。
+^ これらのAPIは、Appleのドキュメントでは積極的に登場しないので、隠されたAPIとして紹介します。
 ^ これは雑談ですが、隠されたAPIの先頭は_で始まることが多いということを覚えておくといいかもしれません。
 
-# How to use hidden API
+### How to use hidden APIs?
 
 ^ さて、これらのAPIはどのようにして使うことができるのでしょうか？
 
-# How to use hidden API
-
-Xcode hides APIs
-
-```swift
-extension View {
-    @_disfavoredOverload
-    func badge(_ count: Int) -> some View {
-        // ...
-    }
-}
-```
-
-```swift
-let vc = UIHostingController(rootView: ContentView())
-vc._disableSafeArea = true
-```
-
-^ 先ほど紹介したXcodeが隠しているAPIは、補完こそ効かないものの、コードに記載すればそのままコンパイルすることができます。
-
-# How to use hidden API
-
-ObjC Private API
+#### ObjC Private API
 
 ```swift
 final class User: NSObject {
@@ -157,11 +283,95 @@ user.perform(selector, with: "John Doe")
 ^ ObjCの非公開APIは、基底クラスであるNSObjectを使って呼び出すことができます。
 ^ Selectorを使って文字列でメソッド名を指定し、performメソッドを呼び出すことで非公開APIを呼び出すことができます。
 
-## Why hidden api is hidden?
+#### Undocumented API
 
-^ では、こんなに便利なAPIたちは、なぜ隠されているのでしょうか？
+```swift
+let vc = UIHostingController(rootView: ContentView())
+vc._disableSafeArea = true
+```
 
-## Why hidden api is hidden?
+^ SwiftのUndocumented APIについては、公開されているものは直接呼び出すことができます。
+^ 公開されているか否かについては、後ほど詳しく解説します。
+
+#### UnderscoredAttributes
+
+```swift
+extension View {
+    @_disfavoredOverload
+    func badge(_ count: Int) -> some View {
+        // ...
+    }
+}
+```
+
+^ UnderscoredAttributesについても、通常のメソッドと同様に呼び出すことができます。
+
+
+
+- Uncompliance in review guildeline 2.5.1[^2]
+
+[^2]:https://developer.apple.com/jp/app-store/review/guidelines/
+
+^ 最後に、本番のアプリで隠されたAPIを使うとAppStoreの審査基準に違反する可能性があります。
+^ ガイドライン2.5.1には「アプリでは公開APIのみ使用する」と記載されており、Appleのドキュメントページにリンクしてあるところから察するに、アンドキュメントなAPIを使うことは推奨されないと捉えて良いと思います。
+
+## What's the best usecase?
+
+^ それでは、隠されたAPIの最適な使用例について考えてみましょう。
+
+### What's the best usecase?
+
+|Development Phase|Suitable|
+|---|---|
+|Concept Development| :+1: |
+|Testing| :warning: |
+|Product Development| :bomb: |
+
+### Concept Development
+
+- Troublesome implementation
+- Difficult implementation
+- Complex visual effect
+- Mocking-up cycle more quickly
+
+#### UITextView._setPlaceholder
+
+// codes
+
+#### UINavigationItem._setWeeTitle
+
+// codes
+
+#### CIFilter
+
+// codes
+
+#### _UIHostingView
+
+// codes
+
+### Testing 
+
+// TBD
+
+### Product Development
+
+Using hidden API is risky.
+
+But, You can learn design from hidden API.
+
+### API Naming, Archtectures. 
+
+// codes
+
+### What's the best usecase?
+
+- Hidden API can quicken development cycle
+- But 
+
+#### instrument stacktrace
+
+### Hidden API's risk
 
 API design factor
 
@@ -170,16 +380,17 @@ API design factor
     - Declarative UI framework hides imperative API
     - Easy framework hides complex API
 
+^ では、こんなに便利なAPIたちは、なぜ隠されているのでしょうか？
 ^ 理由の一つは、APIデザインの過程で非公開になったAPIがあるためです。
 ^ フレームワークには明確な目的があり、その目的に沿ったAPIが公開されています。
 ^ 例えば、フレームワーク利用者に宣言的UIを提供するフレームワークには、命令的なAPIは非公開になっていますし、簡単に使うためのフレームワークからは複雑なAPIは非公開になっています。
 
-## All hidden apis are NOT deisgned performing
+#### All hidden apis are NOT deisgned performing
 
 ^ そして、これが意味するのは、隠されたAPIは我々が呼び出すことを想定して設計されているわけではないということです。
 ^ そのため、隠されたAPIを利用する際には、リスクが付きまといます。
 
-# Hidden API's risk
+#### Hidden API's risk
 
 - Undocumented
 - Unstable
@@ -187,7 +398,7 @@ API design factor
 
 ^ 隠されたAPIを呼び出すリスクと対策について考えてみましょう。
 
-## Undocumented
+#### Undocumented
 
 - Poor performance?
 - Runtime argument validation?
@@ -200,7 +411,7 @@ API design factor
 ^ 呼び出すパフォーマンスがとても悪い可能性、ランタイムで引数が検証される可能性や、事前に他のメソッドを呼ぶ必要があるなどの可能性があります。
 ^ これらのリスクは、E2Eテストを行うことである程度カバーすることができます。
 
-## Unstable
+#### Unstable
 
 - breakable from any update
 
@@ -212,70 +423,9 @@ API design factor
 ^ 対策としては、定期的なテストを行うことで壊れたことに気づくことができます。
 ^ また、OSやフレームワークのベータ版を使うことで、早期に変更を検知することもできます。
 
-## AppStrore Rejection
+#### AppStrore Rejection
 
-- Uncompliance in review guildeline 2.5.1[^2]
-
-[^2]:https://developer.apple.com/jp/app-store/review/guidelines/
-
-^ 最後に、本番のアプリで隠されたAPIを使うとAppStoreの審査基準に違反する可能性があります。
-^ ガイドライン2.5.1には「アプリでは公開APIのみ使用する」と記載されており、Appleのドキュメントページにリンクしてあるところから察するに、アンドキュメントなAPIを使うことは推奨されないと捉えて良いと思います。
-
-# What's the best usecase?
-
-^ それでは、隠されたAPIの最適な使用例について考えてみましょう。
-
-# What's the best usecase?
-
-|Development Phase|Suitable|
-|---|---|
-|Concept Development| :+1: |
-|Testing| :warning: |
-|Product Development| :bomb: |
-
-## Concept Development
-
-- Troublesome implementation
-- Difficult implementation
-- Complex visual effect
-- Mocking-up cycle more quickly
-
-### UITextView._setPlaceholder
-
-// codes
-
-### UINavigationItem._setWeeTitle
-
-// codes
-
-### CIFilter
-
-// codes
-
-### _UIHostingView
-
-// codes
-
-## Testing 
-
-// TBD
-
-## Product Development
-
-Using hidden API is risky.
-
-But, You can learn design from hidden API.
-
-### API Naming, Archtectures. 
-
-// codes
-
-# What's the best usecase?
-
-- Hidden API can quicken development cycle
-- But 
-
-# How to find hidden APIs?
+## How to find hidden APIs?
 
 - header
 - swiftinterface
@@ -283,14 +433,14 @@ But, You can learn design from hidden API.
 - stacktrace
 - SNS
 
-## Headers
+#### Headers
 
 - Use `class-dump`
 - perform `_methodDescription`
 
 [^3]:https://www.developer.limneos.net/
 
-### swiftinterface
+#### swiftinterface
 
 ```
 /Applications/
@@ -307,28 +457,36 @@ But, You can learn design from hidden API.
                                             Frameworks/
 ```
 
-### Stacktrace
+#### Stacktrace
 
 // Add Image
 
 - Breakpoint, Instruments
 
-## Sharing
+#### Sharing
 
 - Survey in SNS, gist and more.
 
-# Recap
+# Advanced techniques
+
+- xcframework
+
+# Next steps
 
 - You can use hidden APIs.
 - Hidden APIs are useful for some development phases.
 - But, using hidden APIs is risky.
 - You can find hidden APIs by header, swiftinterface, swift repository, stacktrace, SNS.
 
-# References
+# Thank you for listening!
 
 --- 
 
-# Idea
+# Memo
+
+https://www.jacklandrin.com/2018/05/16/method-in-objective-c-messgae-passing/
+
+https://xta0.me/2023/06/28/Swift-modules-1.html
 
 ```
 @available(watchOS, introduced: 6.0, deprecated: 9.4, message: "Use UIHostingController/safeAreaRegions or _UIHostingView/safeAreaRegions")
