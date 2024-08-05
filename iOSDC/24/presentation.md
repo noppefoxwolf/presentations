@@ -368,10 +368,6 @@ func testPrivateMethod() {
 
 ^ OSやフレームワークのベータ版でテストを行うことで、早期に変更を検知することもできます。
 
-### AppStore rejection
-
-- 
-
 ## What's the best usecase?
 
 |Development Phase|Suitable|
@@ -395,9 +391,9 @@ func testPrivateMethod() {
     - Complex visual effect
 
 ^ コンセプト開発やハッカソン、UIデザインなどの場面は、隠されたAPIの使い所です。
-^ 時間のかかる実装や、複雑なビジュアルエフェクトを隠されたAPIを使うことで短時間で実装することができます。
+^ 時間のかかる実装や、先ほどのVariableBlurのように複雑なビジュアルエフェクトを隠されたAPIを使うことで短時間で実装することができます。
 
-#### UITextView.setAttributedPlaceholder:
+#### UITextView.setAttributedPlaceholder:[^8]
 
 ```swift
 extension UITextView {
@@ -411,11 +407,13 @@ extension UITextView {
 }
 ```
 
+[^8]:https://gist.github.com/AdamWhitcroft/c6ffc0323b9ce227588df7145685ae26#file-wrappeduitextview-swift-L41
+
 ---
 
 ![fit autoplay loop](placeholder.mp4)
 
-#### UINavigationItem._setWeeTitle:
+#### UINavigationItem._setWeeTitle:[^7]
 
 ```swift
 extension UINavigationItem {
@@ -428,15 +426,21 @@ extension UINavigationItem {
 }
 ```
 
+[^7]:https://github.com/feedback-assistant/reports/issues/506
+
 #### UINavigationItem._setWeeTitle:
 
 ![inline](wee.png)
 
-#### CIFilter
+#### UIReturnKeyType(rawValue: 126)
 
-// codes
+```swift
+textField.returnKeyType = UIReturnKeyType(rawValue: 126)!
+```
 
-^ Deisgnツールに出来ないエフェクト
+#### UIReturnKeyType(rawValue: 126)
+
+![inline](buy.png)
 
 #### _UIHostingView
 
@@ -502,6 +506,7 @@ Can learn UI scructure, architecture
 - Get Method name list
 - Read Stacktrace
 - Find SNS Posts
+- Send feedback to Apple
 
 ^ 最後に、非公開APIを見つける方法についてお話しします。
 ^ ここまでの話で、swiftinterfaceやtbdを読むことで非公開APIを見つけることができることがわかりました。
@@ -531,9 +536,16 @@ print(names)
 
 ![right fit](posts.png)
 
-^ 最後に、SNSでは非公開APIに関する情報が共有されていることがあります。
+^ SNSでは非公開APIに関する情報が共有されていることがあります。
 ^ 例えば、TwitterやGitHub Gistなどで非公開APIに関する情報を共有している人がいるかもしれません。
 ^ こういった情報を見つけることで、非公開APIを見つける手がかりを得ることができます。
+
+### Send feedback to Apple
+
+- Send feedback to Apple
+
+^ 最後に、非公開APIを見つけた際には、Appleにフィードバックを送ることも重要です。
+^ どんなユースケースがあるのか、どのようなAPIが欲しいのかをAppleに伝えることで、APIが公開される可能性があります。
 
 # Recap
 
