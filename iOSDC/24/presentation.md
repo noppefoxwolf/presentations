@@ -212,36 +212,91 @@ SwiftUI.framework
 
 ### Swift Hidden API
 
-```swift
+arm64-apple-ios-simulator.swiftinterface
 
+```swift
+...
 @_Concurrency.MainActor
 open class UIHostingController<Content> : UIKit.UIViewController 
 where Content : SwiftUICore.View {
-
     @_Concurrency.MainActor @preconcurrency 
     public var _disableSafeArea: Swift.Bool {
         get
         set
     }
-
 }
+...
 ```
 
 ^ swiftinterfaceファイルは、通常のswiftと同じように読めるテキストファイルです。
 ^ 実装は含まれていないので、protocolのようにメソッドの宣言だけが含まれています。
-^ この例では、UIHostingControllerの_disableSafeAreaプロパティが宣言されています。
+^ この例は、swiftinterfaceの一部を抜粋したものですが、UIHostingControllerに_disableSafeAreaというプロパティがあることがわかります。
+^ このように、ドキュメントには載っていない隠されたAPIが実は公開されているということが分かりました。
 
-### Swift API
+### Swift Hidden API
 
 ```swift
 let vc = UIHostingController(rootView: ContentView())
 vc._disableSafeArea = true
 ```
 
-^ そして公開されているAPIでも、ドキュメントに載っていないAPIが存在します。
-^ 例えば、UIHostingControllerはセーフエリアを無効化する_disableSafeAreaプロパティを持っているのですが、これはドキュメントには記載されていません。
+^ 実際に、この_disableSafeAreaプロパティを使ってUIHostingControllerのsafeAreaを無効にすることができます。
 
-#### UnderscoredAttributes[^1]
+### Swift Hidden API
+
+SwiftUI.tbd
+
+```
+--- !tapi-tbd
+tbd-version:     0
+targets:         [ i386-ios-simulator, x86_64-ios-simulator, arm64-ios-simulator ]
+install-name:    '/System/Library/Frameworks/SwiftUI.framework/SwiftUI'
+current-version: 0.0.0
+swift-abi-version: 0
+exports:
+  - targets:         [ i386-ios-simulator, x86_64-ios-simulator, arm64-ios-simulator ]
+    symbols:         [ ... ]
+```
+
+^ 次に、tbdファイルを見てみましょう。
+^ tbdファイルは、publicとinternalのAPIのリストが含まれているファイルです。
+^ exportsのsymbolsには、公開されているAPIのリストが含まれています。
+
+### Swift Hidden API
+
+SwiftUI.tbd (exports/symbols)
+
+```
+...
+'_$s7SwiftUI4ViewPAAE12userActivity...', 
+'_$s7SwiftUI4ViewPAAE12userActivity...', 
+'_$s7SwiftUI4ViewPAAE12userActivity...', 
+'_$s7SwiftUI4ViewPAAE12userActivity...', 
+'_$s7SwiftUI4ViewPAAE12variableBlur...',
+'_$s7SwiftUI4ViewPAAE12variableBlur...',
+...
+```
+
+^ APIのリストは、マングリングされたシンボル名が含まれています。
+
+### Swift Hidden API
+
+```swift
+swift demangle '_$s7SwiftUI4....'
+
+_$s7SwiftUI4.... --->
+View.variableBlur(maxRadius: CGFloat, mask: Image, opaque: Bool) -> some
+```
+
+^ `swift demangle`でマングリングされたシンボル名をデマングルすると、元のメソッド名がわかります。
+
+### Swift Hidden API
+
+TBD
+
+^ xxxxx
+
+#### UnderscoredAttributes[^1] [^5]
 
 ```swift
 extension View {
@@ -254,72 +309,70 @@ extension View {
 
 [^1]:https://github.com/swiftlang/swift/blob/main/docs/ReferenceGuides/UnderscoredAttributes.md
 
-^ また、Swiftの言語機能にはリポジトリにドキュメントがあるものの、通常の開発では非推奨のAPIも存在します。
+[^5]:https://github.com/swiftlang/swift/pull/37854
+
+^ 最後は、SwiftのUnderscoredAttributesについて見ていきましょう。
+^ Swiftには、_で始まるAttributesがいくつか存在します。
 ^ 例えば、@_disfavoredOverloadは同名のメソッドが呼ばれる際の優先度を下げることができます。
-^ Swiftのリポジトリには、UnderscoredAttributesというドキュメントがありますが、ここに書いてあるAPIはアプリ開発での利用は推奨されていません。
-^ これらのAPIは、Appleのドキュメントでは積極的に登場しないので、隠されたAPIとして紹介します。
-^ これは雑談ですが、隠されたAPIの先頭は_で始まることが多いということを覚えておくといいかもしれません。
+^ これらのAPIは特別な設定なしに使うことができます。
+^ Appleのドキュメントには記載されていない隠れたAPIですが、2021年にSwiftのリポジトリにドキュメントが追加されました。
+^ ドキュメントによると、UnderscoredAttributesは言語機能開発のためのものであり、通常の開発での利用は強くお勧めしないとのことです。
 
-### How to use hidden APIs?
+# Agenda
 
-^ さて、これらのAPIはどのようにして使うことができるのでしょうか？
+- Perform
+- **Usecase**
+- Find
 
-#### ObjC Private API
+^ これで、非公開APIがどんなもので、どのように実行するのかについて理解できました。
+^ 続いて、メインテーマである開発効率を向上させるための非公開APIの最適なユースケースについて考えていきましょう。
+^ その前に、一度非公開APIを使うことのリスクについて考えてみましょう。
 
-```swift
-final class User: NSObject {
-    private(set) var name: String = "Placeholder"
-    
-    @objc(_setUserName:)
-    private func _setUserName(_ name: String) {
-        self.name = name
-    }
-}
+### Hidden API's risk ⚠️
 
-let selector = Selector("_setUserName:")
-user.perform(selector, with: "John Doe")
-```
-
-^ ObjCの非公開APIは、基底クラスであるNSObjectを使って呼び出すことができます。
-^ Selectorを使って文字列でメソッド名を指定し、performメソッドを呼び出すことで非公開APIを呼び出すことができます。
-
-#### Undocumented API
-
-```swift
-let vc = UIHostingController(rootView: ContentView())
-vc._disableSafeArea = true
-```
-
-^ SwiftのUndocumented APIについては、公開されているものは直接呼び出すことができます。
-^ 公開されているか否かについては、後ほど詳しく解説します。
-
-#### UnderscoredAttributes
-
-```swift
-extension View {
-    @_disfavoredOverload
-    func badge(_ count: Int) -> some View {
-        // ...
-    }
-}
-```
-
-^ UnderscoredAttributesについても、通常のメソッドと同様に呼び出すことができます。
-
-
-
-- Uncompliance in review guildeline 2.5.1[^2]
+- semantics are subject to change
+- side-effect is not controllable
+- AppStore rejection
+    - Uncompliance in review guildeline 2.5.1[^2]
 
 [^2]:https://developer.apple.com/jp/app-store/review/guidelines/
 
-^ 最後に、本番のアプリで隠されたAPIを使うとAppStoreの審査基準に違反する可能性があります。
-^ ガイドライン2.5.1には「アプリでは公開APIのみ使用する」と記載されており、Appleのドキュメントページにリンクしてあるところから察するに、アンドキュメントなAPIを使うことは推奨されないと捉えて良いと思います。
+^ 非公開APIを使うことには、いくつかのリスクが伴います。
+^ まず、非公開APIはいつでも変更される可能性があります。
+^ そのため、アップデートの際に挙動が変わったり、API自体が無くなる可能性があることを覚えておきましょう。
+^ また、非公開APIにはドキュメントがありません。メソッドの名前から挙動を推測するしかないため、意図しない副作用が発生する可能性があります。
+^ 最後に、非公開APIを使うことでAppStoreの審査基準に違反する可能性があります。
+^ これらのリスクを理解した上で、非公開APIを使うことが重要です。
+^ せっかくなので、リスクを下げるための方法も考えてみましょう。
+
+### Lowering risk
+
+- E2E testing is lowering changing and side-effect risk
+
+```swift
+func testPrivateMethod() {
+    let object = Sample()
+    object.performSelector(
+        #Selector("setUserName:"),
+        withObject: "noppe"
+    )
+    #expect(object.userName == "noppe")
+}
+```
+
+^ メソッドの挙動が変わることや、副作用に関しては、定期的に実行するテストの中でE2Eテストを書くことでリスクを低減することができます。
+
+### Lowing risk
+
+- Use beta version for early detection
+
+^ OSやフレームワークのベータ版でテストを行うことで、早期に変更を検知することもできます。
+
+### AppStore rejection
+
+- 
 
 ## What's the best usecase?
-
-^ それでは、隠されたAPIの最適な使用例について考えてみましょう。
-
-### What's the best usecase?
 
 |Development Phase|Suitable|
 |---|---|
@@ -327,32 +380,85 @@ extension View {
 |Testing| :warning: |
 |Product Development| :bomb: |
 
+^ それでは、これらのリスクを理解した上で、隠されたAPIをどのような場面で使うのが最適なのか考えてみましょう。
+^ 開発は、コンセプト開発、テスト、製品開発の3つのフェーズに分けることができます。
+^ コンセプト開発では、アイデアを形にするために短いサイクルで開発を進めるため、隠されたAPIを使うことで開発効率を向上させることができます。
+^ テストでの利用は、APIが変更されたときの影響が大きいですが便利なテストを書くことができます。
+^ 製品開発フェーズでは、隠されたAPIを使うことは避けるべきです。しかし、隠されたAPIからデザインを学ぶことはできます。
+^ それでは、それぞれのフェーズでの隠されたAPIの使いどころを掘りさげていきましょう。
+
 ### Concept Development
 
-- Troublesome implementation
-- Difficult implementation
-- Complex visual effect
-- Mocking-up cycle more quickly
+- Concept Development, Hackathon, UI Design
+    - Troublesome implementation
+    - Difficult implementation
+    - Complex visual effect
 
-#### UITextView._setPlaceholder
+^ コンセプト開発やハッカソン、UIデザインなどの場面は、隠されたAPIの使い所です。
+^ 時間のかかる実装や、複雑なビジュアルエフェクトを隠されたAPIを使うことで短時間で実装することができます。
 
-// codes
+#### UITextView.setAttributedPlaceholder:
 
-#### UINavigationItem._setWeeTitle
+```swift
+extension UITextView {
+    func setPlaceholder(_ placeholder: String?) {
+        let string = placeholder.map(NSAttributedString.init)
+        let selector = Selector(("setAttributedPlaceholder:"))
+        if responds(to: selector) {
+            perform(selector, with: string)
+        }
+    }
+}
+```
 
-// codes
+---
+
+![fit autoplay loop](placeholder.mp4)
+
+#### UINavigationItem._setWeeTitle:
+
+```swift
+extension UINavigationItem {
+    func setWeeTitle(_ title: String) {
+        let selector = Selector(("_setWeeTitle:"))
+        if responds(to: selector) {
+            perform(selector, with: title as NSString)
+        }
+    }
+}
+```
+
+#### UINavigationItem._setWeeTitle:
+
+![inline](wee.png)
 
 #### CIFilter
 
 // codes
 
+^ Deisgnツールに出来ないエフェクト
+
 #### _UIHostingView
 
-// codes
+```swift
+let view = _UIHostingView(rootView: ContentView())
+```
+
+^ SwiftUIのViewを使って、UIHostingViewを使うことで、SwiftUIのViewをUIKitのViewとして使うことができます。
 
 ### Testing 
 
 // TBD
+
+- Snapshot testing
+
+^ テストフェーズでは、APIが変更されたときの影響が大きいですが便利なテストを書くことができます。
+
+#### Instruments
+
+![inline](instruments.png)
+
+^ 知識として非公開APIを知っておくと、Instrumentやスタックトレースを使ってデバッグする際に役立ちます。
 
 ### Product Development
 
@@ -360,135 +466,107 @@ Using hidden API is risky.
 
 But, You can learn design from hidden API.
 
-### API Naming, Archtectures. 
+^ 製品開発フェーズでは、隠されたAPIを使うことは避けるべきです。
+^ しかし、隠されたAPIからAPIのデザインを学ぶことはできます。
 
-// codes
+#### API naming
 
-### What's the best usecase?
+Can find official SDK naming rule from header
 
-- Hidden API can quicken development cycle
-- But 
+```ObjC
+-(void)_endScrollingCursorOverrideIfNecessary;
+-(UIOffset)_firstPageOffset;
+-(id)_frameLayoutGuideIfExists;
+```
 
-#### instrument stacktrace
+^ 例えば、APIのメソッド名を決める時どんな単語を使うべきかを学ぶことができます。
 
-### Hidden API's risk
+#### API design
 
-API design factor
+Can learn UI scructure, architecture
 
-- Framework has clear porpose
-- Cases
-    - Declarative UI framework hides imperative API
-    - Easy framework hides complex API
+```ObjC
+@interface UITextView : UIScrollView {
+    _UITextContainerView* _containerView;
+    ...
+}
+...
+@end
+```
 
-^ では、こんなに便利なAPIたちは、なぜ隠されているのでしょうか？
-^ 理由の一つは、APIデザインの過程で非公開になったAPIがあるためです。
-^ フレームワークには明確な目的があり、その目的に沿ったAPIが公開されています。
-^ 例えば、フレームワーク利用者に宣言的UIを提供するフレームワークには、命令的なAPIは非公開になっていますし、簡単に使うためのフレームワークからは複雑なAPIは非公開になっています。
-
-#### All hidden apis are NOT deisgned performing
-
-^ そして、これが意味するのは、隠されたAPIは我々が呼び出すことを想定して設計されているわけではないということです。
-^ そのため、隠されたAPIを利用する際には、リスクが付きまといます。
-
-#### Hidden API's risk
-
-- Undocumented
-- Unstable
-- AppStrore Rejection
-
-^ 隠されたAPIを呼び出すリスクと対策について考えてみましょう。
-
-#### Undocumented
-
-- Poor performance?
-- Runtime argument validation?
-- Method combination needed?
-
-+ E2E testing
-
-^ まずは、ドキュメントがないことです。
-^ ドキュメントが無いということは、どんな挙動をするかわからないということです。
-^ 呼び出すパフォーマンスがとても悪い可能性、ランタイムで引数が検証される可能性や、事前に他のメソッドを呼ぶ必要があるなどの可能性があります。
-^ これらのリスクは、E2Eテストを行うことである程度カバーすることができます。
-
-#### Unstable
-
-- breakable from any update
-
-- schedule testing
-- use beta version
-
-^ そして、非公開APIはいつでも変更される可能性があります。
-^ OSのアップデートや、フレームワークのアップデートで、メソッド自体が無くなったり挙動が変わるリスクがあることを覚えておきましょう。
-^ 対策としては、定期的なテストを行うことで壊れたことに気づくことができます。
-^ また、OSやフレームワークのベータ版を使うことで、早期に変更を検知することもできます。
-
-#### AppStrore Rejection
+^ 同様に、APIの設計やクラスの分け方なども学ぶことができます。
 
 ## How to find hidden APIs?
 
-- header
-- swiftinterface
-- swift repository
-- stacktrace
-- SNS
+- Read swiftinterface, tbd, headers
+- Get Method name list
+- Read Stacktrace
+- Find SNS Posts
 
-#### Headers
+^ 最後に、非公開APIを見つける方法についてお話しします。
+^ ここまでの話で、swiftinterfaceやtbdを読むことで非公開APIを見つけることができることがわかりました。
+^ ここでは、いくつかの隠れたAPIを見つけるテクニックを紹介します。
 
-- Use `class-dump`
-- perform `_methodDescription`
+### Get Method name list
 
-[^3]:https://www.developer.limneos.net/
-
-#### swiftinterface
-
-```
-/Applications/
-    Xcode.app/
-        Contents/
-            Developer/
-                Platforms/
-                    iPhoneSimulator.platform/
-                        Developer/
-                            SDKs/
-                                iPhoneSimulator.sdk/
-                                    System/
-                                        Library/
-                                            Frameworks/
+```swift
+let selector = Selector("_methodDescription")
+let names = scrollView.perform(selector)
+print(names)
 ```
 
-#### Stacktrace
+^ ObjCで書かれたフレームワークの場合、インスタンスに_methodDescriptionを使うことで、クラスが持つ全てのメソッド名を取得することができます。
 
-// Add Image
+### Read Stacktrace
 
-- Breakpoint, Instruments
+![right fit](stacktrace.png)
 
-#### Sharing
+^ 特定の動作に関連するメソッド名を見つけるために、スタックトレースを読むこともオススメです。
+^ 特にUIスレッドのスタックトレースを読むことで、UIの挙動に関連するメソッド名を見つけることができます。
+^ 例えば、UIRefreshControlの挙動を調べる際に、アクションがトリガーされるところまでのスタックトレースを読むとスクロール周りの内部ハンドラを一気に見つけることができます。
+
+### Find SNS Posts
 
 - Survey in SNS, gist and more.
 
-# Advanced techniques
+![right fit](posts.png)
 
-- xcframework
+^ 最後に、SNSでは非公開APIに関する情報が共有されていることがあります。
+^ 例えば、TwitterやGitHub Gistなどで非公開APIに関する情報を共有している人がいるかもしれません。
+^ こういった情報を見つけることで、非公開APIを見つける手がかりを得ることができます。
+
+# Recap
+
+- Perform
+- Usecase
+- Find
+
+^ これで、非公開APIを実行する方法、最適なユースケース、非公開APIを見つける方法について理解できました。
+^ 非公開APIは、開発効率を向上させるための手段の一つです。
+^ しかし、リスクを理解した上で使うことが重要です。
+^ また、非公開APIを使うことで、フレームワークの裏側に興味を持つことができ、開発効率を向上させることができます。
+^ このトークを通じて、非公開APIを使うことのメリットとデメリットを理解していただければと思います。
 
 # Next steps
 
-- You can use hidden APIs.
-- Hidden APIs are useful for some development phases.
-- But, using hidden APIs is risky.
-- You can find hidden APIs by header, swiftinterface, swift repository, stacktrace, SNS.
+- Thinking about backend everytime
+
+^ 最後に、隠されたAPIで開発効率を向上するために普段からフレームワークの裏側に興味を持つことが重要です。
+^ 隠れているものを探したり、制御するためには多くの時間がかかります。
+^ 今回紹介したのは、あくまで手段の一つです。
+^ TBD
 
 # Thank you for listening!
 
+![inline](public-and-private.png)
+
+^ 以上になります。ありがとうございました。
+
 --- 
 
-# Memo
+# References
 
 https://www.jacklandrin.com/2018/05/16/method-in-objective-c-messgae-passing/
 
 https://xta0.me/2023/06/28/Swift-modules-1.html
 
-```
-@available(watchOS, introduced: 6.0, deprecated: 9.4, message: "Use UIHostingController/safeAreaRegions or _UIHostingView/safeAreaRegions")
-  @_Concurrency.MainActor @preconcurrency public var _disableSafeArea: Swift.Bool {
-```
