@@ -452,11 +452,15 @@ let view = _UIHostingView(rootView: ContentView())
 
 ### Testing 
 
-// TBD
+UIDebuggingInformationOverlay
 
-- Snapshot testing
+- iOS10+
+- iOS11+ needs some changes
 
-^ テストフェーズでは、APIが変更されたときの影響が大きいですが便利なテストを書くことができます。
+![right fit autoplay loop](UIDebuggingInformationOverlay.mp4)
+
+^ アプリのテストフェースでは、UIDebuggingInformationOverlayを使って、UIのデバッグを行うことができます。
+^ この機能はiOS10に導入された非公開APIで、アプリのUIをデバッグする際に役立ちます。
 
 #### Instruments
 
@@ -565,8 +569,7 @@ print(names)
 
 ^ 最後に、隠されたAPIで開発効率を向上するために普段からフレームワークの裏側に興味を持つことが重要です。
 ^ 隠れているものを探したり、制御するためには多くの時間がかかります。
-^ 今回紹介したのは、あくまで手段の一つです。
-^ TBD
+^ 必要な瞬間に、すぐに使えるようにしておくことが重要です。
 
 # Thank you for listening!
 
