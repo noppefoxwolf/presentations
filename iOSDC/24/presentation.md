@@ -292,9 +292,24 @@ View.variableBlur(maxRadius: CGFloat, mask: Image, opaque: Bool) -> some
 
 ### Swift Hidden API
 
-TBD
+modify swiftinterface
 
-^ xxxxx
+```swift
+@available(iOS 17.0, macOS 14.0, watchOS 10.0, tvOS 17.0, *)
+extension SwiftUICore.View {
+    nonisolated public func variableBlur(
+        maxRadius: CoreFoundation.CGFloat,
+        mask: SwiftUI.Image,
+        opaque: Swift.Bool
+    ) -> some SwiftUI.View
+}
+```
+
+^ このメソッドを
+
+### Swift Hidden API
+
+![inline](variableBlur.png)
 
 #### UnderscoredAttributes[^1] [^5]
 
@@ -585,3 +600,4 @@ https://www.jacklandrin.com/2018/05/16/method-in-objective-c-messgae-passing/
 
 https://xta0.me/2023/06/28/Swift-modules-1.html
 
+https://www.kodeco.com/295-swizzling-in-ios-11-with-uidebugginginformationoverlay/
