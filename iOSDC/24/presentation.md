@@ -582,7 +582,11 @@ Can learn UI scructure, architecture
 
 ### Get Method name list
 
+_methodDescription (UIKitCore)
+
 ```swift
+import UIKit
+
 let selector = Selector("_methodDescription")
 let names = scrollView.perform(selector)
 print(names)
@@ -590,6 +594,17 @@ print(names)
 
 ^ ObjCで書かれたフレームワークの場合、インスタンスに_methodDescriptionを実行することで、クラスが持つ全てのメソッド名を取得することができます。
 ^ 実質ヘッダーダンプのような情報が簡単に得られるので、非公開APIを探す際には非常に便利です。
+^ このメソッドはUIKitのコアフレームワークによってNSObjectの拡張として実装されているため、macOSのAppKitなどでは使うことができない点には注意が必要です。
+
+### Get Method name list
+
+- Runtime Header
+- p-x9/swift-objc-dump**[^9]
+
+
+^ メソッドリストなどのクラス情報の取得は、他にもいくつかの方法ですることができます。
+^ GitHubなどで情報を探すほか、p-x9さんが作成したswift-objc-dumpというツールを使うことで、クラス情報を取得することができます。
+^ 今回のスライドに関しても、p-x9さんにレビューをいただきました。この場でお礼を述べさせていただきます。
 
 ### Read Stacktrace
 
@@ -649,9 +664,12 @@ textField.returnKeyType = UIReturnKeyType(rawValue: 126)!
 ^ 必要な瞬間に、すぐに使えるような知識を普段から蓄えておくことが大切です。
 ^ 隠されたAPIに限らす、積極的な情報交換をiOSDCでしてみてください。
 
-# Thank you for listening!
+# Thank you
 
-![inline](public-and-private.png)
+- Special thanks
+    - @p_x9
+
+![right fit](public-and-private.png)
 
 ^ 以上になります。ありがとうございました。
 
