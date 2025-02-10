@@ -27,17 +27,17 @@ Regular talk（20 min）
 
 # DeNA Co., Ltd.,
 
-- iOS Engineer
-    - 2016〜
-- Pococha
+- 2016 ~
+  - Pococha
+  - iOS Senior App Developer
 
 ^ また、2016年からDeNAでライブアプリのPocochaを開発しています。
 ^ 8年目になりますが、どんどんメンバーも増え新しいことに日々チャレンジしています。
 
 # Enjoy my talk!
 
-- Talking is Japanese
-- Slide is English
+- The talk will be in Japanese
+- Slides are in English
 
 ^ なお、トークは日本語で行いますが、日本のエンジニアイベントに興味を持ってくれた海外の方にも楽しんでいただけるように、英語でスライドを表示しています。
 ^ 今日のトークでは「iOSの隠されたAPIを解明し、開発効率を向上させる方法」をお話しします。
@@ -111,7 +111,7 @@ Sample *object = [Sample new];
 
 ### ObjC Private API
 
-Add header file.
+You can expose the method by adding a header file yourself.
 
 ```ObjC
 @interface Sample (Private)
@@ -129,7 +129,7 @@ Add header file.
 
 ### ObjC Private API
 
-Manually dynamic dispatch
+You can call the method by using performSelector without adding a header file.
 
 ```ObjC
 [object performSelector:NSSelectorFromString(@"validate")];
@@ -159,8 +159,8 @@ object.performSelector(
 
 ### Swift Hidden API
 
-- Swift does not have header file
-- Dynamic Link Framework has Swift module data
+- Swift does not have any header file.
+- Dynamic Link Framework has Swift module data.
 
 ^ 次にSwiftのAPIについて見ていきましょう。
 ^ Swiftにはヘッダーファイルがないため、非公開APIを呼び出す方法限られます。
@@ -169,11 +169,11 @@ object.performSelector(
 
 ### Swift Hidden API
 
-- tbd
+- tbd file
     - dynamic library stub for Eager linking [^4]
     - public and internal api list
 
-- swiftinterface
+- swiftinterface file
     - public api list
 
 [^4]: https://developer.apple.com/jp/videos/play/wwdc2022/110364/
@@ -314,7 +314,7 @@ View.variableBlur(maxRadius: CGFloat, mask: Image, opaque: Bool) -> some
 
 ### Swift Hidden API
 
-modify swiftinterface
+modify swiftinterface file yourself
 
 ```swift
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, tvOS 17.0, *)
@@ -369,8 +369,8 @@ extension View {
 
 ### Hidden API's risk ⚠️
 
-- semantics are subject to change
-- side-effect is not controllable
+- Semantics are subject to change.
+- Side-effects are not controllable.
 - AppStore rejection
     - Uncompliance in review guildeline 2.5.1[^2]
 
@@ -386,7 +386,7 @@ extension View {
 
 ### Lowering risk
 
-- E2E testing is lowering changing and side-effect risk
+- Testing for lowing changing and side-effects risk.
 
 ```swift
 func testPrivateMethod() {
@@ -403,7 +403,7 @@ func testPrivateMethod() {
 
 ### Lowing risk
 
-- Use beta for early detection changes
+- Use beta for early detection changes.
 
 ![right fit](beta.png)
 
@@ -426,7 +426,7 @@ func testPrivateMethod() {
 
 ### Concept Development
 
-- Concept Development, Hackathon, UI Design
+- Concept Development, Hackathon, UI Design, and more.
     - Troublesome implementation
     - Difficult implementation
     - Complex visual effect
@@ -505,8 +505,10 @@ let view = _UIHostingView(rootView: ContentView())
 
 UIDebuggingInformationOverlay
 
-- iOS10+
-- iOS11+ needs some changes
+- iOS10 
+  - easy to use
+- iOS11+ 
+  - needs to jump through some hoops
 
 ![right fit autoplay loop](UIDebuggingInformationOverlay.mp4)
 
@@ -529,7 +531,7 @@ UIDebuggingInformationOverlay
 
 Using hidden API is risky.
 
-But, You can learn design from hidden API.
+But, You can learn API design from hidden APIs.
 
 ^ 最後に製品開発フェーズでのユースケースです。
 ^ 繰り返しになりますが、隠されたAPIを使うことはリジェクトリスクもあるため避けるべきです。
@@ -537,7 +539,7 @@ But, You can learn design from hidden API.
 
 #### API naming
 
-Can find official SDK naming rule from header
+You can learn API naming rules from official SDK headers.
 
 ```ObjC
 -(void)_endScrollingCursorOverrideIfNecessary;
@@ -545,7 +547,7 @@ Can find official SDK naming rule from header
 -(id)_frameLayoutGuideIfExists;
 ```
 
-ObjC is Dynamic Dispatch. Don't override method name.
+(note) Don't override the method names, because ObjC uses Dynamic Dispatch.
 
 ^ 例えば、Appleがどのような命名規則があるのかをヘッダーファイルから見つけることができます。
 ^ これによって、クラスやメソッド名を決める時にどんな単語を使うべきかを参考にすることができます。
@@ -554,7 +556,7 @@ ObjC is Dynamic Dispatch. Don't override method name.
 
 #### API design
 
-Can learn UI scructure, architecture
+You can learn UI scructures and architectures.
 
 ```ObjC
 @interface UITextView : UIScrollView {
@@ -570,19 +572,23 @@ Can learn UI scructure, architecture
 
 ## How to find hidden APIs?
 
-- Read swiftinterface, tbd, headers
-- Get Method name list
-- Read Stacktrace
-- Find SNS Posts
+- Read swiftinterface, tbd and headers.
+- Get method name list
+- Read the stacktrace
+- Find SNS posts
 - Send feedback to Apple
 
 ^ 最後に、非公開APIを見つける方法についてお話しします。
 ^ ここまでの話で、swiftinterfaceやtbdを読むことで非公開APIを見つけることができることはわかりました。
 ^ それに関連して、いくつかの隠れたAPIを見つけるテクニックを紹介します。
 
-### Get Method name list
+### Get method name list
+
+_methodDescription (located in UIKitCore)
 
 ```swift
+import UIKit
+
 let selector = Selector("_methodDescription")
 let names = scrollView.perform(selector)
 print(names)
@@ -590,8 +596,19 @@ print(names)
 
 ^ ObjCで書かれたフレームワークの場合、インスタンスに_methodDescriptionを実行することで、クラスが持つ全てのメソッド名を取得することができます。
 ^ 実質ヘッダーダンプのような情報が簡単に得られるので、非公開APIを探す際には非常に便利です。
+^ このメソッドはUIKitのコアフレームワークによってNSObjectの拡張として実装されているため、macOSのAppKitなどでは使うことができない点には注意が必要です。
 
-### Read Stacktrace
+### Get method name list
+
+- Runtime Header
+- p-x9/swift-objc-dump**[^9]
+
+
+^ メソッドリストなどのクラス情報の取得は、他にもいくつかの方法ですることができます。
+^ GitHubなどで情報を探すほか、p-x9さんが作成したswift-objc-dumpというツールを使うことで、クラス情報を取得することができます。
+^ 今回のスライドに関しても、p-x9さんにレビューをいただきました。この場でお礼を述べさせていただきます。
+
+### Read stacktrace
 
 ![right fit](stacktrace.png)
 
@@ -599,9 +616,9 @@ print(names)
 ^ 特にUIスレッドのスタックトレースを読むことで、UIの挙動に関連するメソッド名を見つけることができます。
 ^ 例えば、UIRefreshControlの挙動を調べる際に、アクションがトリガーされるところまでのスタックトレースを読むとスクロール周りの内部ハンドラを一気に見つけることができます。
 
-### Find SNS Posts
+### Find SNS posts
 
-- Survey in SNS, gist and more.
+- Survey the SNS landscape
 
 ![right fit](posts.png)
 
@@ -623,8 +640,8 @@ textField.returnKeyType = UIReturnKeyType(rawValue: 126)!
 
 ### Send feedback to Apple
 
-- Send feedback to Apple
-- Usecase, API request
+- Apple sometimes publicizes the API after receiving our feedback.
+- Write feedback about usecases and APIs.
 
 ^ 最後に、便利な非公開APIを見つけた際には、Appleにフィードバックを送ることも重要です。
 ^ どんなユースケースがあるのか、どのようなAPIが欲しいのかをAppleに伝えることで、APIが公開される可能性があります。
@@ -649,9 +666,13 @@ textField.returnKeyType = UIReturnKeyType(rawValue: 126)!
 ^ 必要な瞬間に、すぐに使えるような知識を普段から蓄えておくことが大切です。
 ^ 隠されたAPIに限らす、積極的な情報交換をiOSDCでしてみてください。
 
-# Thank you for listening!
+# Thank you
 
-![inline](public-and-private.png)
+- Special thanks
+    - @p_x9
+    - Guilherme Rosado Martins
+
+![right fit](public-and-private.png)
 
 ^ 以上になります。ありがとうございました。
 
