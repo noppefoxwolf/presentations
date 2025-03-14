@@ -4,132 +4,133 @@ slidenumber: true
 
 ## noppe (Tomoya Hirano)
 
-^ みなさんこんにちは、では早速初めていきましょう。
+^ Hello everyone, let's get started!
 
 ---
 
-# 176 Emojis starts from Japan
+# 176 Emojis Started in Japan
 
-^ 絵文字は1999年に日本で生まれました。
-^ 最初はたったの176種類でした。
+^ Emojis were born in Japan in 1999.
+^ At first, there were only 176 types.
 
 ---
 
-# 2025. Unocode emojis over 3000+.
+# 2025: Unicode Emojis Over 3000+
 
-^ 今ではUnicodeの絵文字だけで、3000を超えます。
+^ Now, Unicode alone has over 3000 emojis.
 
 ---
 
 # Genmoji
 
-そして、今年、Genmojiが登場しました。
-Apple Intelligenceが生成する絵文字です。
+^ And this year, Genmoji arrived.
+^ These are AI-generated emojis from Apple Intelligence.
 
 ---
 
 # Custom Emojis
 
-^ さらに、私たちはユニークな絵文字も使います。
-^ SlackやMastodon, Discordでは、ユーザーが絵文字を登録することができます。
-^ ミームの絵文字は、私も大好きです。
+^ Moreover, we also use unique emojis.
+^ In platforms like Slack, Mastodon, and Discord, users can register their own emojis.
+^ Meme emojis—I love them too!
 
 ---
 
 # "Hello, try!Swift 😻"
 
-^ OK、ではメッセージを送りましょう。
-^ 「猫ミームのメッセージ😻」
-^ この黄色いトカゲは、私の妻が描いたキャラクターです。
+^ OK, let's send a message.
+^ "A cat meme message 😻"
+^ This yellow lizard is a character drawn by my wife.
 
 ---
 
 # "Hello, try!Swift (OK)"
 
-^ （一息おいて…）
-^ 「猫ミームのメッセージ(OK)」
-^ あぁ、なんということでしょう。
-^ もう通知には、可愛らしいトカゲはいません。代わりに(OK)と書かれています。
+^ (Pause...)
+^ "A cat meme message (OK)"
+^ Oh no...
+^ The adorable lizard is gone from the notification, replaced by "(OK)."
 
 ---
 
-# Notifications are silence?
+# Are Notifications Silent?
 
-^ 通知にカスタム絵文字を表示することは出来ないのでしょうか？
-^ 今年のWWDCを思い出してみましょう。
+^ Can't we display custom emojis in notifications?
+^ Let's recall WWDC this year.
 
 ---
 
 # WWDC
 
-^ これです！Genmojiは通知に表示する事が出来ます。
+^ Here it is! Genmoji can be displayed in notifications.
 
 ---
 
-# Can custom emojis spoof Genmoji?
+# Can Custom Emojis Spoof Genmoji?
 
-^ カスタム絵文字を、Genmojiに装うことは出来るでしょうか？
-^ 試してみましょう
+^ Can custom emojis pretend to be Genmoji?
+^ Let's try it out.
 
 ---
 
-# Extract Genmoji
+# Extracting Genmoji
 
 ![Screenshot of UITextView]()
 
-^ まずは、Genmojiを解剖してみましょう。
-^ UITextViewにGenmojiをタイプします。
+^ First, let's analyze Genmoji.
+^ Type a Genmoji into a UITextView.
 
 ---
 
 ![Screenshot of attributedString runs]()
 
-^ attributesを参照します。
-^ Genmojiの正体は、NSAdaptiveImageGlyphです。
+^ Check the attributes.
+^ Genmoji is represented as NSAdaptiveImageGlyph.
 
 ---
 
-![Screenshot of NSAdaptiveIamgeGlyph documents]()
+![Screenshot of NSAdaptiveImageGlyph documents]()
 
-^ NSAdapativeImageGlyphは、imageContentというDataでinitする事ができます。
-^ つまり、このimageContentを作ればカスタム絵文字のNSAdapativeImageGlyphが作れそうです。
+^ NSAdaptiveImageGlyph can be initialized with imageContent data.
+^ This means we might be able to create a custom NSAdaptiveImageGlyph.
 
 ---
 
 ![Screenshot of look Data header]()
 
-^ NSAdapativeImageGlyphのimageContentを書き出します。
-^ ヘッダーを見ると、heicであると分かりました。
+^ Let's extract the imageContent data from NSAdaptiveImageGlyph.
+^ Looking at the header, we see it is in HEIC format.
 
 ---
 
 ![Screenshot of metadata]()
 
-^ このデータのメタデータを見てみましょう。
-^ いくつかキーがあります。時間がないので答えを言います。
-^ tiff:DocumentName。これが重要です。
+^ Now, let's check the metadata of this data.
+^ There are several keys. To save time, I'll give you the answer.
+^ The key is tiff:DocumentName.
 
 ---
 
 ![Screenshot of create own Data]()
 
-^ 用意したイメージデータとtiff:DocumentNameを組み合わせてheicファイルを作ります。
-^ このデータで、NSAdaptiveImageGlythを作ってみましょう。
+^ We create an HEIC file by combining our image data with tiff:DocumentName.
+^ Now, let's try creating an NSAdaptiveImageGlyph with this data.
 
 ---
 
 ![gif of work with custom emoji as Genmoji]()
 
-^ ビンゴ！動きました。
-^ 通知にも表示されます。
-^ 私の妻も喜んでいます。
+^ Bingo! It works!
+^ It even appears in notifications.
+^ My wife is happy too.
 
 ---
 
-# See more
+# See More
 
 https://github.com/noppefoxwolf/Zenmoji
 
-^ 今回のコードはオープンソースとして公開しています。
-^ 私の名前はTomoyaです。Mastodonアプリを開発しています。
-^ この後もtry!Swiftをお楽しみください！
+^ The code is open-source.
+^ My name is Tomoya. I develop a Mastodon app.
+^ Enjoy the rest of try!Swift!
+
