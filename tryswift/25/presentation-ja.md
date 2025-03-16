@@ -37,7 +37,7 @@ slidenumber: true
 # Genmoji
 
 - AI generated emojis
-- Inifinity emojis types
+- ♾️ emojis types
 
 ![right fit](genmojis.png)
 
@@ -47,21 +47,23 @@ slidenumber: true
 
 ---
 
-# Infinity is not all
+# ♾️ ≠ All
+
+^ ご存知の通り、無限とは全てではありません
 
 ---
 
 # Custom Emoji[^2]
 
 - Uploaded user emojis
-- Slack, Twitch, Discord
+- Slack, Twitch, Discord, Mastodon
 - Meme
 
 ![right fit](slackemoji.png)
 
 [^2]: https://slackmojis.com
 
-^ さらに、私たちはユニークな絵文字も使います。
+^ 私たちはユニークな絵文字も使います。
 ^ SlackやMastodon, Discordでは、ユーザーが絵文字を登録することができます。
 ^ ミームの絵文字は、私も大好きです。
 
@@ -69,6 +71,7 @@ slidenumber: true
 
 # Custom Emoji[^3]
 
+- My wife also makes emojis
 - Everyone can make emoji
 
 ![right fit](lineemoji.png)
@@ -77,7 +80,7 @@ slidenumber: true
 
 ---
 
-// icon
+![inline](appicon.png)
 
 ^ さて、絵文字は送信しなければ意味がありません。
 ^ 今日のために、私の妻が作った絵文字が使えるメッセージアプリを作りました。
@@ -94,8 +97,6 @@ slidenumber: true
 
 ![inline](received-notification.png)
 
-^ （一息おいて…）
-^ 「猫ミームのメッセージ(OK)」
 ^ あぁ、なんということでしょう。
 ^ もう通知には、可愛らしいトカゲはいません。代わりに(OK)と書かれています。
 
@@ -108,7 +109,7 @@ slidenumber: true
 
 ---
 
-# WWDC
+![inline](INSendMessageIntent.png)
 
 ^ これです！Genmojiは通知に表示する事が出来ます。
 
@@ -123,35 +124,54 @@ slidenumber: true
 
 # Extract Genmoji
 
-![Screenshot of UITextView]()
+![inline](adaptiveglyph.jpeg)
 
 ^ まずは、Genmojiを解剖してみましょう。
 ^ UITextViewにGenmojiをタイプします。
 
 ---
 
-![Screenshot of attributedString runs]()
+```swift
+let range = NSRange(location: 0, length: attributedText.length)
+attributedText.enumerateAttribute(
+    .adaptiveImageGlyph,
+    in: range,
+    using: { value, _, _ in
+        let imageGlyph = value as! NSAdaptiveImageGlyph
+        let data: Data = imageGlyph.imageContent
+    }
+)
+```
 
 ^ attributesを参照します。
 ^ Genmojiの正体は、NSAdaptiveImageGlyphです。
 
 ---
 
-![Screenshot of NSAdaptiveIamgeGlyph documents]()
-
-^ NSAdapativeImageGlyphは、imageContentというDataでinitする事ができます。
-^ つまり、このimageContentを作ればカスタム絵文字のNSAdapativeImageGlyphが作れそうです。
-
----
-
-![Screenshot of look Data header]()
+![inline](heic.png)
 
 ^ NSAdapativeImageGlyphのimageContentを書き出します。
 ^ ヘッダーを見ると、heicであると分かりました。
 
 ---
 
-![Screenshot of metadata]()
+## Metadata of Genmoji HEIC
+
+```
+<CGImageMetadata 0x103812be0> (
+    tiff:DocumentName = 142D3296-51E6-40E2-AC35-0FAD3C5E965C0
+    tiff:XPosition = 0/1
+    tiff:TileWidth = 160
+    tiff:YPosition = 0/1
+    dc:description = ()
+    Iptc4xmpExt:DigitalSourceType = http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia
+    tiff:TileLength = 160
+    photoshop:Credit = Apple Image Playground
+    tiff:Orientation = 1
+    iio:hasXMP = True
+    xmp:CreatorTool = Apple TextKit
+)
+```
 
 ^ このデータのメタデータを見てみましょう。
 ^ いくつかキーがあります。時間がないので答えを言います。
@@ -159,16 +179,48 @@ slidenumber: true
 
 ---
 
-![Screenshot of create own Data]()
+```swift
+func imageContent() -> Data {
+    let imageContent = NSMutableData()
+    let destination = CGImageDestinationCreateWithData(
+        imageContent,
+        NSAdaptiveImageGlyph.contentType.identifier as CFString,
+        1,
+        nil
+    )!
+    let metadata = CGImageMetadataCreateMutable()
+    CGImageMetadataSetValueWithPath(
+        metadata,
+        nil,
+        "tiff:DocumentName" as CFString,
+        UUID().uuidString as CFString
+    )
+    let image = UIImage(resource: ._032)
+    CGImageDestinationAddImageAndMetadata(
+        destination,
+        image.cgImage!,
+        metadata,
+        nil
+    )
+    CGImageDestinationFinalize(destination)
+    return imageContent as Data
+}
+```
 
 ^ 用意したイメージデータとtiff:DocumentNameを組み合わせてheicファイルを作ります。
 ^ このデータで、NSAdaptiveImageGlythを作ってみましょう。
 
 ---
 
-![gif of work with custom emoji as Genmoji]()
+![inline](send-message.png)
 
 ^ ビンゴ！動きました。
+^ 送信してみましょう
+
+---
+
+![inline](notifications.png)
+
 ^ 通知にも表示されます。
 ^ 私の妻も喜んでいます。
 
