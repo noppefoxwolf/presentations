@@ -30,7 +30,7 @@ slidenumber: true
 
 ![right fit](genmoji.png)
 
-^ そして2024年、Genmojiが登場しました。
+^ そして去年、Genmojiが登場しました。
 
 ---
 
@@ -78,16 +78,25 @@ slidenumber: true
 
 [^3]: ©kitsune-imori.lineem2018
 
+^ 私の妻は絵文字クリエイターでもあります。
+^ これは彼女の作ったnewtのキャラクターです。
+^ そう、自分の感情だけでなく、趣味趣向を表現する事ができます。
+^ 今や絵文字はハイコンテキストなものなのです。
+
 ---
 
 ![inline](appicon.png)
 
 ^ さて、絵文字は送信しなければ意味がありません。
-^ 今日のために、私の妻が作った絵文字が使えるメッセージアプリを作りました。
+^ 今日のために、メッセージアプリを作りました。
+^ 私の妻が作った絵文字を送る事ができます。
 
 ---
 
 ![inline](send-message.png)
+
+^ 早速送信してみましょう。
+^ かわいいnewtですね。送信！
 
 ---
 
@@ -97,28 +106,31 @@ slidenumber: true
 
 ![inline](received-notification.png)
 
-^ あぁ、なんということでしょう。
-^ もう通知には、可愛らしいトカゲはいません。代わりに(OK)と書かれています。
+^ 通知が届きました。
+^ あぁ、なんということでしょう！
+^ もう通知には、可愛らしいnewtはいません。
+^ 代わりに(Heart)と書かれています。
+^ 通知にカスタム絵文字を表示することは出来ないのでしょうか？
 
 ---
 
-# Notifications are silence?
+# Back to WWDC24.
 
-^ 通知にカスタム絵文字を表示することは出来ないのでしょうか？
-^ 今年のWWDCを思い出してみましょう。
+^ 去年のWWDCを思い出してみましょう。
 
 ---
 
 ![inline](INSendMessageIntent.png)
 
-^ これです！Genmojiは通知に表示する事が出来ます。
+^ これです！見えますか？
+^ Genmojiは通知に表示する事が出来ます。
 
 ---
 
 # Can custom emojis spoof Genmoji?
 
 ^ カスタム絵文字を、Genmojiに装うことは出来るでしょうか？
-^ 試してみましょう
+^ 試してみましょう！
 
 ---
 
@@ -126,7 +138,7 @@ slidenumber: true
 
 ![inline](adaptiveglyph.jpeg)
 
-^ まずは、Genmojiを解剖してみましょう。
+^ まずは、Genmojiをextractしてみましょう。
 ^ UITextViewにGenmojiをタイプします。
 
 ---
@@ -143,15 +155,16 @@ attributedText.enumerateAttribute(
 )
 ```
 
-^ attributesを参照します。
-^ Genmojiの正体は、NSAdaptiveImageGlyphです。
+^ それから、adaptiveImageGlyphを見てみましょう。
+^ Genmojiは、NSAdaptiveImageGlyphです。
+^ imageContentというデータを持っています。これをエクスポートします。
 
 ---
 
 ![inline](heic.png)
 
-^ NSAdapativeImageGlyphのimageContentを書き出します。
-^ ヘッダーを見ると、heicであると分かりました。
+^ エクスポートしたデータはheicとして見る事ができます。
+^ つまり、Genmojiはheicです。
 
 ---
 
@@ -175,7 +188,7 @@ attributedText.enumerateAttribute(
 
 ^ このデータのメタデータを見てみましょう。
 ^ いくつかキーがあります。時間がないので答えを言います。
-^ tiff:DocumentName。これが重要です。
+^ tiff:DocumentName。これが必要です。
 
 ---
 
@@ -184,52 +197,50 @@ func imageContent() -> Data {
     let imageContent = NSMutableData()
     let destination = CGImageDestinationCreateWithData(
         imageContent,
-        NSAdaptiveImageGlyph.contentType.identifier as CFString,
-        1,
-        nil
+        NSAdaptiveImageGlyph.contentType.identifier
     )!
+
     let metadata = CGImageMetadataCreateMutable()
-    CGImageMetadataSetValueWithPath(
-        metadata,
-        nil,
-        "tiff:DocumentName" as CFString,
-        UUID().uuidString as CFString
-    )
-    let image = UIImage(resource: ._032)
-    CGImageDestinationAddImageAndMetadata(
-        destination,
-        image.cgImage!,
-        metadata,
-        nil
-    )
-    CGImageDestinationFinalize(destination)
+    metadata["tiff:DocumentName"] = UUID().uuidString
+    
+    let image = UIImage(resource: .emoji)
+    destination.add(image.cgImage!, metadata)
+    
+    destination.finalize()
     return imageContent as Data
 }
 ```
 
-^ 用意したイメージデータとtiff:DocumentNameを組み合わせてheicファイルを作ります。
+^ イメージデータとtiff:DocumentNameを組み合わせてheicファイルを作ります。
 ^ このデータで、NSAdaptiveImageGlythを作ってみましょう。
 
 ---
 
 ![inline](send-message.png)
 
-^ ビンゴ！動きました。
-^ 送信してみましょう
+^ さぁ、もう一度送信してみましょう。
 
 ---
 
 ![inline](notifications.png)
 
-^ 通知にも表示されます。
-^ 私の妻も喜んでいます。
+^ YES!通知に可愛らしいnewtが表示されました。
+^ きっと、私の妻も喜んでいます。
 
 ---
 
-# See more
+# Thank you for listening
 
 https://github.com/noppefoxwolf/Zenmoji
 
-^ 今回のコードはオープンソースとして公開しています。
+## My name is Tomoya
+
+- Solo iOS app developer
+- DAWN for Mastodon
+- WWDC24 attendee
+
+![right fit](Original@512x512.png)
+
+^ 今回のコードはZenmojiというオープンソースとして公開しています。
 ^ 私の名前はTomoyaです。Mastodonアプリを開発しています。
-^ この後もtry!Swiftをお楽しみください！
+^ 最後までtry!Swiftをお楽しみください！
