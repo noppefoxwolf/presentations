@@ -157,7 +157,7 @@ slidenumber: true
 
 ---
 
-# 1. Type any Genmoji on UITextView
+# 1. Type any Genmoji into the UITextView
 
 ![inline](adaptiveglyph.jpeg)
 
