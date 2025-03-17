@@ -1,6 +1,6 @@
 slidenumber: true
 
-# Spice up your notifications
+# Spice up your notifications 🥳
 
 ## noppe (Tomoya Hirano)
 
@@ -10,7 +10,8 @@ slidenumber: true
 
 # 1999
 
-NTT Docomo 176 Emojis [^1] ☀️
+- NTT Docomo created 176 emojis.[^1] ☀️
+- That can add emotion to messages.
 
 ![right fit](moma.png)
 
@@ -22,7 +23,8 @@ NTT Docomo 176 Emojis [^1] ☀️
 
 # 2019
 
-Unicode emojis over 3000+. 🧜‍♀️
+- Unicode now includes over 3,000 emojis.
+- Allowing for a wider range of expressions.
 
 ![right fit](unicode-emojis.png)
 
@@ -40,8 +42,8 @@ Unicode emojis over 3000+. 🧜‍♀️
 
 # Genmoji
 
-- AI generated emojis
-- ♾️ emojis types 🤯
+- Apple Intelligence can generate emojis.
+- ♾️ emojis variations 🤯
 
 ![right fit](genmojis.png)
 
@@ -59,9 +61,9 @@ Unicode emojis over 3000+. 🧜‍♀️
 
 # Custom Emoji[^2]
 
-- Users can uploaded image as emojis.
-- Slack, Twitch, Discord, Mastodon and more.
-- AI can't generate memes.
+- Users can upload images as emojis.
+- This feature is supported on platforms like `Slack`, `Twitch`, `Discord`, `Mastodon`, and more.
+- AI is unable to generate memes.
 
 ![right fit](slackemoji.png)
 
@@ -74,9 +76,9 @@ Unicode emojis over 3000+. 🧜‍♀️
 
 # Custom Emoji[^3]
 
-- Emoji creater is famous job in Japan.
-- Creater sale own emojis in Messenger app.
-- This character made by my wife. →
+- Emoji creators are well-known professionals in Japan.
+- Creators can sell their own emojis on messaging apps.
+- This character was created by my wife.
 
 ![right fit](lineemoji.png)
 
@@ -111,6 +113,11 @@ Unicode emojis over 3000+. 🧜‍♀️
 ![inline](received-notification.png)
 
 ^ ♪ 通知が届きました。
+
+---
+
+![inline](received-notification-zoom.png)
+
 ^ あぁ、なんということでしょう！
 ^ もう通知には、可愛らしいnewtはいません。
 ^ 代わりに(Heart)と書かれています。
@@ -137,26 +144,28 @@ Unicode emojis over 3000+. 🧜‍♀️
 
 ---
 
-# 💡
+# 🦊💡
 
 ^ あぁ、良いことを思いつきました。
 
 ---
 
-# Can ![inline](zenmoji-emoji.png) spoof as ![inline](genmoji-emoji.heic)?
+# Can ![inline](zenmoji-emoji.png) spoof as AI generated ![inline](genmoji-emoji.heic)?
 
 ^ カスタム絵文字をGenmojiに偽装することは出来るでしょうか？
 ^ 試してみましょう！
 
 ---
 
-# Extract Genmoji
+# 1. Type any Genmoji on UITextView
 
 ![inline](adaptiveglyph.jpeg)
 
 ^ まずは、GenmojiをUITextViewにタイプします。
 
 ---
+
+# 2. Export Genmoji data
 
 ```swift
 let range = NSRange(location: 0, length: attributedText.length)
@@ -166,6 +175,7 @@ attributedText.enumerateAttribute(
     using: { value, _, _ in
         let imageGlyph = value as! NSAdaptiveImageGlyph
         let data: Data = imageGlyph.imageContent
+        data.write()
     }
 )
 ```
@@ -184,7 +194,7 @@ attributedText.enumerateAttribute(
 
 ---
 
-## Metadata of Genmoji HEIC
+# 3. Metadata of Genmoji HEIC
 
 ```xml
 <CGImageMetadata 0x103812be0> (
@@ -209,6 +219,8 @@ attributedText.enumerateAttribute(
 ^ これがあればGenmojiとして認識されます。
 
 ---
+
+# 4. Make fake Genmoji with custom image
 
 ```swift
 func imageContent() -> Data {
