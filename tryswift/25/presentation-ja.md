@@ -8,7 +8,9 @@ slidenumber: true
 
 ---
 
-# 1999: NTT Docomo 176 Emojis [^1]
+# 1999
+
+NTT Docomo 176 Emojis [^1] ☀️
 
 ![right fit](moma.png)
 
@@ -18,7 +20,9 @@ slidenumber: true
 
 ---
 
-# 2019: Unocode emojis over 3000+.
+# 2019
+
+Unicode emojis over 3000+. 🧜‍♀️
 
 ![right fit](unicode-emojis.png)
 
@@ -37,7 +41,7 @@ slidenumber: true
 # Genmoji
 
 - AI generated emojis
-- ♾️ emojis types
+- ♾️ emojis types 🤯
 
 ![right fit](genmojis.png)
 
@@ -55,9 +59,9 @@ slidenumber: true
 
 # Custom Emoji[^2]
 
-- Uploaded user emojis
-- Slack, Twitch, Discord, Mastodon
-- Meme
+- Users can uploaded image as emojis.
+- Slack, Twitch, Discord, Mastodon and more.
+- AI can't generate memes.
 
 ![right fit](slackemoji.png)
 
@@ -65,14 +69,14 @@ slidenumber: true
 
 ^ 私たちはユニークな絵文字も使います。
 ^ SlackやMastodon, Discordでは、ユーザーが絵文字を登録することができます。
-^ ミームの絵文字は、私も大好きです。
 
 ---
 
 # Custom Emoji[^3]
 
-- My wife also makes emojis
-- Everyone can make emoji
+- Emoji creater is famous job in Japan.
+- Creater sale own emojis in Messenger app.
+- This character made by my wife. →
 
 ![right fit](lineemoji.png)
 
@@ -80,8 +84,8 @@ slidenumber: true
 
 ^ 私の妻は絵文字クリエイターでもあります。
 ^ これは彼女の作ったnewtのキャラクターです。
-^ そう、自分の感情だけでなく、趣味趣向を表現する事ができます。
-^ 今や絵文字はハイコンテキストなものなのです。
+^ そう、カスタム絵文字は自分の感情だけでなく、趣向を表現する事ができます。
+^ カスタム絵文字はハイコンテキストなものなのです。
 
 ---
 
@@ -89,7 +93,7 @@ slidenumber: true
 
 ^ さて、絵文字は送信しなければ意味がありません。
 ^ 今日のために、メッセージアプリを作りました。
-^ 私の妻が作った絵文字を送る事ができます。
+^ このアプリでは、私の妻が作った絵文字を送る事ができます。
 
 ---
 
@@ -106,11 +110,12 @@ slidenumber: true
 
 ![inline](received-notification.png)
 
-^ 通知が届きました。
+^ ♪ 通知が届きました。
 ^ あぁ、なんということでしょう！
 ^ もう通知には、可愛らしいnewtはいません。
 ^ 代わりに(Heart)と書かれています。
-^ 通知にカスタム絵文字を表示することは出来ないのでしょうか？
+^ これはいけませんね。
+^ 通知にカスタム絵文字を表示することは出来ますか？
 
 ---
 
@@ -123,13 +128,24 @@ slidenumber: true
 ![inline](INSendMessageIntent.png)
 
 ^ これです！見えますか？
+
+---
+
+![inline](INSendMessageIntent-zoom.png)
+
 ^ Genmojiは通知に表示する事が出来ます。
 
 ---
 
-# Can custom emojis spoof Genmoji?
+# 💡
 
-^ カスタム絵文字を、Genmojiに装うことは出来るでしょうか？
+^ あぁ、良いことを思いつきました。
+
+---
+
+# Can ![inline](zenmoji-emoji.png) spoof as ![inline](genmoji-emoji.heic)?
+
+^ カスタム絵文字をGenmojiに偽装することは出来るでしょうか？
 ^ 試してみましょう！
 
 ---
@@ -138,8 +154,7 @@ slidenumber: true
 
 ![inline](adaptiveglyph.jpeg)
 
-^ まずは、Genmojiをextractしてみましょう。
-^ UITextViewにGenmojiをタイプします。
+^ まずは、GenmojiをUITextViewにタイプします。
 
 ---
 
@@ -155,29 +170,30 @@ attributedText.enumerateAttribute(
 )
 ```
 
-^ それから、adaptiveImageGlyphを見てみましょう。
+^ それから、attributedStringにいるGenmojiを見てみましょう。
 ^ Genmojiは、NSAdaptiveImageGlyphです。
-^ imageContentというデータを持っています。これをエクスポートします。
+^ imageContentというデータを持っています。
+^ このデータをエクスポートします。
 
 ---
 
 ![inline](heic.png)
 
-^ エクスポートしたデータはheicとして見る事ができます。
-^ つまり、Genmojiはheicです。
+^ エクスポートしたデータはheicイメージとして見る事ができます。
+^ つまり、Genmojiはheicイメージです。
 
 ---
 
 ## Metadata of Genmoji HEIC
 
-```
+```xml
 <CGImageMetadata 0x103812be0> (
     tiff:DocumentName = 142D3296-51E6-40E2-AC35-0FAD3C5E965C0
     tiff:XPosition = 0/1
     tiff:TileWidth = 160
     tiff:YPosition = 0/1
     dc:description = ()
-    Iptc4xmpExt:DigitalSourceType = http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia
+    Iptc4xmpExt:DigitalSourceType = ...
     tiff:TileLength = 160
     photoshop:Credit = Apple Image Playground
     tiff:Orientation = 1
@@ -186,9 +202,11 @@ attributedText.enumerateAttribute(
 )
 ```
 
-^ このデータのメタデータを見てみましょう。
-^ いくつかキーがあります。時間がないので答えを言います。
-^ tiff:DocumentName。これが必要です。
+^ それから、このデータのメタデータを見てみましょう。
+^ いくつかキーがあります。
+^ 時間がないので答えを言います。
+^ tiff:DocumentName、これが重要なピースです。
+^ これがあればGenmojiとして認識されます。
 
 ---
 
@@ -212,6 +230,7 @@ func imageContent() -> Data {
 ```
 
 ^ イメージデータとtiff:DocumentNameを組み合わせてheicファイルを作ります。
+^ tiff:DocumentNameにはUUIDをセットします。
 ^ このデータで、NSAdaptiveImageGlythを作ってみましょう。
 
 ---
@@ -241,6 +260,7 @@ https://github.com/noppefoxwolf/Zenmoji
 
 ![right fit](Original@512x512.png)
 
-^ 今回のコードはZenmojiというオープンソースとして公開しています。
+^ 今回のソースコードはZenmojiという名前でオープンソースとして公開しています。
 ^ 私の名前はTomoyaです。Mastodonアプリを開発しています。
 ^ 最後までtry!Swiftをお楽しみください！
+^ Thank you!
