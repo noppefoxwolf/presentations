@@ -13,7 +13,7 @@ struct App: SwiftUI.App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView3()
         }
     }
 }
@@ -37,4 +37,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         [.badge, .banner, .list, .sound]
     }
 
+}
+
+
+extension UITextView {
+    func extractGenmoji() {
+        let range = NSRange(location: 0, length: attributedText.length)
+        attributedText.enumerateAttribute(
+            .adaptiveImageGlyph,
+            in: range,
+            using: { value, _, _ in
+                let imageGlyph = value as! NSAdaptiveImageGlyph
+                let data: Data = imageGlyph.imageContent
+                
+            }
+        )
+    }
 }
