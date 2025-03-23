@@ -16,6 +16,7 @@ slidenumber: true
 ![right fit](moma.png)
 
 ^ 1999年、NTTドコモは176種類の絵文字を作りました。
+^ これはメッセージに感情を加えることができます。
 
 [^1]: https://www.moma.org/collection/works/196070
 
@@ -29,6 +30,7 @@ slidenumber: true
 ![right fit](unicode-emojis.png)
 
 ^ 2019年には、Unicodeの絵文字は3000種類を超えました。
+^ これにより、より多くの表現が可能になりました。
 
 ---
 
@@ -50,12 +52,13 @@ slidenumber: true
 
 ^ Genmojiは、Apple Intelligenceが生成する絵文字です。
 ^ 種類は…無限です。
+^ つまり、ハイコンテキストな表現が可能になりました。
 
 ---
 
 # ♾️ ≠ All
 
-^ ご存知の通り、無限とは全てではありません
+^ しかし、ご存知の通り、無限とは全てではありません
 
 ---
 
@@ -69,66 +72,69 @@ slidenumber: true
 
 [^2]: https://slackmojis.com
 
-^ 私たちはユニークな絵文字も使います。
+^ そう、私たちはミームの絵文字も使います。
 ^ SlackやMastodon, Discordでは、ユーザーが絵文字を登録することができます。
 
 ---
 
 # Custom Emoji[^3]
 
+- Custom emojis are **not** just memes.
 - Emoji creators are well-known professionals in Japan.
-- Creators can sell their own emojis on messaging apps.
-- This character was created by my wife.
+- キツネイモリ (`Fox-Newt`) was created by my wife.
 
 ![right fit](lineemoji.png)
 
 [^3]: ©kitsune-imori.lineem2018
 
-^ 私の妻は絵文字クリエイターでもあります。
-^ これは彼女の作ったnewtのキャラクターです。
-^ そう、カスタム絵文字は自分の感情だけでなく、趣向を表現する事ができます。
-^ カスタム絵文字はハイコンテキストなものなのです。
+^ カスタム絵文字はミームだけではありません。
+^ 日本では、多くの絵文字クリエイターが活動しています。
+^ 私の妻も、絵文字クリエイターです。
+^ これは彼女の作ったキャラクターです。fox-newtと呼ばれています。
+^ カスタム絵文字は、ユーザーの個性を強調することができます。
 
 ---
 
 ![inline](appicon.png)
 
-^ さて、絵文字は送信しなければ意味がありません。
-^ 今日のために、メッセージアプリを作りました。
-^ このアプリでは、私の妻が作った絵文字を送る事ができます。
+^ さて、絵文字は送信しなければ無意味です。
+^ なので、私は今日のトークために、メッセージアプリを作りました。
+^ このアプリは、Fox-Newtの絵文字を送る事ができます。
 
 ---
 
 ![inline](send-message.png)
 
 ^ 早速送信してみましょう。
-^ かわいいnewtですね。送信！
+^ かわいいfox-newtですね。送信！
 
 ---
 
 ![](a-few-minutes-later.jpg)
 
+^ ♪
+
 ---
 
 ![inline](received-notification.png)
 
-^ ♪ 通知が届きました。
+^ いいね！相手に通知が届きました。
 
 ---
 
 ![inline](received-notification-zoom.png)
 
 ^ あぁ、なんということでしょう！
-^ もう通知には、可愛らしいnewtはいません。
+^ もう通知には、可愛らしいfox-newtはいません。
 ^ 代わりに(Heart)と書かれています。
 ^ これはいけませんね。
-^ 通知にカスタム絵文字を表示することは出来ますか？
+^ 通知にカスタム絵文字を表示することは出来ないのですか？
 
 ---
 
 # Back to WWDC24.
 
-^ 去年のWWDCを思い出してみましょう。
+^ OK, 去年のWWDCを思い出してみましょう。
 
 ---
 
@@ -194,6 +200,9 @@ attributedText.enumerateAttribute(
 
 ---
 
+[.code-highlight: all]
+[.code-highlight: 2]
+
 # 3. Metadata of Genmoji HEIC
 
 ```xml
@@ -242,7 +251,7 @@ func imageContent() -> Data {
 ```
 
 ^ イメージデータとtiff:DocumentNameを組み合わせてheicファイルを作ります。
-^ tiff:DocumentNameにはUUIDをセットします。
+^ tiff:DocumentNameにはランダムなUUIDをセットします。
 ^ このデータで、NSAdaptiveImageGlythを作ってみましょう。
 
 ---
@@ -255,7 +264,7 @@ func imageContent() -> Data {
 
 ![inline](notifications.png)
 
-^ YES!通知に可愛らしいnewtが表示されました。
+^ Awesome! 通知に可愛らしいfox-newtが表示されました。
 ^ きっと、私の妻も喜んでいます。
 
 ---
