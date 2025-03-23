@@ -50,14 +50,14 @@ slidenumber: true
 ![right fit](genmojis.png)
 
 ^ Genmoji is made by Apple Intelligence.
-^ The types are… infinity.
+^ The number of types is… infinite.
 ^ This means we can express ourselves in many ways.
 
 ---
 
 # ♾️ ≠ All
 
-^ But as you know, infinity does not mean all.
+^ But infinity doesn’t cover everything.
 
 ---
 
@@ -127,7 +127,7 @@ slidenumber: true
 ^ The cute fox-newt is gone from the notification.
 ^ Instead, it says (Heart).
 ^ This is not good.
-^ Can't we show custom emojis in notifications?
+^ Is it possible to show custom emojis in notifications?
 
 ---
 
@@ -151,7 +151,7 @@ slidenumber: true
 
 # 🦊💡
 
-^ Oh, I have a good idea.
+^ Wait, I have an idea!
 
 ---
 
@@ -188,7 +188,7 @@ attributedText.enumerateAttribute(
 ^ And then, let's check the Genmoji in the attributedString.
 ^ Genmoji is an NSAdaptiveImageGlyph.
 ^ It has data called imageContent.
-^ We will export this data.
+^ Let’s export this data.
 
 ---
 
@@ -264,7 +264,7 @@ func imageContent() -> Data {
 ![inline](notifications.png)
 
 ^ Awesome! The cute fox-newt appears in the notification.
-^ My wife will be happy.
+^ She’ll be so happy!
 
 ---
 
