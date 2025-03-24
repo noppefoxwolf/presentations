@@ -1,6 +1,6 @@
 slidenumber: true
 
-# Spice up your notifications 🥳
+# **Spice up your notifications 🥳**
 
 ## noppe (Tomoya Hirano)
 
