@@ -49,7 +49,7 @@ slidenumber: true
 
 ![right fit](genmojis.png)
 
-^ Genmoji is made by Apple Intelligence.
+^ Genmoji is generated emoji by Apple Intelligence.
 ^ The number of types is… infinite.
 ^ This means we can express ourselves in many ways.
 
@@ -72,7 +72,7 @@ slidenumber: true
 [^2]: https://slackmojis.com
 
 ^ Yes, we also use meme emojis.
-^ On Slack and Mastodon, users can register their own emojis.
+^ On Slack and Mastodon, Users can register their own emojis.
 
 ---
 
@@ -80,16 +80,16 @@ slidenumber: true
 
 - Custom emojis are **not** just memes.
 - Emoji makers are well-known artists in Japan.
-- Kitsuneimori (`Fox-Newt`) was made by my wife.
+- キツネイモリ (`Fox-Newt`) was made by my wife.
 
 ![right fit](lineemoji.png)
 
 [^3]: ©kitsune-imori.lineem2018
 
 ^ Custom emojis are not just memes.
-^ Many emoji creators are active in Japan.
+^ A lot of emoji creators are active in Japan.
 ^ My wife is also an emoji creator.
-^ This is her character. It is called fox-newt.
+^ This is her character. It's called fox-newt.
 ^ Custom emojis can show the personality of users.
 
 ---
@@ -157,7 +157,7 @@ slidenumber: true
 
 # Can ![inline](zenmoji-emoji.png) spoof as AI generated ![inline](genmoji-emoji.heic)?
 
-^ Can we spoof a custom emoji is a Genmoji?
+^ Can custom emoji spoof as a Genmoji?
 ^ Let's try it!
 
 ---
@@ -166,7 +166,7 @@ slidenumber: true
 
 ![inline](adaptiveglyph.jpeg)
 
-^ First, type a Genmoji into the UITextView.
+^ First, type a Genmoji character into the UITextView.
 
 ---
 
@@ -185,14 +185,18 @@ attributedText.enumerateAttribute(
 )
 ```
 
-^ And then, let's check the Genmoji in the attributedString.
-^ Genmoji is an NSAdaptiveImageGlyph.
-^ It has data called imageContent.
+^ And then, let's check that attributedString.
+^ You can find an NSAdaptiveImageGlyph.
+^ And, It has a data property called imageContent.
 ^ Let’s export this data.
 
 ---
 
-![inline](heic.png)
+# 2. Export Genmoji data
+
+- Genmoji is heic image data.
+
+![right fit](heic.png)
 
 ^ The exported data can be seen as a heic image.
 ^ This means Genmoji is a heic image.
@@ -220,11 +224,11 @@ attributedText.enumerateAttribute(
 )
 ```
 
-^ Next, let's look at the metadata of this data.
-^ There are some keys.
-^ I will give you the answer since we are short on time.
-^ tiff:DocumentName, this is the key piece.
-^ With this, it will be recognized as a Genmoji.
+^ Next, let’s look at the metadata of this HEIC image.
+^ There are a few keys inside.
+^ So, which one makes it a Genmoji?
+^ It’s tiff:DocumentName.
+^ That’s the key that tells the system it’s a Genmoji.
 
 ---
 
@@ -249,7 +253,7 @@ func imageContent() -> Data {
 }
 ```
 
-^ We will create a heic file by combining image data and tiff:DocumentName.
+^ We will create a heic file by combining UIImage and tiff:DocumentName key.
 ^ Set a random UUID for tiff:DocumentName.
 ^ Now, let's create an NSAdaptiveImageGlyph with this data.
 
@@ -268,19 +272,25 @@ func imageContent() -> Data {
 
 ---
 
-# Thank you for listening
+# You can try it!
 
 https://github.com/noppefoxwolf/Zenmoji
 
+^ The source code for this talk is open-source and called Zenmoji.
+^ You can try it out!
+
+---
+
 ## My name is Tomoya
 
-- Solo iOS app developer
-- DAWN for Mastodon
+- Solo iOS app developer in 🇯🇵
+- **DAWN for Mastodon**
+- github.com/noppefoxwolf
 - WWDC24 attendee
 
 ![right fit](Original@512x512.png)
 
-^ The source code for this talk is open-source and called Zenmoji.
-^ My name is Tomoya. I develop a Mastodon app.
+^ My name is Tomoya. 
+^ I develop a 3rd party Mastodon app called DAWN.
 ^ Enjoy the rest of try!Swift!
 ^ Thank you!
