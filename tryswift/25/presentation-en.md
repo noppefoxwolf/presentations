@@ -170,20 +170,9 @@ slidenumber: true
 
 ---
 
-# 2. Export Genmoji data
+### 2. Export Genmoji data
 
-```swift
-let range = NSRange(location: 0, length: attributedText.length)
-attributedText.enumerateAttribute(
-    .adaptiveImageGlyph,
-    in: range,
-    using: { value, _, _ in
-        let imageGlyph = value as! NSAdaptiveImageGlyph
-        let data: Data = imageGlyph.imageContent
-        data.write()
-    }
-)
-```
+![inline](attributedstring.png)
 
 ^ And then, let's check that attributedString.
 ^ You can find an NSAdaptiveImageGlyph.
@@ -232,26 +221,9 @@ attributedText.enumerateAttribute(
 
 ---
 
-# 4. Make fake Genmoji with custom image
+### 4. Make fake Genmoji with custom image
 
-```swift
-func imageContent() -> Data {
-    let imageContent = NSMutableData()
-    let destination = CGImageDestinationCreateWithData(
-        imageContent,
-        NSAdaptiveImageGlyph.contentType.identifier
-    )!
-
-    let metadata = CGImageMetadataCreateMutable()
-    metadata["tiff:DocumentName"] = UUID().uuidString
-    
-    let image = UIImage(resource: .emoji)
-    destination.add(image.cgImage!, metadata)
-    
-    destination.finalize()
-    return imageContent as Data
-}
-```
+![inline](make_imageContentData.png)
 
 ^ We will create a heic file by combining UIImage and tiff:DocumentName key.
 ^ Set a random UUID for tiff:DocumentName.
