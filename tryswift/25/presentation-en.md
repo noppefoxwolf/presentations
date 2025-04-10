@@ -16,7 +16,7 @@ slidenumber: true
 ![right fit](moma.png)
 
 ^ In 1999, NTT Docomo made 176 types of emojis.
-^ These can add feelings to messages.
+^ They show emotion simply.
 
 [^1]: https://www.moma.org/collection/works/196070
 
@@ -65,21 +65,21 @@ slidenumber: true
 
 - Users can upload images as emojis.
 - This feature works on platforms like `Slack`, `Twitch`, `Discord`, `Mastodon`, and more.
-- AI cannot create memes.
+- Meme emojis are also popular.
 
 ![right fit](slackemoji.png)
 
 [^2]: https://slackmojis.com
 
 ^ Yes, we also use meme emojis.
-^ On Slack and Mastodon, Users can register their own emojis.
+^ On Slack, Twitch, Discord, Mastodon and more, Users can register their own emojis.
 
 ---
 
 # Custom Emoji[^3]
 
 - Custom emojis are **not** just memes.
-- Emoji makers are well-known artists in Japan.
+- Emoji creaters are well-known artists in Japan.
 - キツネイモリ (`Fox-Newt`) was made by my wife.
 
 ![right fit](lineemoji.png)
@@ -89,16 +89,16 @@ slidenumber: true
 ^ Custom emojis are not just memes.
 ^ A lot of emoji creators are active in Japan.
 ^ My wife is also an emoji creator.
-^ This is her character. It's called fox-newt.
-^ Custom emojis can show the personality of users.
+^ Please remember, This is a character she created herself. 
+^ It's called キツネイモリ. In english, it's called Fox-Newt. 
+^ Custom emojis can also show a user’s personality, such as their likes and hobbies.
 
 ---
 
 ![inline](appicon.png)
 
-^ Now, emojis are useless if not sent.
-^ So, for today's talk, I made a messaging app.
-^ This app can send Fox-Newt emojis.
+^ Now, for today's talk, I made a messaging app.
+^ You can chat with your friends using cute fox-newt emojis.
 
 ---
 
@@ -111,7 +111,7 @@ slidenumber: true
 
 ![](a-few-minutes-later.jpg)
 
-^ ♪
+^ A few minutes later, my wife received the message.
 
 ---
 
@@ -246,23 +246,35 @@ slidenumber: true
 
 # You can try it!
 
+- The source code is open-source.
+
 https://github.com/noppefoxwolf/Zenmoji
+
+![right fit](zenmoji.png)
 
 ^ The source code for this talk is open-source and called Zenmoji.
 ^ You can try it out!
 
 ---
 
-## My name is Tomoya
+## My name is Tomoya, aka noppe.
 
-- Solo iOS app developer in 🇯🇵
-- **DAWN for Mastodon**
+- Work at DeNA in 🇯🇵.
+- iOS app developer.
 - github.com/noppefoxwolf
-- WWDC24 attendee
+- x.com/noppefoxwolf
 
-![right fit](Original@512x512.png)
+![right fit 75%](Original@512x512.png)
 
-^ My name is Tomoya. 
-^ I develop a 3rd party Mastodon app called DAWN.
+^ My name is Tomoya. Call me noppe.
+^ I'm a iOS app developer, and work at DeNA in Japan.
+
+---
+
+![fit](appstore.png)
+
+^ And DAWN for mastodon is my personal project.
+^ This app using today's techniques a bit.
+^ Please check it out!
 ^ Enjoy the rest of try!Swift!
-^ Thank you!
+^ Thank you for listening!
