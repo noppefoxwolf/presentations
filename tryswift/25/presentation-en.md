@@ -87,11 +87,11 @@ slidenumber: true
 [^3]: ©kitsune-imori.lineem2018
 
 ^ Custom emojis are not just memes.
-^ A lot of emoji creators are active in Japan.
-^ My wife is also an emoji creator.
+^ A lot of emoji-creators are active in Japan.
+^ My wife is also an emoji-creator.
 ^ Please remember, This is a character she created herself. 
 ^ It's called キツネイモリ. In english, it's called Fox-Newt. 
-^ Custom emojis can also show a user’s personality, such as their likes and hobbies.
+^ Custom-emojis can also show a user’s personality, such as their likes and hobbies.
 
 ---
 
@@ -166,7 +166,7 @@ slidenumber: true
 
 ![inline](adaptiveglyph.jpeg)
 
-^ First, type a Genmoji character into the UITextView.
+^ First, type a Genmoji-character into the UITextView.
 
 ---
 
@@ -187,8 +187,8 @@ slidenumber: true
 
 ![right fit](heic.png)
 
-^ The exported data can be seen as a heic image.
-^ This means Genmoji is a heic image.
+^ The exported-data can be seen as a heic-image.
+^ This means Genmoji is a heic-image.
 
 ---
 
@@ -213,8 +213,8 @@ slidenumber: true
 )
 ```
 
-^ Next, let’s look at the metadata of this HEIC image.
-^ There are a few keys inside.
+^ Next, let’s look at the metadata of this HEIC-image.
+^ There are a few-key-values inside.
 ^ Which key is required for a Gemmoji?
 ^ It’s tiff:DocumentName.
 ^ That’s the key piece.
@@ -275,6 +275,6 @@ https://github.com/noppefoxwolf/Zenmoji
 
 ^ And DAWN for mastodon is my personal project.
 ^ This app using today's techniques a bit.
-^ Please check it out!
+^ Please check it out too!
 ^ Enjoy the rest of try!Swift!
 ^ Thank you for listening!
