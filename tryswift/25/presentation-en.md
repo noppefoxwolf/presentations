@@ -176,7 +176,7 @@ slidenumber: true
 
 ^ And then, let's check that attributedString.
 ^ You can find an NSAdaptiveImageGlyph.
-^ And, It has a data property called imageContent.
+^ And, It has a data-property called imageContent.
 ^ Let’s export this data.
 
 ---
@@ -215,9 +215,9 @@ slidenumber: true
 
 ^ Next, let’s look at the metadata of this HEIC image.
 ^ There are a few keys inside.
-^ So, which one makes it a Genmoji?
+^ Which key is required for a Gemmoji?
 ^ It’s tiff:DocumentName.
-^ That’s the key that tells the system it’s a Genmoji.
+^ That’s the key piece.
 
 ---
 
@@ -225,7 +225,7 @@ slidenumber: true
 
 ![inline](make_imageContentData.png)
 
-^ We will create a heic file by combining UIImage and tiff:DocumentName key.
+^ We'll create a heic file by UIImage and tiff:DocumentName key.
 ^ Set a random UUID for tiff:DocumentName.
 ^ Now, let's create an NSAdaptiveImageGlyph with this data.
 
