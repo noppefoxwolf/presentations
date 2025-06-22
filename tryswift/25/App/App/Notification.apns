@@ -1,0 +1,12 @@
+{
+  "Simulator Target Bundle": "dev.noppe.App",
+  "aps": {
+    "alert": {
+      "title": "通知のタイトル",
+      "body": "通知の本文"
+    },
+    "sound": "default",
+    "badge": 1,
+    "mutable-content": 1
+  }
+}
