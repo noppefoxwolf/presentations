@@ -15,7 +15,7 @@ slidenumber: true
 
 ![right fit](moma.png)
 
-^ In 1999, NTT Docomo made 176 types of emojis.
+^ In 1999, NTT Docomo made 176(one-hundred-seventy-six) types of emojis.
 ^ They show emotion simply.
 
 [^1]: https://www.moma.org/collection/works/196070
@@ -29,7 +29,7 @@ slidenumber: true
 
 ![right fit](unicode-emojis.png)
 
-^ In 2019, Unicode emojis exceeded 3,000 types.
+^ In 2019(Twenty nineteen), Unicode emojis exceeded 3,000 types.
 ^ This allows for more expressions.
 
 ---
@@ -241,19 +241,7 @@ slidenumber: true
 
 ^ Awesome! The cute fox-newt appears in the notification.
 ^ She’ll be so happy!
-
----
-
-# You can try it!
-
-- The source code is open-source.
-
-https://github.com/noppefoxwolf/Zenmoji
-
-![right fit](zenmoji.png)
-
-^ The source code for this talk is open-source and called Zenmoji.
-^ You can try it out!
+^ OK, That's it.
 
 ---
 
@@ -275,6 +263,19 @@ https://github.com/noppefoxwolf/Zenmoji
 
 ^ And DAWN for mastodon is my personal project.
 ^ This app using today's techniques a bit.
-^ Please check it out too!
+^ Please check it out!
+
+---
+
+# You can try it!
+
+- The source code is open-source.
+
+https://github.com/noppefoxwolf/Zenmoji
+
+![right fit](qrcode.png)
+
+^ The source code for this talk is open-source and called Zenmoji.
+^ You can try it out too!
 ^ Enjoy the rest of try!Swift!
 ^ Thank you for listening!
