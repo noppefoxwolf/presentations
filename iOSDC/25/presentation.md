@@ -239,25 +239,28 @@ $$
 
 ---
 
-# 1. User
+# 1. User pain
+
+- What is bothering users?
 
 ^ まずは、何よりユーザーの体験から考えること。
 ^ 最初は、ユーザーが何を不都合に感じるのかを考えたり、ヒアリングをしたりします。
-^ なので、いくらメモリやCPUが使われても、ユーザーが快適と感じるならヨシ。
-^ それくらい割り切ってしまっていいでしょう。
 
 ---
 
-# 2. Value
+# 2. Service Value
+
+- What is the most important value your app provides?
 
 ^ 次に、アプリの提供するコアな価値は何か。
 ^ 天気のアプリなら、いち早く天気予報が見れることが大事です。
-^ 逆にそれ以外なら劣化してもOK！
-^ エンジニアは、ついつい見えているパフォーマンスの問題を解決したくなってしまいますが、それを直して意味があるのか。考えると優先度がつけやすいかと思います。
 
 ---
 
 # 3. Measurement
+
+- What do you think about the app?
+- Putting the problem into numbers.
 
 ^ そして、計測すること。
 ^ ここでの計測は、定量的なものも、定性的なものもです。
@@ -270,9 +273,15 @@ $$
 
 # Trade-off
 
+- adjust benefit
+
 ^ 最後に、忘れてはいけないのがパフォーマンスチューニングとは「トレードオフのパズルである」ということです。
 ^ 当然、処理が軽くなるのが理想ですが、突き詰めるところ大事でないものの品質を落とし、大事なものの品質を上げるという話になりがちです。
 ^ このときに、「ユーザー体験」「アプリの提供価値」を軸に取捨選択を行います。
+^ なので、いくらメモリやCPUが使われても、ユーザーが快適と感じるならヨシ。
+^ それくらい割り切ってしまっていいでしょう。
+^ 逆にそれ以外なら劣化してもOK！
+^ エンジニアは、ついつい見えているパフォーマンスの問題を解決したくなってしまいますが、それを直して意味があるのか。考えると優先度がつけやすいかと思います。
 
 ---
 
@@ -289,7 +298,7 @@ $$
 
 ---
 
-# Trade-off of performance
+# Trade-off
 
 - image quality
 - framerate
@@ -301,10 +310,44 @@ $$
 ---
 
 ```mermaid
-graph LR
-ImageView --- ImageProvider
-```
+flowchart TD
+      %% Input
+      GIF[📂 GIF/APNG/WebP<br/>File Input]
 
+      %% Processing
+      Provider[🎬 AnimatedImageProvider]
+      Processor[⚙️ ImageProcessor<br/>Background Thread]
+      Cache[💾 Frame Cache<br/>CGImage Storage]
+
+      %% Display
+      UpdateLink[⏱️ UIUpdateLink<br/>60fps Timer]
+      View[📱 AnimatedImageView<br/>Display]
+
+      %% Flow
+      GIF --> Provider
+      Provider --> Processor
+
+      note1[🔄 Decode all frames<br/>Optimize for memory<br/>Cache processed images]
+      Processor -.-> note1
+      Processor --> Cache
+
+      note2[⚡ Every 16ms:<br/>1. Calculate current frame<br/>2. Get from cache<br/>3. Display]
+      UpdateLink -.-> note2
+      UpdateLink --> Provider
+      Provider --> Cache
+      Cache --> View
+
+      %% Styling
+      classDef input fill:#2a4d2a,stroke:#66bb6a,stroke-width:2px,color:#ffffff
+      classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
+      classDef display fill:#2a4d5a,stroke:#4fc3f7,stroke-width:2px,color:#ffffff
+      classDef note fill:#4d3a2a,stroke:#ff9800,stroke-width:1px,color:#ffffff
+
+      class GIF input
+      class Provider,Processor,Cache process
+      class UpdateLink,View display
+      class note1,note2 note
+```
 
 ^ どん
 ^ こんな感じです。簡単ですね
@@ -366,7 +409,7 @@ ImageProvider --- NSCache
 
 1. Resizing
 2. Drop frames
-3. Decoding
+3. Decompress
 
 ^ ImageProcessorでは、３つの事をしています。
 ^ フレーム画像のリサイズ・フレームの間引き・デコードです。
@@ -378,26 +421,59 @@ ImageProvider --- NSCache
 1. Final Size <= Rendering Size
 
 ^ 画面に表示する以上のサイズをメモリに保持するのは無駄なので、実際に画面にレンダリングするサイズまで小さくします。
+^ つまり、ビューのサイズが変更されるたびにキャッシュを捨てて作り直します。
 
 ---
 
 # Drop Frame
 
+1. Memory Status Assessment
+    - Calculate memory usage using image size x number of frames x 4 bytes
+2. VSync Synchronization Selection
+    - 12 frame rate options from 60fps to 1fps
+3. Frame Selection
+    - Thin out frames evenly along VSync boundaries
+
 ^ フレームドロップは特殊なロジックでやります
 
 ---
 
-# デコード
+# Decompress
+
+![inline](DGifDecompress.png)
 
 ^ 仮にリサイズが不要な場合でも必ず画像をレンダリングし直す。
 ^ GIFの場合は、UIImageで遅延デコードされてメインスレッドが重くなるケースがあるので気を付ける
 
 ---
 
-## まとめ
-- UIブロック回避・滑らかさ・安定性。
-- 抽象化と段階的劣化で全体最適。
-- AnimatedImageは多様なメディアに適合。
+# UIImage decompress
+
+```swift
+let decodedImage = await uiImage.byPreparingForDisplay()
+```
+
+^ UIImageの場合は、byPreparingForDisplayメソッドを呼ぶことで任意のタイミングでデコンプレスすることができます。
+
+---
+
+# CGImage decompress
+
+```swift
+let context = CGContext(...)!
+context.draw(image, in: rect)
+let decodedImage = context.makeImage()
+```
+
+^ CGImageの場合は、単純にCGContextにdrawしてあげればこの問題が発生しません。
+
+---
+
+## Recap
+
+- UI blocking prevention, smoothness, and stability.
+- Overall optimization through abstraction and gradual degradation.
+- AnimatedImage is suitable for a variety of media.
 
 ^ 本日の要点は、滑らかさ、安定性、そして全体最適の三点です。つまり、メインを塞がず、負荷時は段階的に劣化し、抽象で違いを吸収するということになります。Actor境界、非同期キャッシュ、間引き、事前デコードの組み合わせが鍵でした。以上が今日のお話です。詳細はOSSのリポジトリをご覧ください。
 
