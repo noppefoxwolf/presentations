@@ -213,8 +213,9 @@ for index in 0..<count {
 }
 ```
 
-^ CoreGraphicsを使うことで、GIFが持っている画像の枚数や表示時間、各画像を取り出すことができます。
-^ なお、このAPIはAPNGやWEBPにも対応しているのでGIFかどうかを考える必要がありません。便利ですね。
+^ CoreGraphicsのCGImageSourceを使うと、画像データのメタデータに簡単にアクセスすることができます。
+^ これによって、GIFが持っている画像の枚数や表示時間、各画像を取り出すことができます。
+^ なお、このCGImageSourceはAPNGやWEBPにも対応しているので、ファイルタイプを気にする必要がありません。便利ですね。
 ^ こうして、すべてのフレームのUIImageを作ることができました。
 
 ---
@@ -261,12 +262,20 @@ imageView.startAnimating()
 ![right fit](image-size.png)
 
 ## Formula for memory usage:
+
 $$M_{\text{bytes}} = W \times H \times C \times N$$
+
+```
+480×400×4×34 
+= 25,958,400Byte ≈ 25MB
+```
 
 - **W**: Width in pixels (480)
 - **H**: Height in pixels (400) 
 - **C**: Channels (4 for ARGB)
 - **N**: Number of frames (34)
+
+
 
 ^ メモリがどれくらい使われるかは、次の計算式で予想することができます。
 ^ Wは横ピクセル数、Hは縦のピクセル数、Cはチャンネル数でARGBなら4が入ります。
@@ -369,7 +378,7 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 - **Perfect color accuracy**
 
 ^ では、逆にトレードオフはなんでしょうか
-^ ユーザーは絵文字のコンテキストさえ分かれば良いので、多少、画質を劣化させたり、GIFのフレームレートを落としてもそんなに問題にはならないはずです。
+^ ユーザーは絵文字のコンテキストさえ分かれば良いので、気にならない程度でフレームごとの画質を劣化させたり、フレームレートを落としてもそんなに問題にはならないはずです。
 ^ では、今のポイントを抑えてアーキテクチャを考えてみましょう
 
 ---
@@ -424,10 +433,10 @@ flowchart TD
 graph TB
 
 subgraph View
-    UIUpdateLink
+    UpdateLink
     S[setNeedsDisplay]
 end
-UIUpdateLink -->|Request Image at 12345.67| ImageProvider
+UpdateLink -->|Request Image at 12345.67| ImageProvider
 ImageProvider -.->|Image?| S
 subgraph ImageProvider
 end
@@ -440,13 +449,34 @@ class Provider,Processor,Cache process
 class UpdateLink,View,S display
 ```
 
-^ ビューはUIUpdateLinkを持っています。
-^ UIUpdateLinkは登録されたアクションを、決まったタイミングで何度も呼び出すクラスです。
-^ タイマーと異なり、画面の更新に合わせて発火してくれます。iOS16以前ではCADisplayLinkが同じような役割のクラスになります。
-^ 60fpsでImageProviderに画像がキャッシュされているかを確認します。
-^ この時、タイムスタンプを渡してImageProviderがそのタイムスタンプで表示するべき画像があるかを確認します。
+^ ビューはUpdateLinkを持っています。
+^ UpdateLinkは画面が更新されるたびにImageProviderに表示するべきフレーム画像のキャッシュがあるかを問い合わせます。
 ^ 画像があればViewに画像を返却し、ビューに描画をします。
 ^ この仕組みの良いところは、ImageProviderが画像を返すか否かによってビューの描画をコントロールできる点です。これにより、ImageProviderの設計によってパフォーマンスのチューニングがやりやすくなります。
+
+---
+
+# UIUpdateLink 🆕
+
+- iOS17+
+- An object you use to observe, participate in, and affect the UI update process.
+
+```swift
+// Update y every frame.
+
+let updateLink = UIUpdateLink(view: view)
+updateLink.addAction { link, info in 
+    // Code that runs each UI update, after processing input events, 
+    // but before `CADisplayLink` callbacks.
+    self.view.center.y = sin(info.modelTime) * 100 + self.view.bounds.midY
+}
+```
+
+^ UpdateLinkでは、内部的にUIUpdateLinkを利用しています。
+^ 登録されたアクションを、決まったタイミングで何度も呼び出すクラスです。
+^ タイマーと異なり、画面の更新に合わせて発火してくれます。
+^ 60fpsでImageProviderに画像がキャッシュされているかを確認します。
+^ AnimatedImageではiOS16以前も対応しており、そちらではCADisplayLinkを利用しています。
 
 ---
 
@@ -596,8 +626,9 @@ let decodedImage = context.makeImage()
 ```
 
 ^ この問題を解決するには、事前にバックグラウンドスレッドでフレームを復元しておく必要があります。
-^ UIImageの場合は、byPreparingForDisplayメソッドを呼ぶことで任意のタイミングでフレームを復元することができます。
-^ CGImageの場合は、CGContextにdrawすることで復元されたフレームでCGImageを得ることができます。
+^ UIImageの場合は、byPreparingForDisplayメソッドを使うことで任意のタイミングでフレームを復元することができます。
+^ このメソッドは非同期なので、メインスレッドに影響を与えないところもポイントです。
+^ また、CGImageの場合は、CGContextにdrawすることで復元されたフレームでCGImageを得ることができます。
 
 ---
 
