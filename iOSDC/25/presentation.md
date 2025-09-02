@@ -18,13 +18,12 @@ code: SF Mono
 ^ はい、では本日はよろしくお願いします。
 ^ 「ハイパフォーマンスなGIFアニメ再生を実現する工夫」というタイトルで20分ほど話させていただければと思います。
 ^ スライドは広く見てもらうために英語になりますが、トークは日本語で行います。
-+=
+
 ---
 
 # Who am I
 
 - **noppe** 🦊
-
 - iOSDC 18~25 Speaker
 - Senior iOS App Developer at DeNA
 - Indie App Developer
@@ -42,7 +41,7 @@ code: SF Mono
 
 ## Features
 - Beautiful, familiar iOS design
-- Rich media support (GIF, APNG, WebP)
+- Animation image support (GIF, APNG, WebP)
 - High-performance timeline scrolling
 - Multi-instance support
 
@@ -102,11 +101,6 @@ code: SF Mono
 - User-uploaded emoji sets (like Slack!)
 - Each server has its own emoji collection
 - Support for GIF, APNG, WebP formats
-
-## Usage scenarios
-- Posting content with custom expressions
-- Reactions to announcements
-- Post reactions (on forked instances)
 
 ^ そして、Mastodonの特徴の一つにカスタム絵文字という機能があります。
 ^ Slackなどにもある、ユーザーが登録できる絵文字セットのことですね
@@ -178,9 +172,9 @@ view.addSubview(imageView)
 
 ---
 
-UIKit not supported any animation image.
+![inline](not-supported.png)
 
-![right fit](not-supported.png)
+UIKit not supported any animation image.
 
 ^ これは、表示することはできますが、残念ながらこれではアニメーションしません。
 ^ ここで、一度GIFファイルの構造を振り返りましょう。
