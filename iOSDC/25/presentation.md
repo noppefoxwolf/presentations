@@ -122,7 +122,7 @@ code: SF Mono
 
 [.footer: Beware of flashing lights / 点滅にお気をつけください]
 
-^ これはつまり、タイムラインに大量の絵文字、しかもGIFが溢れる可能性があるということです。
+^ これはつまり、タイムラインに数十個の絵文字、しかもGIFが溢れる可能性があるということです。
 ^ 同時に数十個のGIFアニメーションが再生される状況も珍しくありません。
 ^ これは明らかにパフォーマンス上の大きな課題となります。
 
@@ -367,6 +367,21 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 ^ なので、大量に絵文字が表示されていても、スクロールに影響を与えないことを重要としました。
 ^ そして、Mastodonならではの要件としてGIF以外にもAPNGやWEBPもサポートすることにしました。
 ^ これはMastodonが分散型であるが故、必ず絵文字がGIFであるという保証がないからですね。
+
+---
+
+# AnimatedImage Library
+
+github.com/noppefoxwolf/AnimatedImage
+
+- Specialized UIKit component for high-performance GIF playback
+- Supports GIF, APNG, WebP formats
+- Memory-efficient frame caching
+- Background processing pipeline
+
+^ 今日紹介する最適化手法は、AnimatedImageというOSSライブラリとして実装しています。
+^ これは高パフォーマンスなGIF再生に特化したUIKitコンポーネントです。
+^ 複数のアニメーション形式に対応し、メモリ効率的なフレームキャッシュとバックグラウンド処理パイプラインを提供しています。
 
 ---
 
