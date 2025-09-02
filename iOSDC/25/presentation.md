@@ -4,28 +4,26 @@ theme: Fraunces, 4
 text: #FFF, SF Pro
 text-emphasis: SF Pro
 text-strong: SF Pro
-header: #FFF, alignment(left), text-scale(0.5), SF Pro Expanded Regular
-header-emphasis: SF Pro
-header-strong: SF Pro
-slidenumber-style: SF Pro
-footer-style: SF Pro
+autoscale: true
+header: #FFF, alignment(left), text-scale(0.5), SF Pro Text
+header-emphasis: SF Pro Text
+header-strong: SF Pro Text
+slidenumber-style: SF Pro Text
+footer-style: SF Pro Text
 code: SF Mono
 
 # High-performance GIF playback
-
-```
-iOSDC25 day1 Track D noppe
-```
+## iOSDC25 day1 Track D noppe
 
 ^ はい、では本日はよろしくお願いします。
 ^ 「ハイパフォーマンスなGIFアニメ再生を実現する工夫」というタイトルで20分ほど話させていただければと思います。
 ^ スライドは広く見てもらうために英語になりますが、トークは日本語で行います。
-
++=
 ---
 
 # Who am I
 
-- **noppe**
+- **noppe** 🦊
 
 - iOSDC 18~25 Speaker
 - Senior iOS App Developer at DeNA
@@ -34,38 +32,63 @@ iOSDC25 day1 Track D noppe
 ![right fill](Original.png)
 
 ^ まず、自己紹介です。noppeと言います。狐のアイコンで活動しています。
-^ 以下略
+^ iOSDCには2018年から毎年登壇させていただいており、今年で8年連続となります。
+^ 普段はDeNAでiOSアプリの開発をしており、個人でも趣味でアプリを作っています。
+^ 今日お話しするDAWN for Mastodonも、そんな個人開発アプリの一つです。
 
 ---
 
-![fit](screenshots.png)
+# DAWN for Mastodon
+
+## Features
+- Beautiful, familiar iOS design
+- Rich media support (GIF, APNG, WebP)
+- High-performance timeline scrolling
+- Multi-instance support
+
+![right fit](screenshot.png)
 
 ^ 2023年、私は個人開発でアプリを開発していました。それが、DAWN for Mastodonです。
 ^ DAWN for Mastodonは、名前の通りMastodonというSNSのためのアプリです。
 ^ Mastodonはまだ一般に普及しているとは言えませんが、このアプリはMastodonを誰もが快適に使えるように、「ふつうのアプリ」を目指して開発されています。
 ^ Mastodonの特殊性を、UIデザインとエンジニアリングで一般化しようというのが、このアプリの目指すところです。
+^ 特に、リアクションなどのコミュニケーションの基点になる部分と、滑らかなタイムラインのスクロールに力を入れています。
 
 ---
 
+# What is Mastodon?
+
 ![inline 50%](mastodon-logo.png)
 
+- Decentralized social networking platform
 - First released in 2016 by Eugen Rochko
-
+- Open-source software built with Ruby on Rails
+- Anyone can deploy their own server
+- Servers connect to form a federated network
 
 ^ Mastodonをご存知ない方のために、少しMastodonについても説明します。
-^ Mastodonは2016年にドイツのオイゲン・ロチコによって開発されたオープンソースソフトウェアです。Ruby on Railsで書かれています。
+^ Mastodonは2016年にドイツのオイゲン氏によって開発されたオープンソースソフトウェアです。Ruby on Railsで書かれています。
 ^ Mastodon自体は特定のサービスを指しているわけではなく、企業や個人は、Mastodonを自分のサーバーにデプロイしてTwitterのようなSNSを運用することができます。
+^ つまり、分散型のソーシャルネットワークプラットフォームということですね。
 
 [.footer: https://en.wikipedia.org/wiki/Mastodon_%28social_network%29]
 
 ---
 
+# Decentralization
+
 ![fit](decentralization.png)
+
+## Key Benefits
+- No single point of failure
+- User choice of servers/policies
+- Cross-server communication
+- Compatible with Threads, Misskey, etc.
 
 [.footer: https://blog.joinmastodon.org/2018/12/why-does-decentralization-matter/]
 
 ^ 特徴的なのは、そのサーバー間で投稿を交換し合うことで他のサーバーの投稿もタイムラインに表示されることです。
-^ つまり、ユーザーは一つのアカウントを使って複数のサーバーの投稿を見ることができます。
+^ つまり、ユーザーはどこかで一つのアカウントを作れば、そこから複数のサーバーの投稿を見ることができます。
 ^ DAWNは、このネットワークに接続してMastodonをiPhoneで快適に使うUIを提供しています。
 ^ 現在、同様のプロトコルをInstagramのThreadsや、Misskeyなどが採用しているため、これらの投稿もMastodonから見ることができます。
 
@@ -75,30 +98,53 @@ iOSDC25 day1 Track D noppe
 
 ![right fit](emoji-picker.png)
 
-- Users can use custom-emojis in following situation.
-    - Sending post
-    - Reaction to announcement
-    - Reaction to post (forked instance only)
+## What are Custom Emojis?
+- User-uploaded emoji sets (like Slack!)
+- Each server has its own emoji collection
+- Support for GIF, APNG, WebP formats
+
+## Usage scenarios
+- Posting content with custom expressions
+- Reactions to announcements
+- Post reactions (on forked instances)
 
 ^ そして、Mastodonの特徴の一つにカスタム絵文字という機能があります。
-^ Slackなどにもある、ユーザーが登録できる絵文字セットです。
-^ これらをタイムラインの投稿やリアクションとして使うことができます。
+^ Slackなどにもある、ユーザーが登録できる絵文字セットのことですね
+^ 各サーバーが独自の絵文字コレクションを持つことができ、GIF、APNG、WebPなど様々なフォーマットに対応しています。
+^ そして、これらをタイムラインの投稿や一部のサーバーでは、リアクションとして使うことができます。
 
 ---
 
 
-![inline autoplay loop](emoji-darake.mov)
+# The Challenge
+
+![right fit autoplay loop](emoji-darake.mov)
+
+## Timeline can be filled with animated emojis!
+- Dozens of GIFs playing simultaneously
+- Different formats (GIF, APNG, WebP)
+- Various sizes and frame rates
+- **Performance nightmare** 😱
 
 [.footer: Beware of flashing lights / 点滅にお気をつけください]
 
 ^ これはつまり、タイムラインに大量の絵文字、しかもGIFが溢れる可能性があるということです。
+^ 同時に数十個のGIFアニメーションが再生される状況も珍しくありません。
+^ これは明らかにパフォーマンス上の大きな課題となります。
 
 ---
 
-Image of dawn
+# DAWN's Solution
 
-^ DAWNでは、これをやってのけました。GIFの絵文字が大量に表示されても、大きくパフォーマンスを損なうことなく動作します。
+## ✅ Smooth scrolling with dozens of animated emojis
+## ✅ Memory efficient rendering
+## ✅ Support for GIF, APNG, WebP
+## ✅ Responsive UI under heavy load
+
+^ DAWNでは、これをやってのけました
+^ GIFの絵文字が大量に表示されても、大きくパフォーマンスを損なうことなく動作します。
 ^ 今日は、これらをどうやって実現しているか紹介します。
+^ 具体的には、滑らかなスクロール、メモリ効率、複数フォーマット対応、そして高負荷時でもレスポンシブなUIを実現する方法についてです。
 
 ---
 
@@ -128,31 +174,32 @@ let imageView = UIImageView(image: image)
 view.addSubview(imageView)
 ```
 
-^ いつものように、UIImageを作ってUIImageViewに入れてみましょう。
+^ いつものように、gifファイルからUIImageを作ってUIImageViewに入れてみましょう。
 
 ---
 
-- UIKit not supported any animation image.
+UIKit not supported any animation image.
 
 ![right fit](not-supported.png)
 
-^ 表示することはできますが、残念ながらこれではアニメーションしません。
+^ これは、表示することはできますが、残念ながらこれではアニメーションしません。
 ^ ここで、一度GIFファイルの構造を振り返りましょう。
 
 ---
 
-![inline autoplay loop](nyancat.mp4)
+![](gif-has-frames.png)
 
 [.footer: https://www.nyan.cat]
 
 ^ GIFはパラパラ漫画のように複数の画像を持ったファイルであると考えることができます。
-^ 実際プレビューで開くと、各フレームの画像を確認することができます。
+^ 実際にmacのプレビューで開くと、各フレームの画像を確認することができます。
+^ つまり、これらのすべてのフレームを取り出して、一定時間ごとに表示をすればいいわけですね。
 
 ---
 
 ```swift
 
-// Building animation images
+// Extract Frame Images
 
 // GIF, APNG, WEBP file
 let fileURL = ...
@@ -194,34 +241,44 @@ imageView.startAnimating()
 
 ![fit autoplay loop](working.mp4)
 
-^ やった、動きました。以上になります。
+^ やった、動きました。なので、今回のトークは以上になります。ありがとうございました。
 
 ---
 
-![inline](memory-usage.png)
+# Memory Usage Problem
+
+![right fit](memory-usage.png)
+
+## 😱 25MB for a single GIF!
+- Same as an 8K JPEG image
+- Memory usage grows exponentially
+- App crashes with multiple GIFs
 
 ^ しかし、この方法。数が増えていくとアプリがどんどん重くなります。
 ^ たった１枚のGIFを再生するのに25MBほど使っていました。
 ^ 25MBといえば、8Kのjpegと同じくらいです。
 ^ この25MBはどこから来たのでしょうか
+^ 複数のGIFを表示すると、メモリ使用量が指数的に増加し、アプリがクラッシュしかねません。
 
 ---
 
-$$
-M_{\text{bytes}} = W \times H \times C \times N
-$$
-
-$$
-25MB ≒ 26,112,000byte = 480 \times 400 \times 4 \times 34
-$$
+# Memory Calculation
 
 ![right fit](image-size.png)
+
+## Formula for memory usage:
+$$M_{\text{bytes}} = W \times H \times C \times N$$
+
+- **W**: Width in pixels (480)
+- **H**: Height in pixels (400) 
+- **C**: Channels (4 for ARGB)
+- **N**: Number of frames (34)
 
 ^ メモリがどれくらい使われるかは、次の計算式で予想することができます。
 ^ Wは横ピクセル数、Hは縦のピクセル数、Cはチャンネル数でARGBなら4が入ります。
 ^ これが34枚分のGIFだったということで、25MB程度になります。
-^ 当然のことを言いますが、34フレームのGIFを表示するというのは34枚分の画像を展開しているということ。
-^ メモリも食い潰します。これでは大量に表示するとクラッシュしかねません。どうしたものか
+^ 34フレームのGIFを表示するというのは34枚分の画像をメモリ上に展開しているということになります。
+^ 当然メモリも食い潰します。どうしたものか
 ^ こういうときにやることは一つ。
 
 ---
@@ -232,35 +289,43 @@ $$
 
 ---
 
-# Planning
+# Performance Tuning Framework
+
+## My approach to performance optimization
 
 ^ ですが、一言にパフォーマンスチューニングと言ってもどう進めたら良いのか分かりませんよね。
-^ ここで、私のパフォーマンスチューニングの勘所を紹介します。
+^ ここで、私のパフォーマンスチューニングの勘所、効率的に問題に取り組むための体系的なアプローチをご紹介します。
 
 ---
 
-# 1. User pain
+# 1. Identify User Pain
 
-- What is bothering users?
+## 🎯 Start with user experience
+- What specific issues are users facing?
+- Where do they struggle the most?
+- What makes them frustrated?
 
 ^ まずは、何よりユーザーの体験から考えること。
 ^ 最初は、ユーザーが何を不都合に感じるのかを考えたり、ヒアリングをしたりします。
+^ 技術的な指標よりも、実際のユーザーが困っていることから始めることが重要です。
 
 ---
 
-# 2. Service Value
+# 2. Define Core Value
 
-- What is the most important value your app provides?
+## 🎯 What is your app's primary mission?
+- What makes your app irreplaceable?
+- What would users miss most if removed?
 
 ^ 次に、アプリの提供するコアな価値は何か。
 ^ 天気のアプリなら、いち早く天気予報が見れることが大事です。
 
 ---
 
-# 3. Measurement
+# 3. Measure Everything
 
-- What do you think about the app?
-- Putting the problem into numbers.
+- How does it *feel* to users?
+- Are metrics matching user perception?
 
 ^ そして、計測すること。
 ^ ここでの計測は、定量的なものも、定性的なものもです。
@@ -271,24 +336,28 @@ $$
 
 ---
 
-# Trade-off
+# 4. Smart Trade-offs
 
-- adjust benefit
+## ⚖️ Performance tuning is about choices
+- You can't optimize everything
+- Focus resources on what matters most
+- Sacrifice less important aspects for core value
 
 ^ 最後に、忘れてはいけないのがパフォーマンスチューニングとは「トレードオフのパズルである」ということです。
 ^ 当然、処理が軽くなるのが理想ですが、突き詰めるところ大事でないものの品質を落とし、大事なものの品質を上げるという話になりがちです。
 ^ このときに、「ユーザー体験」「アプリの提供価値」を軸に取捨選択を行います。
 ^ なので、いくらメモリやCPUが使われても、ユーザーが快適と感じるならヨシ。
 ^ それくらい割り切ってしまっていいでしょう。
-^ 逆にそれ以外なら劣化してもOK！
 ^ エンジニアは、ついつい見えているパフォーマンスの問題を解決したくなってしまいますが、それを直して意味があるのか。考えると優先度がつけやすいかと思います。
 
 ---
 
-# Case of DAWN
+# DAWN's Requirements
 
-1. Context
-1. Smooth scrolling
+## 🎯 Primary goal: Smooth scrolling
+- Users spend most time browsing timeline
+- Jerky scrolling kills user experience
+- Must maintain 60fps even with many animated emojis
 
 ^ では、DAWNでは何が大事なのでしょうか。
 ^ DAWNはSNSのアプリです。ユーザーはほとんどの時間をスクロールしています。そのときにタイムラインのスクロールが引っかかると嫌になりますよね。
@@ -298,10 +367,12 @@ $$
 
 ---
 
-# Trade-off
+# DAWN's Trade-offs
 
-- image quality
-- framerate
+## ⚠️ What we can sacrifice:
+- **Image quality** (slightly compressed)
+- **Frame rate** (30fps → 15fps for heavy GIFs)
+- **Perfect color accuracy**
 
 ^ では、逆にトレードオフはなんでしょうか
 ^ ユーザーは絵文字のコンテキストさえ分かれば良いので、多少、画質を劣化させたり、GIFのフレームレートを落としてもそんなに問題にはならないはずです。
@@ -315,9 +386,9 @@ flowchart TD
       GIF[📂 GIF/APNG/WebP<br/>File Input]
 
       %% Processing
-      Provider[🎬 AnimatedImageProvider]
+      Provider[🎬 ImageProvider]
       Processor[⚙️ ImageProcessor<br/>Background Thread]
-      Cache[💾 Frame Cache<br/>CGImage Storage]
+      Cache[💾 Cache<br/>CGImage Storage]
 
       %% Display
       UpdateLink[⏱️ UIUpdateLink<br/>60fps Timer]
@@ -327,12 +398,8 @@ flowchart TD
       GIF --> Provider
       Provider --> Processor
 
-      note1[🔄 Decode all frames<br/>Optimize for memory<br/>Cache processed images]
-      Processor -.-> note1
       Processor --> Cache
 
-      note2[⚡ Every 16ms:<br/>1. Calculate current frame<br/>2. Get from cache<br/>3. Display]
-      UpdateLink -.-> note2
       UpdateLink --> Provider
       Provider --> Cache
       Cache --> View
@@ -359,45 +426,94 @@ flowchart TD
 
 ---
 
-# ImageView
-
 ```mermaid
-graph LR
-ImageView --- UIUpdateLink
+graph TB
+
+subgraph View
+    UIUpdateLink
+    S[setNeedsDisplay]
+end
+UIUpdateLink -->|Request Image at 12345.67| ImageProvider
+ImageProvider -.->|Image?| S
+subgraph ImageProvider
+end
+
+classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
+classDef display fill:#2a4d5a,stroke:#4fc3f7,stroke-width:2px,color:#ffffff
+
+
+class Provider,Processor,Cache process
+class UpdateLink,View,S display
 ```
 
 ^ ビューはUIUpdateLinkを持っています。
 ^ UIUpdateLinkは登録されたアクションを、決まったタイミングで何度も呼び出すクラスです。
-^ タイマーと異なるのは、画面の描画に合わせて呼ばれる点です。
-^ タイマーだと開始したタイミング次第で、次のフレームまでの猶予時間がバラバラになりますが、UIUpdateLinkなら毎回一定の猶予時間で呼ばれます。
-^ また、UIUpdateLinkはビューが表示されている間だけ動作するのでビューが非表示になったりすると自動的に画面の更新に係る処理が停止します。
+^ タイマーと異なり、画面の更新に合わせて発火してくれます。iOS16以前ではCADisplayLinkが同じような役割のクラスになります。
+^ 60fpsでImageProviderに画像がキャッシュされているかを確認します。
+^ この時、タイムスタンプを渡してImageProviderがそのタイムスタンプで表示するべき画像があるかを確認します。
+^ 画像があればViewに画像を返却し、ビューに描画をします。
+^ この仕組みの良いところは、ImageProviderが画像を返すか否かによってビューの描画をコントロールできる点です。これにより、ImageProviderの設計によってパフォーマンスのチューニングがやりやすくなります。
 
 ---
 
-# ImageProvider
-
 ```mermaid
-graph LR
-ImageProvider --- NSCache
+graph TB
+
+subgraph ImageProvider
+    ImageProcessor
+    Cache
+end
+
+ImageProcessor -->|Store frames| Cache
+
+classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
+class ImageProvider,ImageProcessor,Cache process
+
 ```
 
-^ ImageProviderはNSCacheを持っています。
-^ NSCacheはスレッドセーフなので、ビューからの呼び出しと、バックグラウンドスレッドからの保存に対応しています。
+^ ImageProviderはImageProcessorとCacheを持っています。
+^ ImageProcessorはこの後解説しますが、画像の最適化をします。
+^ CacheはNSCacheで実装しており、スレッドセーフなことを活かしてビューからの呼び出しと、ImageProcessorからのスレッドからの保存に対応しています。
 
 [.footer: https://developer.apple.com/documentation/Foundation/NSCache]
 
 ---
 
-# ImageProvider
+```mermaid
+flowchart TD
+      %% Input
+      GIF[📂 GIF/APNG/WebP<br/>File Input]
 
-^ では、続いてImageProviderについて深掘りします。
-^ ImageProviderは、ImageProcessorとCacheを持っています。
-^ ImageProvderは、Viewのサイズなど最適化に関わる要素が変わるたびにキャッシュを作り直します。
-^ ImageProcessorはアニメーション画像から各フレームを最適化してCacheに保存します。
+      %% Processing
+      Provider[🎬 ImageProvider]
+      Processor[⚙️ ImageProcessor<br/>Background Thread]
+      Cache[💾 Cache<br/>CGImage Storage]
 
----
+      %% Display
+      UpdateLink[⏱️ UIUpdateLink<br/>60fps Timer]
+      View[📱 AnimatedImageView<br/>Display]
 
-# TBD
+      %% Flow
+      GIF --> Provider
+      Provider --> Processor
+
+      Processor --> Cache
+
+      UpdateLink --> Provider
+      Provider --> Cache
+      Cache --> View
+
+      %% Styling
+      classDef input fill:#2a4d2a,stroke:#66bb6a,stroke-width:2px,color:#ffffff
+      classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
+      classDef display fill:#2a4d5a,stroke:#4fc3f7,stroke-width:2px,color:#ffffff
+      classDef note fill:#4d3a2a,stroke:#ff9800,stroke-width:1px,color:#ffffff
+
+      class GIF input
+      class Provider,Processor,Cache process
+      class UpdateLink,View display
+      class note1,note2 note
+```
 
 ^ これまでのアーキテクチャをまとめると、このような構造になります。
 ^ お気づきの通り、ImageProcessorがこの最適化の要です。
@@ -409,79 +525,103 @@ ImageProvider --- NSCache
 
 1. Resizing
 2. Drop frames
-3. Decompress
+3. Rendering
 
 ^ ImageProcessorでは、３つの事をしています。
-^ フレーム画像のリサイズ・フレームの間引き・デコードです。
+^ フレーム画像のリサイズ・フレームの間引き・レンダリングです。
 
 ---
 
-# Image Resizing Rule
+# Resizing
 
-1. Final Size <= Rendering Size
+- Resize frame images to minimize memory usage
+
+---
+
+![original](resizing.png)
 
 ^ 画面に表示する以上のサイズをメモリに保持するのは無駄なので、実際に画面にレンダリングするサイズまで小さくします。
 ^ つまり、ビューのサイズが変更されるたびにキャッシュを捨てて作り直します。
+^ 実際には、リサイズ結果のサイズだけを決めて、次の工程に進みます。
 
 ---
 
-# Drop Frame
+# Drop Frames
 
-1. Memory Status Assessment
-    - Calculate memory usage using image size x number of frames x 4 bytes
-2. VSync Synchronization Selection
-    - 12 frame rate options from 60fps to 1fps
-3. Frame Selection
-    - Thin out frames evenly along VSync boundaries
+- adjust integlity by max memory limit.
 
-^ フレームドロップは特殊なロジックでやります
+^ 次は、描画フレームを間引く工程です。
+^ この時点で、全てのフレームをデコードすると使われるメモリの量が判明しているので、それが大きすぎる場合はフレームを間引いて調整します。
+^ 例えば、毎秒10フレームのgifをキャッシュするのに必要なメモリが10MBで、5MBに抑えたい時は、フレーム数を半分にするという感じですね。
+
+---
+
+![fit autoplay loop](quality.mov)
+
+^ 実際に調整している様子がこちらです。integlityを調整することで、フレームレートが変化しています。
+
+---
+
+# Rendering
+
+## Avoid main thread blocking
+- **Problem**: UIImage uses lazy decompression
+- **Solution**: Force decompression on background thread
+- **Result**: Smooth rendering without frame drops
+
+^ そして、最後にレンダリングです。
+^ リサイズの必要が無いフレームでも、必ず各フレームをレンダリングします。
+^ その理由として、特にGIF画像などの場合、UIImageが描画のギリギリまで最終的に描画する画像データを保持しないという挙動があります。
+^ アニメーションのフレームデータは圧縮されており、前のフレームとの差分などを使って完全なフレームを復元します。
+
+---
+
+- DGifDecompressLine run on Main Thread.
+
+![inline](DGifDecompress.png)
+
+^ この処理が、標準の挙動だとメインスレッドで行われてしまいます。
+^ これではメインスレッドが影響を受け、スムーズなスクロールに影響を与える可能性があります。
 
 ---
 
 # Decompress
 
-![inline](DGifDecompress.png)
-
-^ 仮にリサイズが不要な場合でも必ず画像をレンダリングし直す。
-^ GIFの場合は、UIImageで遅延デコードされてメインスレッドが重くなるケースがあるので気を付ける
-
----
-
-# UIImage decompress
-
 ```swift
-let decodedImage = await uiImage.byPreparingForDisplay()
+// UIKit decompress
+
+let decompressedImage = await uiImage.byPreparingForDisplay()
 ```
 
-^ UIImageの場合は、byPreparingForDisplayメソッドを呼ぶことで任意のタイミングでデコンプレスすることができます。
-
----
-
-# CGImage decompress
-
 ```swift
+// CoreGraphics decompress
+
 let context = CGContext(...)!
 context.draw(image, in: rect)
 let decodedImage = context.makeImage()
 ```
 
-^ CGImageの場合は、単純にCGContextにdrawしてあげればこの問題が発生しません。
+^ この問題を解決するには、事前にバックグラウンドスレッドでフレームを復元しておく必要があります。
+^ UIImageの場合は、byPreparingForDisplayメソッドを呼ぶことで任意のタイミングでフレームを復元することができます。
+^ CGImageの場合は、CGContextにdrawすることで復元されたフレームでCGImageを得ることができます。
 
 ---
 
-## Recap
+# Recap
 
-- UI blocking prevention, smoothness, and stability.
-- Overall optimization through abstraction and gradual degradation.
-- AnimatedImage is suitable for a variety of media.
+1. Performance tuning is trade-off. 
+2. メインスレッドとメモリの依存を減らす
 
-^ 本日の要点は、滑らかさ、安定性、そして全体最適の三点です。つまり、メインを塞がず、負荷時は段階的に劣化し、抽象で違いを吸収するということになります。Actor境界、非同期キャッシュ、間引き、事前デコードの組み合わせが鍵でした。以上が今日のお話です。詳細はOSSのリポジトリをご覧ください。
+^ 今日の要点は、まずパフォーマンスチューニングとはトレードオフであるということ。ユーザーのペインやコアバリューを理解し、何をやって何をしないのかを最初に決めましょう。
+^ 次に、DAWNの実際のケースを例にGIFアニメーションの描画の最適化を行いました。
+^ 以上が今日のお話です。詳細はOSSのリポジトリをご覧ください。
 
 ---
 
 ![](oss.png)
 
-^ 本日はAnimatedImageに焦点を当てて説明します。多くのOSSの中でも、体感に直結する領域であり、設計判断が成果に直に反映されます。事例とともに設計の勘所を押さえていきます。以上が前置きです。
+^ 本日のAnimatedImageをはじめ、DAWN for Mastodonは主要な機能を30を超えるOSSとして公開しています。
+^ ぜひ他のOSSも覗いてみてください。
 
 ---
 
@@ -491,5 +631,5 @@ let decodedImage = context.makeImage()
 |---|--:|
 |作って学ぶWebP入門|day1 13:00 Track A|
 
-^ 今回登場したWebP自体の細かい仕様については、午後の「作って学ぶWebP入門」を見ると良いと思います。
+^ また。今回登場したWebP自体の細かい仕様については、午後の「作って学ぶWebP入門」を見ると良いと思います。
 ^ では、以上になります。ありがとうございました。
