@@ -545,11 +545,7 @@ flowchart TD
 
 ---
 
-# ImageProcessor
-
-1. Resizing
-2. Drop frames
-3. Rendering
+![fit](Pipeline.png)
 
 ^ ImageProcessorでは、３つの事をしています。
 ^ フレーム画像のリサイズ・フレームの間引き・レンダリングです。
@@ -572,7 +568,7 @@ flowchart TD
 
 # Drop Frames
 
-- adjust integlity by max memory limit.
+- adjust integrity by max memory limit.
 
 ^ 次は、描画フレームを間引く工程です。
 ^ この時点で、全てのフレームをデコードすると使われるメモリの量が判明しているので、それが大きすぎる場合はフレームを間引いて調整します。
@@ -582,7 +578,7 @@ flowchart TD
 
 ![fit autoplay loop](quality.mov)
 
-^ 実際に調整している様子がこちらです。integlityを調整することで、フレームレートが変化しています。
+^ 実際に調整している様子がこちらです。integrityを調整することで、フレームレートが変化しています。
 
 ---
 
@@ -634,7 +630,7 @@ let decodedImage = context.makeImage()
 
 ![fit autoplay loop](result.mp4)
 
-^ これらの最適化をした結果、これだけの大量のアニメーション画像を表示しても100MB程度のメモリ使用に納めることができ、またスクロールもスムーズになりました。
+^ これらの最適化をした結果、１画面に50を超えるアニメーション画像を表示しても100MB程度のメモリ使用に納めることができ、またスクロールもスムーズになりました。
 
 ---
 
