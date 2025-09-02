@@ -632,6 +632,12 @@ let decodedImage = context.makeImage()
 
 ---
 
+![fit autoplay loop](result.mp4)
+
+^ これらの最適化をした結果、これだけの大量のアニメーション画像を表示しても100MB程度のメモリ使用に納めることができ、またスクロールもスムーズになりました。
+
+---
+
 # Recap
 
 1. Performance tuning is trade-off. 
