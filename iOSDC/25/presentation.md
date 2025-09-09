@@ -455,7 +455,9 @@ class UpdateLink,View,S display
 
 ---
 
-TODO
+# Synchronization
+
+![inline](Synchronize.gif)
 
 ^ また、副次的なメリットとしてUpdateLinkのタイムスタンプを元にフレーム画像を取得するので、同じGIF画像を複数表示した場合に、それぞれのアニメーションが同期して動作します。
 ^ これにより、スライドのように複数のアニメーション絵文字が同じタイミングで動作するようになります。
