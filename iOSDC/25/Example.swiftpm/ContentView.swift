@@ -4,24 +4,18 @@ import ImageIO
 import os
 
 struct ContentView: View {
-    
-    @State
-    var show: Bool = false
+    let columns = Array(repeating: GridItem(.fixed(240)), count: 2)
     
     var body: some View {
-        VStack(spacing: 20) {
-            if show {
-                GIFAnimationView()
-                    .frame(width: 200, height: 200)
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 2) {
+                ForEach(0..<1000, id: \.self) { index in
+                    GIFAnimationView()
+                        .frame(width: 240, height: 200)
+                        .clipped()
+                }
             }
-            
-            
-            Button {
-                show.toggle()
-            } label: {
-                Text("Show")
-            }
-
+            .padding(2)
         }
     }
 }
@@ -69,7 +63,6 @@ struct GIFAnimationView: UIViewRepresentable {
         }
         
         logger.info("Loaded \(frames.count) frames from GIF with total duration: \(totalDuration)")
-        
         imageView.animationImages = frames
         imageView.animationDuration = totalDuration
         imageView.animationRepeatCount = 0

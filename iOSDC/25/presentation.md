@@ -88,7 +88,7 @@ code: SF Mono
 
 ^ 特徴的なのは、そのサーバー間で投稿を交換し合うことで他のサーバーの投稿もタイムラインに表示されることです。
 ^ つまり、ユーザーはどこかで一つのアカウントを作れば、そこから複数のサーバーの投稿を見ることができます。
-^ DAWNは、このネットワークに接続してMastodonをiPhoneで快適に使うUIを提供しています。
+^ DAWNは、Mastodonサーバーに接続してiPhoneで快適に使うUIを提供しています。
 ^ 現在、同様のプロトコルをInstagramのThreadsや、Misskeyなどが採用しているため、これらの投稿もMastodonから見ることができます。
 
 ---
@@ -103,12 +103,11 @@ code: SF Mono
 - Support for GIF, APNG, WebP formats
 
 ^ そして、Mastodonの特徴の一つにカスタム絵文字という機能があります。
-^ これは、Slackなどにもある、ユーザーが登録できる絵文字セットのことです。
+^ これは、SlackやDiscordなどにもある、ユーザーが登録できる絵文字セットのことです。
 ^ 各サーバーが独自の絵文字コレクションを持つことができ、GIF、APNG、WebPなど様々なフォーマットに対応しているということになります。
-^ そして、これらをタイムラインの投稿や一部のサーバーでは、リアクションとして使うことができるわけです。
+^ そして、これらをタイムラインの投稿に使ったり一部のサーバーではリアクションとして使うことができるわけです。
 
 ---
-
 
 # The Challenge
 
@@ -124,21 +123,28 @@ code: SF Mono
 
 ^ これはつまり、タイムラインに数十個の絵文字、しかもGIFが溢れる可能性があるということになります。
 ^ 同時に数十個のGIFアニメーションが再生される状況も珍しくありません。
-^ これは明らかにパフォーマンス上の大きな課題と言えるでしょう。
+
+---
+
+![inline autoplay loop](heavy.mov)
+
+^ 実際に表示をしてみると、このようにスクロールは非常に重たくなってしまいます。
+^ また、メモリ使用量もCPU使用率も高く、デバイスは熱くなり、バッテリーもすぐに減ってしまいます。
 
 ---
 
 # DAWN's Solution
+
+![right fit autoplay loop](smooth.mov)
 
 ## ✅ Smooth scrolling with dozens of animated emojis
 ## ✅ Memory efficient rendering
 ## ✅ Support for GIF, APNG, WebP
 ## ✅ Responsive UI under heavy load
 
-^ DAWNでは、これを解決することができました。
-^ GIFの絵文字が大量に表示されても、大きくパフォーマンスを損なうことなく動作するということになります。
+^ しかしDAWNでは、この問題を解決することができました。
+^ 現在はカスタム絵文字が大量に表示されても、大きくパフォーマンスを損なうことなく動作しています。
 ^ 今日は、これらをどうやって実現しているか、その手法をご紹介します。
-^ 具体的には、滑らかなスクロール、メモリ効率、複数フォーマット対応、そして高負荷時でもレスポンシブなUIを実現する方法についてお話しします。
 
 ---
 
@@ -148,7 +154,7 @@ code: SF Mono
 2. How to improve performance.
 
 ^ 今日のお話は、大きく分けて２つのテーマに分かれます。
-^ まず、一般的な方法でどのようにしてGIFを再生するか、という点です。
+^ まずは、一般的な方法でどのようにしてGIFを再生するか、という点です。
 ^ そして、そこで発生するパフォーマンス上の課題をどのように対処するか、ということについてです。
 ^ では、順番に見ていきましょう。
 
@@ -181,13 +187,12 @@ UIKit not supported any animation image.
 
 ---
 
-![](gif-has-frames.png)
+![](gif-frames.gif)
 
 [.footer: https://www.nyan.cat]
 
-^ GIFはパラパラ漫画のように複数の画像を持ったファイルであると考えることができます。
-^ 実際にmacのプレビューで開くと、各フレームの画像を確認することができます。
-^ つまり、これらのすべてのフレームを取り出して、一定時間ごとに表示をすればいいわけですね。
+^ GIFはこのスライドのように複数の画像を持ったファイルであると考えることができます。
+^ つまり、GIFの持つ全てのフレームを取り出して、順番に表示することでアニメーションを実現できます。
 
 ---
 
@@ -213,7 +218,8 @@ for index in 0..<count {
 }
 ```
 
-^ CoreGraphicsのCGImageSourceを使うと、画像データのメタデータに簡単にアクセスすることができます。
+^ この仕組みを実現するには、まずフレームを取り出す必要があります。
+^ CoreGraphicsフレームワークのCGImageSourceを使うと、画像データのメタデータに簡単にアクセスすることができます。
 ^ これによって、GIFが持っている画像の枚数や表示時間、各画像を取り出すことができます。
 ^ なお、このCGImageSourceはAPNGやWEBPにも対応しているので、ファイルタイプを気にする必要がありません。便利ですね。
 ^ こうして、すべてのフレームのUIImageを作ることができました。
@@ -223,20 +229,22 @@ for index in 0..<count {
 ```swift
 // Playback animation images
 
-let gifImageData = ...
 let imageView = UIImageView()
 imageView.animationImages = images
 imageView.startAnimating()
 ```
 
-^ 実はUIImageViewはanimationImagesというプロパティを持っているので、ここに取り出したUIImageの配列をセットしてみましょう。
+^ 作ったUIImageの配列をUIImageViewにセットしてみましょう。
+^ 実はUIImageViewはanimationImagesというプロパティを持っているので、ここに取り出したUIImageの配列をセットします。
 ^ アニメーションを始めるにはstartAnimatingメソッドを呼びます。
 
 ---
 
 ![fit autoplay loop](working.mp4)
 
-^ このように動作しました。もちろん、これで満足すれば話は終わりなのですが。
+^ はい、これでGIFアニメーションが再生されました。
+^ ですが、今回のトークはパフォーマンスチューニングがテーマです。
+^ つまり、この方法には大きな問題があります。
 
 ---
 
@@ -244,16 +252,15 @@ imageView.startAnimating()
 
 ![right fit](memory-usage.png)
 
-## 😱 25MB for a single GIF!
+## 25MB for a single GIF!
 - Same as an 8K JPEG image
 - Memory usage grows exponentially
 - App crashes with multiple GIFs
 
-^ ただし、この方法には大きな問題があります。数が増えていくとアプリがどんどん重くなってしまうのです。
-^ 実際に測定してみると、たった１枚のGIFを再生するのに25MBほど使っていました。
+^ そう、メモリ使用量が指数的に増加し、アプリがクラッシュしてしまうことがあります。
+^ 実際に測定してみると、たった340KBほどの１枚のGIFを再生するのに25MBほど使っていました。
 ^ 25MBといえば、8Kの高解像度JPEG画像と同じくらいの容量ということになります。
 ^ では、この25MBはどこから来るのでしょうか。
-^ 複数のGIFを表示すると、メモリ使用量が指数的に増加し、アプリがクラッシュしてしまうこともあります。
 
 ---
 
@@ -272,27 +279,27 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 - **W**: Width in pixels (480)
 - **H**: Height in pixels (400) 
-- **C**: Channels (4 for ARGB)
+- **C**: Color (4 for ARGB)
 - **N**: Number of frames (34)
 
+[.footer: 8bit, ARGB image case]
 
-
-^ メモリがどれくらい使われるかは、次の計算式で予想することができます。
-^ Wは横ピクセル数、Hは縦のピクセル数、Cはチャンネル数でARGBなら4が入ります。
+^ メモリがどれくらい使われるかは、一般的な画像であればM=W×H×C×Nという式で計算することができます。
+^ Wは横ピクセル数、Hは縦のピクセル数、Cは1ピクセルあたりの色成分の数でARGBなら4が入ります。
 ^ これが34枚分のGIFだったということで、25MB程度になります。
-^ 34フレームのGIFを表示するというのは34枚分の画像をメモリ上に展開しているということになります。
-^ 当然メモリも食い潰します。どうしたものか
-^ こういうときにやることは一つ。
+^ 34フレームのGIFを表示するというのは34枚分の非圧縮の画像をメモリ上に展開しているということになります。
+^ つまり、GIFのフレーム数が多いほど、解像度が高いほど、メモリ使用量が増えるということになります。
 
 ---
 
 # Performance tuning
 
-^ そう、パフォーマンスチューニングということになります。
+^ このままでは、複数のGIFがあるとすぐにメモリが足りなくなってしまうと予想できます。
+^ ここで、パフォーマンスチューニングの必要性が出てきます。
 
 ---
 
-# Performance Tuning Framework
+# Performance Tuning
 
 ## My approach to performance optimization
 
@@ -303,10 +310,12 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 # 1. Identify User Pain
 
-## 🎯 Start with user experience
+## Start with user experience
 - What specific issues are users facing?
 - Where do they struggle the most?
 - What makes them frustrated?
+
+![right fill](ux.png)
 
 ^ まずは、何よりユーザーの体験から考えること。
 ^ 最初は、ユーザーが何を不都合に感じるのかを考えたり、ヒアリングをしたりします。
@@ -316,9 +325,11 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 # 2. Define Core Value
 
-## 🎯 What is your app's primary mission?
+## What is your app's primary mission?
 - What makes your app irreplaceable?
 - What would users miss most if removed?
+
+![fill right](corevalue.png)
 
 ^ 次に、アプリの提供するコアな価値は何か。
 ^ 天気のアプリなら、いち早く天気予報が見れることが大事です。
@@ -329,6 +340,8 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 - How does it *feel* to users?
 - Are metrics matching user perception?
+
+![right fill](inspect.png)
 
 ^ そして、計測すること。
 ^ ここでの計測は、定量的なものも、定性的なものもです。
@@ -348,29 +361,25 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 ^ 最後に、忘れてはいけないのがパフォーマンスチューニングとは「トレードオフのパズルである」ということです。
 ^ 当然、処理が軽くなるのが理想ですが、突き詰めるところ大事でないものの品質を落とし、大事なものの品質を上げるという話になりがちです。
-^ このときに、「ユーザー体験」「アプリの提供価値」を軸に取捨選択を行います。
+^ このときに、「ユーザー体験」「アプリのコアバリュー」を軸に取捨選択を行います。
 ^ なので、いくらメモリやCPUが使われても、ユーザーが快適と感じるならヨシ。
 ^ それくらい割り切ってしまっていいでしょう。
 ^ エンジニアは、ついつい見えているパフォーマンスの問題を解決したくなってしまいますが、それを直して意味があるのか。考えると優先度がつけやすいかと思います。
 
 ---
 
-# DAWN's Requirements
-
-## 🎯 Primary goal: Smooth scrolling
-- Users spend most time browsing timeline
-- Jerky scrolling kills user experience
-- Must maintain 60fps even with many animated emojis
+![](trade-off.png)
 
 ^ では、DAWNでは何が大事なのでしょうか。
-^ DAWNはSNSのアプリです。ユーザーはほとんどの時間をスクロールしています。そのときにタイムラインのスクロールが引っかかると嫌になりますよね。
+^ DAWNはSNSのアプリです。絵文字のリアクションを介したコミュニケーションが重要なバリューになります。
+^ またユーザーはほとんどの時間をスクロールしています。そのときにタイムラインのスクロールが引っかかると質の悪い体験になりますよね。
 ^ なので、大量に絵文字が表示されていても、スクロールに影響を与えないことを重要としました。
-^ そして、Mastodonならではの要件としてGIF以外にもAPNGやWEBPもサポートすることにしました。
-^ これはMastodonが分散型であるが故、必ず絵文字がGIFであるという保証がないからですね。
+^ 一方で、絵文字のフレームごとの画質やフレームレートは、ユーザーが絵文字のコンテキストを理解できる程度であれば、多少犠牲にしても良いと考えました。
+^ 幸いなことに、これらを犠牲にすることで、メモリ使用量とCPU使用率を大幅に削減できてアプリの安定性や発熱、バッテリー持ちの改善に繋がりそうな気がします。
 
 ---
 
-# AnimatedImage Library
+# AnimatedImage
 
 github.com/noppefoxwolf/AnimatedImage
 
@@ -379,69 +388,42 @@ github.com/noppefoxwolf/AnimatedImage
 - Memory-efficient frame caching
 - Background processing pipeline
 
-^ 今日紹介する最適化手法は、AnimatedImageというOSSライブラリとして実装しています。
+^ 今日紹介する最適化手法は、AnimatedImageというOSSライブラリとして公開しています。
 ^ これは高パフォーマンスなGIF再生に特化したUIKitコンポーネントです。
 ^ 複数のアニメーション形式に対応し、メモリ効率的なフレームキャッシュとバックグラウンド処理パイプラインを提供しています。
-^ github.com/noppefoxwolf/AnimatedImageで公開しており、誰でも利用できます。
 ^ では、この実装の詳細を見ていきましょう。
 
 ---
 
-# DAWN's Trade-offs
-
-## ⚠️ What we can sacrifice:
-- **Image quality** (slightly compressed)
-- **Frame rate** (30fps → 15fps for heavy GIFs)
-- **Perfect color accuracy**
-
-^ では、逆にトレードオフとして何を犠牲にするか、ということですが。
-^ ユーザーは絵文字のコンテキストさえ分かれば良いので、気にならない程度でフレームごとの画質を劣化させたり、フレームレートを落としてもそんなに問題にならないはずです。
-^ では、これらのポイントを踏まえて、アーキテクチャを考えてみましょう。
-
----
-
 ```mermaid
-flowchart TD
-      %% Input
-      GIF[📂 GIF/APNG/WebP<br/>File Input]
+%%{init:{'theme':'dark'}}%%
 
-      %% Processing
-      Provider[🎬 ImageProvider]
-      Processor[⚙️ ImageProcessor<br/>Background Thread]
-      Cache[💾 Cache<br/>CGImage Storage]
+sequenceDiagram
+    loop Every frame
+        View->>+Cache: Request image from cache
+        note right of Cache: Retrieve and display
+        Cache-->>-View: Display cached image
+    end
 
-      %% Display
-      UpdateLink[⏱️ UIUpdateLink<br/>60fps Timer]
-      View[📱 AnimatedImageView<br/>Display]
+    par Size Changed
+        View->>ImageProcessor: Request optimize frame images
+        note right of ImageProcessor: Optimize and store images
+        ImageProcessor->>Cache: Store optimized images
+    end
 
-      %% Flow
-      GIF --> Provider
-      Provider --> Processor
-
-      Processor --> Cache
-
-      UpdateLink --> Provider
-      Provider --> Cache
-      Cache --> View
-
-      %% Styling
-      classDef input fill:#2a4d2a,stroke:#66bb6a,stroke-width:2px,color:#ffffff
-      classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
-      classDef display fill:#2a4d5a,stroke:#4fc3f7,stroke-width:2px,color:#ffffff
-      classDef note fill:#4d3a2a,stroke:#ff9800,stroke-width:1px,color:#ffffff
-
-      class GIF input
-      class Provider,Processor,Cache process
-      class UpdateLink,View display
-      class note1,note2 note
+    box ImageProvider
+        participant ImageProcessor
+        participant Cache
+    end
 ```
 
-^ どん
-^ こんな感じです。簡単ですね
-^ ImageProviderとViewがあります。
-^ Viewは60fpsでImageProviderに現在表示するべき画像があるかを問い合わせます。もし画像が返ってくればレンダリングします。
-^ 一方で、ImageProviderはバックグラウンドスレッドで、全てのフレームをキャッシュします。
-^ こうすることで、ImageProviderで最適化した画像を作りつつ、Viewは最小限のレンダリングだけに専念することができます。
+^ まず、最初に全体の流れを見てみましょう。
+^ 大きく分けて、ViewとImageProviderがあります。
+^ ImageProviderは、画像最適化のためのImageProcessorと、最適化された画像を保存するCacheを持っています。
+^ ViewとImageProviderは、大きく分けて２つのタスクを行います。
+^ 1つ目は、現在表示するべき画像がキャッシュに存在するかを確認し、存在すればそれを表示することです。
+^ 2つ目は、ビューのサイズが変わったときに、ImageProviderに最適化された画像を生成することをリクエストすることです。
+^ こうすることで、Viewは常に最適化された画像を表示できるようになります。
 ^ では、細かい実装について見ていきましょう。
 
 ---
@@ -466,10 +448,17 @@ class Provider,Processor,Cache process
 class UpdateLink,View,S display
 ```
 
-^ ビューはUpdateLinkを持っています。
-^ UpdateLinkは画面が更新されるたびにImageProviderに表示するべきフレーム画像のキャッシュがあるかを問い合わせます。
-^ 画像があればViewに画像を返却し、ビューに描画をします。
-^ この仕組みの良いところは、ImageProviderが画像を返すか否かによってビューの描画をコントロールできる点です。これにより、ImageProviderの設計によってパフォーマンスのチューニングがやりやすくなります。
+^ まずは、現在表示するべき画像がキャッシュに存在するかを確認し、存在すればそれを表示する部分を見てみましょう。
+^ ビューはUpdateLinkというタイマーを使って、60fpsで画面の更新タイミングに合わせてキャッシュの確認を行います。
+^ キャッシュにフレーム画像があればViewに画像を返却し、ビューに描画をします。
+^ この仕組みの良いところは、ImageProviderが画像を返すか否かによってビューの描画をコントロールできる点です。これにより、重複したフレーム画像をスキップしたり、フレームレートを落としたりすることができます。
+
+---
+
+TODO
+
+^ また、副次的なメリットとしてUpdateLinkのタイムスタンプを元にフレーム画像を取得するので、同じGIF画像を複数表示した場合に、それぞれのアニメーションが同期して動作します。
+^ これにより、スライドのように複数のアニメーション絵文字が同じタイミングで動作するようになります。
 
 ---
 
@@ -489,9 +478,9 @@ updateLink.addAction { link, info in
 }
 ```
 
+^ 先ほど紹介したUpdateLinkですが、内部的にはUIUpdateLinkを利用しています。
 ^ UIUpdateLinkは画面の更新タイミングに合わせてコードを実行できるiOS17の新機能です。
-^ 従来のタイマーと違って、画面描画と同期するため、よりスムーズなアニメーションが実現できます。
-^ 60fpsでImageProviderに画像がキャッシュされているかを確認します。
+^ 時間の経過をベースにしているタイマーと違って、画面描画と同期するため、よりスムーズなアニメーションが実現するのに向いています。
 ^ AnimatedImageではiOS16以前も対応しており、そちらではCADisplayLinkを利用しています。
 
 ---
@@ -511,82 +500,48 @@ class ImageProvider,ImageProcessor,Cache process
 
 ```
 
-^ ImageProviderはImageProcessorとCacheを持っています。
-^ ImageProcessorはこの後解説しますが、画像の最適化をします。
+^ 次にImageProviderの内部構造を見ていきましょう。
+^ 先ほど紹介した通り、ImageProviderはImageProcessorとCacheを持っており、ImageProcessorが最適化したフレーム画像をCacheに保存します。
 ^ CacheはNSCacheで実装しており、スレッドセーフなことを活かしてビューからの呼び出しと、ImageProcessorからのスレッドからの保存に対応しています。
+^ では、この実装の中核であるImageProcessorの実装を見ていきましょう。
 
 [.footer: https://developer.apple.com/documentation/Foundation/NSCache]
 
 ---
 
-```mermaid
-flowchart TD
-      %% Input
-      GIF[📂 GIF/APNG/WebP<br/>File Input]
-
-      %% Processing
-      Provider[🎬 ImageProvider]
-      Processor[⚙️ ImageProcessor<br/>Background Thread]
-      Cache[💾 Cache<br/>CGImage Storage]
-
-      %% Display
-      UpdateLink[⏱️ UIUpdateLink<br/>60fps Timer]
-      View[📱 AnimatedImageView<br/>Display]
-
-      %% Flow
-      GIF --> Provider
-      Provider --> Processor
-
-      Processor --> Cache
-
-      UpdateLink --> Provider
-      Provider --> Cache
-      Cache --> View
-
-      %% Styling
-      classDef input fill:#2a4d2a,stroke:#66bb6a,stroke-width:2px,color:#ffffff
-      classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
-      classDef display fill:#2a4d5a,stroke:#4fc3f7,stroke-width:2px,color:#ffffff
-      classDef note fill:#4d3a2a,stroke:#ff9800,stroke-width:1px,color:#ffffff
-
-      class GIF input
-      class Provider,Processor,Cache process
-      class UpdateLink,View display
-      class note1,note2 note
-```
-
-^ これまでのアーキテクチャをまとめると、このような構造になります。
-^ お気づきの通り、ImageProcessorがこの最適化の要です。
-^ では、続いてImageProcessorを見ていきます。
-
----
-
 ![fit](Pipeline.png)
 
-^ ImageProcessorでは、３つの事をしています。
-^ フレーム画像のリサイズ・フレームの間引き・レンダリングです。
+^ ImageProcessorでは、４つの事をしています。
+^ 画像からフレーム画像を取り出すこと・フレーム画像のリサイズ・フレームの間引き・そしてレンダリングです。
+^ 画像からフレーム画像を取り出す部分は、先ほど紹介したCGImageSourceを使った実装と同じです。
+^ では、順番に見ていきましょう。
 
 ---
 
 # Resizing
 
-- Resize frame images to minimize memory usage
+^ まずはリサイズです。
 
 ---
 
 ![original](resizing.png)
 
+^ 最初に解説した通り、フレーム画像のサイズが大きいとメモリ使用量が増えます。
+^ そこで、ビューのサイズに合わせてフレーム画像をリサイズします。
 ^ 画面に表示する以上のサイズをメモリに保持するのは無駄なので、実際に画面にレンダリングするサイズまで小さくします。
-^ つまり、ビューのサイズが変更されるたびにキャッシュを捨てて作り直します。
-^ 実際には、リサイズ結果のサイズだけを決めて、次の工程に進みます。
+^ これによって、メモリ使用量を大幅に削減できます。特に絵文字リアクションでは、表示サイズが小さいので効果が大きいです。
+^ リサイズの処理コストが高いため、実際にはこの工程ではサイズだけを決めて、実際のリサイズは行わずに次の工程に進みます。
 
 ---
 
 # Drop Frames
 
-- adjust integrity by max memory limit.
-
 ^ 次は、描画フレームを間引く工程です。
+
+---
+
+TODO
+
 ^ この時点で、全てのフレームをデコードすると使われるメモリの量が判明しているので、それが大きすぎる場合はフレームを間引いて調整します。
 ^ 例えば、毎秒10フレームのgifをキャッシュするのに必要なメモリが10MBで、5MBに抑えたい時は、フレーム数を半分にするという感じですね。
 
@@ -600,23 +555,31 @@ flowchart TD
 
 # Rendering
 
-## Avoid main thread blocking
-- **Problem**: UIImage uses lazy decompression
-- **Solution**: Force decompression on background thread
-- **Result**: Smooth rendering without frame drops
-
 ^ そして、最後にレンダリングです。
-^ リサイズの必要が無いフレームでも、必ず各フレームをレンダリングします。
-^ その理由として、特にGIF画像などの場合、UIImageが描画のギリギリまで最終的に描画する画像データを保持しないという挙動があります。
-^ アニメーションのフレームデータは圧縮されており、前のフレームとの差分などを使って完全なフレームを復元します。
+^ これまでの工程で、フレーム画像のサイズとフレーム数が決まっているので、実際にフレーム画像をレンダリングします。
 
 ---
 
-- DGifDecompressLine run on Main Thread.
+# Is Rendering Necessary?
+
+^ ところで、ここで一つ問題があります。
+^ CGImageSourceからはオリジナルのフレーム画像が取り出せます。
+^ リサイズの必要が無いフレームでも、必ず各フレームをレンダリングする必要はあるのでしょうか？
+^ 答えは、Noです。
+^ 実は次のような理由があります。
+
+---
+
+# UIImage lazy decompress issue
+
+- DGifDecompressLine, DGifDecompressInput run on Main Thread.
 
 ![inline](DGifDecompress.png)
 
-^ この処理が、標準の挙動だとメインスレッドで行われてしまいます。
+^ CGImageSourceから取り出したGIFのCGImageは圧縮されており、そのままでは描画に使用できません。
+^ しかし、デフォルトの挙動では、UIImageは描画の直前までフレームを復元しません。
+^ 描画の直前ということは、メインスレッドで行われるということです。
+^ これはInstrumentsで確認することができます。
 ^ これではメインスレッドが影響を受け、スムーズなスクロールに影響を与える可能性があります。
 
 ---
@@ -641,7 +604,7 @@ let decodedImage = context.makeImage()
 ^ UIImageの場合は、byPreparingForDisplayメソッドを使うことで任意のタイミングでフレームを復元することができます。
 ^ このメソッドは非同期なので、メインスレッドに影響を与えないところもポイントです。
 ^ また、CGImageの場合は、CGContextにdrawすることで復元されたフレームでCGImageを得ることができます。
-^ つまり、画面に表示される瞬間に重い処理が走ってスクロールがカクつくのを防げるということです。
+^ どちらもバックグラウンドスレッドで実行できるため、画面に表示される瞬間に重い処理が走ってスクロールがカクつくのを防げます。
 
 ---
 
@@ -649,6 +612,8 @@ let decodedImage = context.makeImage()
 
 ^ これらの最適化をした結果、１画面に50を超えるアニメーション画像を表示しても、クラッシュすることなく100MB以下のメモリ使用に抑えることができました。
 ^ そして最も重要なスクロールの滑らかさも維持できています。
+^ 一方で、ビューの表示とアニメーションの表示の間に若干の遅延が発生したり、フレームレートや解像度が落ちています。この辺りは、トレードオフの結果ですね。
+^ AnimatedImageでは、これらのトレードオフをパラメータで調整できるようにしています。
 
 ---
 
@@ -657,7 +622,7 @@ let decodedImage = context.makeImage()
 1. Performance tuning is trade-off. 
 2. メインスレッドとメモリの依存を減らす
 
-^ 今日の要点をまとめます。
+^ 最後に今回の要点をまとめます。
 ^ 1つ目、パフォーマンスチューニングはトレードオフです。ユーザー体験を最優先に、何を犠牲にするかを明確に決めることが重要です。
 ^ 2つ目、メインスレッドへの負荷とメモリ使用量、この2つの観点から最適化を進めることで大幅な改善が期待できます。
 ^ 以上が今日のお話です。詳細はOSSのリポジトリをご覧ください。
