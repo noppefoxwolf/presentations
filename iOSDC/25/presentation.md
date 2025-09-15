@@ -358,14 +358,14 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 # Tips: Instruments
 
-- Profile specific tests directly in Xcode 26
+- Profile specific tests directly in Xcode
 
 ![inline fit](launch_profiler.gif)
 
-^ パフォーマンスチューニングでは、１つのテストだけをプロファイルできるようになりました。
-^ テストを右クリックして、「Profile」を選択するだけで、Instrumentsが起動します。
+^ ここで、Instrumentsの便利な使い方を一つ紹介します。
+^ パフォーマンスチューニングでは、アプリ全体を実行してプロファイルすると他の処理のノイズが入ってしまいますが、特定のテストだけをプロファイルする方法があります。
+^ 実はテストを右クリックして、「Profile」を選択するだけで、Instrumentsが起動します。
 ^ これにより、特定の機能のパフォーマンスを簡単に測定できるようになりました。
-^ 例えば、今回のGIFアニメーションの表示に関しても、テストを作成しておき、Instrumentsで測定することができます。
 
 ---
 
@@ -393,6 +393,14 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 ---
 
+![inline](animation-hitch.png)
+
+^ スクロールの引っ掛かりは、InstrumentsのAnimation Hitchesで確認するとわかりやすいです。
+^ アニメーションヒッチが発生した箇所のメインスレッドの処理から、何が原因で引っ掛かっているのかを特定できます。
+^ WWDCでも多くのセッションで紹介されているので、ぜひ活用してみてください。
+
+---
+
 # AnimatedImage
 
 github.com/noppefoxwolf/AnimatedImage
@@ -402,7 +410,7 @@ github.com/noppefoxwolf/AnimatedImage
 - Memory-efficient frame caching
 - Background processing pipeline
 
-^ 今日紹介する最適化手法は、AnimatedImageというOSSライブラリとして公開しています。
+^ さて、今日紹介する最適化手法は、AnimatedImageというOSSライブラリとして公開しています。
 ^ これは高パフォーマンスなGIF再生に特化したUIKitコンポーネントです。
 ^ 複数のアニメーション形式に対応し、メモリ効率的なフレームキャッシュとバックグラウンド処理パイプラインを提供しています。
 ^ では、この実装の詳細を見ていきましょう。
@@ -449,14 +457,13 @@ subgraph View
     UpdateLink
     S[setNeedsDisplay]
 end
-UpdateLink -->|Request Image at 12345.67| ImageProvider
+UpdateLink -->|Request Image at timestamp| ImageProvider
 ImageProvider -.->|Image?| S
 subgraph ImageProvider
 end
 
 classDef process fill:#3d2a4d,stroke:#ab47bc,stroke-width:2px,color:#ffffff
 classDef display fill:#2a4d5a,stroke:#4fc3f7,stroke-width:2px,color:#ffffff
-
 
 class Provider,Processor,Cache process
 class UpdateLink,View,S display
@@ -475,6 +482,7 @@ class UpdateLink,View,S display
 
 ^ また、副次的なメリットとしてUpdateLinkのタイムスタンプを元にフレーム画像を取得するので、同じGIF画像を複数表示した場合に、それぞれのアニメーションが同期して動作します。
 ^ これにより、スライドのように複数のアニメーション絵文字が同じタイミングで動作するようになります。
+^ ミーム系のGIF画像など、複数の同じ画像が表示される場合や、並べることで意味がある画像の場合に効果的な効果を得ることができました。
 
 ---
 
@@ -563,20 +571,21 @@ class ImageProvider,ImageProcessor,Cache process
 
 ---
 
-TODO
+![inline autoplay loop](dropframe-feeling.mp4)
 
-^ 単純にフレームを間引くと、アニメーションがカクついてしまいます。
-^ そこで、AnimatedImageではフレームの間引き方を工夫しています。
-^ 具体的には、フレームの表示時間を考慮して、表示時間の長いフレームを優先的に残すようにしています。
-^ 例えば、1秒間に10フレームのgifで、1フレームだけ0.5秒表示されるフレームがある場合、そのフレームを残すようにします。
+^ ただ、同じフレーム数を半分にする場合でも、どのフレームを残すかによってアニメーションの滑らかさが変わります。
+^ この２つの動画は、どちらもフレーム数を半分にしたものですが、間引き方が違います。
+^ 単純にフレームを間引くと、左のようにアニメーションの滑らかさが損なわれます。
+^ そこで、AnimatedImageでは均一にフレームを間引けるように工夫しています。
 ^ こうすることで、アニメーションのカクつきを抑えることができます。
+^ 計測上のパフォーマンスは変化しませんが、このような体感のパフォーマンスを改善する工夫も重要です。
 
 ---
 
-// TODO: もう少し見やすい動画にする
-![fit autoplay loop](quality.mov)
+![fit autoplay loop](quality2.mp4)
 
-^ 実際に調整している様子がこちらです。integrityを調整することで、フレームレートが変化しています。
+^ 実際に調整している様子がこちらです。
+^ integrityを調整することで、フレームレートが変化していますが、アニメーションの連続性は保たれています。
 
 ---
 
