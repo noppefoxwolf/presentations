@@ -23,12 +23,13 @@ code: SF Mono
 
 # Who am I
 
-- **noppe** 🦊
-- iOSDC 18~25 Speaker
-- Senior iOS App Developer at DeNA
-- Indie App Developer
-
 ![right fill](Original.png)
+
+**noppe** 🦊
+
+- iOSDC Speaker (8 years)
+- Senior iOS Developer at DeNA
+- Indie App Developer
 
 ^ まず、自己紹介です。noppeと言います。狐のアイコンで活動しています。
 ^ iOSDCには2018年から毎年登壇させていただいており、今年で8年連続となります。
@@ -38,14 +39,14 @@ code: SF Mono
 ---
 
 # DAWN for Mastodon
-
-## Features
-- Beautiful, familiar iOS design
-- Animation image support (GIF, APNG, WebP)
-- High-performance timeline scrolling
-- Multi-instance support
+My indie app for Mastodon
 
 ![right fit](screenshot.png)
+
+- Normal iOS design
+- Animation images (GIF, APNG, WebP)
+- High-performance scrolling
+- Multi-instance support
 
 ^ 2023年、私は個人開発でアプリを開発していました。それが、DAWN for Mastodonです。
 ^ DAWN for Mastodonは、名前の通りMastodonというSNSのためのアプリです。
@@ -59,48 +60,40 @@ code: SF Mono
 
 ![inline 50%](mastodon-logo.png)
 
-- Decentralized social networking platform
-- First released in 2016 by Eugen Rochko
-- Open-source software built with Ruby on Rails
-- Anyone can deploy their own server
-- Servers connect to form a federated network
+Decentralized social network
+
+- Open-source platform (2016)
+- Anyone can run a server
+- Servers form federated network
+- Compatible with Threads, Misskey
 
 ^ Mastodonをご存知ない方のために、少しMastodonについても説明させていただきます。
 ^ Mastodonは2016年にドイツのオイゲン氏によって開発されたオープンソースソフトウェアです。Ruby on Railsで構築されています。
 ^ ただし、Mastodon自体は特定のサービスを指しているわけではありません。企業や個人が、Mastodonを自分のサーバーにデプロイしてTwitterのようなSNSを運用できるということになります。
 ^ つまり、これが分散型ソーシャルネットワークプラットフォームと言われるものです。
 
-[.footer: https://en.wikipedia.org/wiki/Mastodon_%28social_network%29]
-
 ---
 
-# Decentralization
-
 ![fit](decentralization.png)
-
-## Key Benefits
-- No single point of failure
-- User choice of servers/policies
-- Cross-server communication
-- Compatible with Threads, Misskey, etc.
-
-[.footer: https://blog.joinmastodon.org/2018/12/why-does-decentralization-matter/]
 
 ^ 特徴的なのは、そのサーバー間で投稿を交換し合うことで他のサーバーの投稿もタイムラインに表示されることです。
 ^ つまり、ユーザーはどこかで一つのアカウントを作れば、そこから複数のサーバーの投稿を見ることができます。
 ^ DAWNは、Mastodonサーバーに接続してiPhoneで快適に使うUIを提供しています。
 ^ 現在、同様のプロトコルをInstagramのThreadsや、Misskeyなどが採用しているため、これらの投稿もMastodonから見ることができます。
 
+[.footer: https://en.wikipedia.org/wiki/Mastodon_%28social_network%29]
+
 ---
 
 # Custom Emojis
+User-uploaded animated emojis
 
 ![right fit](emoji-picker.png)
 
-## What are Custom Emojis?
-- User-uploaded emoji sets (like Slack!)
-- Each server has its own emoji collection
-- Support for GIF, APNG, WebP formats
+- Like Slack custom emojis
+- Each server has unique collection
+- GIF, APNG, WebP support
+- Used in posts and reactions
 
 ^ そして、Mastodonの特徴の一つにカスタム絵文字という機能があります。
 ^ これは、SlackやDiscordなどにもある、ユーザーが登録できる絵文字セットのことです。
@@ -110,13 +103,12 @@ code: SF Mono
 ---
 
 # The Challenge
+Timeline filled with animated emojis
 
 ![right fit autoplay loop](emoji-darake.mov)
 
-## Timeline can be filled with animated emojis!
-- Dozens of GIFs playing simultaneously
-- Different formats (GIF, APNG, WebP)
-- Various sizes and frame rates
+- Dozens of GIFs simultaneously
+- Mixed formats & frame rates
 - **Performance nightmare** 😱
 
 [.footer: Beware of flashing lights / 点滅にお気をつけください]
@@ -179,9 +171,11 @@ view.addSubview(imageView)
 
 ---
 
+# Not Working!
+
 ![inline](not-supported.png)
 
-UIKit not supported any animation image.
+UIKit doesn't support animated images
 
 ^ この実装だと表示することはできますが、アニメーションしません。
 ^ ここで、一度GIFファイルの構造を振り返りましょう。
@@ -251,12 +245,12 @@ imageView.startAnimating()
 ---
 
 # Memory Usage Problem
+340KB GIF = 25MB RAM!
 
 ![right fit](memory-usage.png)
 
-## 25MB for a single GIF!
-- Same as an 8K JPEG image
-- Memory usage grows exponentially
+- Same as 8K JPEG memory usage
+- Exponential memory growth
 - App crashes with multiple GIFs
 
 ^ そう、メモリ使用量が指数的に増加し、アプリがクラッシュしてしまうことがあります。
@@ -294,16 +288,15 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 
 ---
 
-# Performance tuning
+# Performance Tuning
 
 ^ このままでは、複数のGIFがあるとすぐにメモリが足りなくなってしまうと予想できます。
 ^ ここで、パフォーマンスチューニングの必要性が出てきます。
 
 ---
 
-# Performance Tuning
-
-## My approach to performance optimization
+# My Approach
+Performance optimization methodology
 
 ^ ただし、一言にパフォーマンスチューニングと言っても、何をすれば良いのでしょうか。
 ^ 例えば、今回であればメモリ使用量を減らすことが本当の目的でしょうか。
@@ -313,13 +306,13 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 ---
 
 # 1. Identify User Pain
-
-## Start with user experience
-- What specific issues are users facing?
-- Where do they struggle the most?
-- What makes them frustrated?
+Start with user experience
 
 ![right fill](ux.png)
+
+- What issues are users facing?
+- Where do they struggle?
+- What frustrates them?
 
 ^ まずは、何よりユーザーの体験から考えること。
 ^ 最初は、ユーザーが何を不都合に感じるのかを考えたり、ヒアリングをしたりします。
@@ -328,12 +321,12 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 ---
 
 # 2. Define Core Value
-
-## What is your app's primary mission?
-- What makes your app irreplaceable?
-- What would users miss most if removed?
+What's your app's mission?
 
 ![fill right](corevalue.png)
+
+- What makes it irreplaceable?
+- What would users miss most?
 
 ^ 次に、アプリの提供するコアな価値は何か。
 ^ 天気のアプリなら、いち早く天気予報が見れることが大事です。
@@ -343,11 +336,14 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 ---
 
 # 3. Measure Everything
-
-- Use profiling tools (Instruments, Xcode)
-- Quantify performance metrics (memory, CPU, frame rate)
+Quantify with profiling tools
 
 ![right fill](inspect.png)
+
+- Use Instruments, Xcode
+- Memory, CPU, frame rate
+- Identify bottlenecks
+- Evaluate improvements
 
 ^ そして、可能な限り数値で測定すること。
 ^ 例えば、メモリ使用量やCPU使用率、フレームレートなど、アプリのパフォーマンスに関する指標を測定します。
@@ -357,10 +353,11 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 ---
 
 # Tips: Instruments
-
-- Profile specific tests directly in Xcode
+Profile specific tests
 
 ![inline fit](launch_profiler.gif)
+
+Right-click test → "Profile"
 
 ^ ここで、Instrumentsの便利な使い方を一つ紹介します。
 ^ パフォーマンスチューニングでは、アプリ全体を実行してプロファイルすると他の処理のノイズが入ってしまいますが、特定のテストだけをプロファイルする方法があります。
@@ -370,9 +367,10 @@ $$M_{\text{bytes}} = W \times H \times C \times N$$
 ---
 
 # 4. Smart Trade-offs
+A puzzle of priorities
 
-- Lowering the quality of unimportant things
-- Raise the quality of what matters
+- Lower quality of unimportant things
+- Raise quality of what matters
 
 ^ 最後に、忘れてはいけないのがパフォーマンスチューニングとは「トレードオフのパズルである」ということです。
 ^ 当然、処理が軽くなるのが理想ですが、突き詰めると大事でないものの品質を落とし、大事なものの品質を上げるという話になります。
@@ -607,11 +605,12 @@ class ImageProvider,ImageProcessor,Cache process
 
 ---
 
-# UIImage lazy decompress issue
-
-- DGifDecompressLine, DGifDecompressInput run on Main Thread.
+# Lazy Decompression Issue
+DGifDecompress runs on main thread
 
 ![inline](DGifDecompress.png)
+
+Blocks smooth scrolling!
 
 ^ CGImageSourceから取り出したGIFのCGImageは圧縮されており、そのままでは描画に使用できません。
 ^ しかし、デフォルトの挙動では、UIImageは描画の直前までフレームを復元しません。
@@ -621,17 +620,14 @@ class ImageProvider,ImageProcessor,Cache process
 
 ---
 
-# Decompress
+# Solution: Pre-decompress
+Decompress on background thread
 
 ```swift
-// UIKit decompress
-
+// UIKit
 let decompressedImage = await uiImage.byPreparingForDisplay()
-```
 
-```swift
-// CoreGraphics decompress
-
+// CoreGraphics
 let context = CGContext(...)!
 context.draw(image, in: rect)
 let decodedImage = context.makeImage()
