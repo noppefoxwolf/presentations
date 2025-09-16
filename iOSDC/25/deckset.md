@@ -38,5 +38,5 @@ presentation.mdはDecksetで使用するMarkdownファイルです。
 
 ```markdown
 # プレゼンテーションのタイトル
-イベント名 日付 発表者名
+## イベント名 日付 発表者名
 ```
