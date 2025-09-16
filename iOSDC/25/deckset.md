@@ -33,3 +33,10 @@ presentation.mdはDecksetで使用するMarkdownファイルです。
 ```markdown
 # 章のタイトル
 ```
+
+表紙は以下のように作成してください。
+
+```markdown
+# プレゼンテーションのタイトル
+イベント名 日付 発表者名
+```
