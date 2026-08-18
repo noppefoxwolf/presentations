@@ -371,9 +371,16 @@ UIKitでは、このような高度なAdaptivityを持たせたコンテナビ�
 
 ---
 
+## コンテナビューコントローラの例: compact-adaptation
+
+https://swift.mackarous.com/posts/2024/10/modifiers-presentation-compact-adaptation/
+
+---
+
 ## コンテナビューコントローラの例: UITabBarController
 
 ---
+
 
 # 状態はサイズだけではない
 
