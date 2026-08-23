@@ -15,11 +15,17 @@ struct ContentView: View {
             }
             .navigationTitle("UI Flexibility")
             .navigationDestination(for: ExampleScreen.self) { screen in
-                AnimatedContainerView(preset: screen.containerPreset) {
-                    screen.destination
+                Group {
+                    if screen == .adaptationAndFlexibility {
+                        screen.destination
+                    } else {
+                        AnimatedContainerView(preset: screen.containerPreset) {
+                            screen.destination
+                        }
+                    }
                 }
-                    .navigationTitle(screen.title)
-                    .navigationBarTitleDisplayMode(.inline)
+                .navigationTitle(screen.title)
+                .navigationBarTitleDisplayMode(.inline)
             }
         }
     }
@@ -46,6 +52,7 @@ private struct ExampleScreenRow: View {
 enum ExampleScreen: String, CaseIterable, Identifiable, Hashable {
     case rigidCard, containerFill, scaling, scrolling, contentSize
     case omission, collapsing, textAdaptation, viewThatFits, responsiveLayout
+    case adaptationAndFlexibility
 
     var id: Self { self }
 
@@ -61,6 +68,7 @@ enum ExampleScreen: String, CaseIterable, Identifiable, Hashable {
         case .textAdaptation: "Text adaptation"
         case .viewThatFits: "ViewThatFits"
         case .responsiveLayout: "Responsive layout"
+        case .adaptationAndFlexibility: "Adaptation + Flexibility"
         }
     }
 
@@ -76,6 +84,7 @@ enum ExampleScreen: String, CaseIterable, Identifiable, Hashable {
         case .textAdaptation: "Wrap, then truncate when necessary"
         case .viewThatFits: "Select a representation by priority"
         case .responsiveLayout: "Switch structure at a size boundary"
+        case .adaptationAndFlexibility: "Grow, add information, then stop"
         }
     }
 
@@ -91,6 +100,7 @@ enum ExampleScreen: String, CaseIterable, Identifiable, Hashable {
         case .textAdaptation: "text.alignleft"
         case .viewThatFits: "rectangle.3.group"
         case .responsiveLayout: "rectangle.split.2x1"
+        case .adaptationAndFlexibility: "rectangle.center.inset.filled"
         }
     }
 
@@ -115,6 +125,7 @@ enum ExampleScreen: String, CaseIterable, Identifiable, Hashable {
         case .textAdaptation: TextAdaptationExampleView()
         case .viewThatFits: ViewThatFitsExampleView()
         case .responsiveLayout: ResponsiveLayoutExampleView()
+        case .adaptationAndFlexibility: AdaptationAndFlexibilityExampleView()
         }
     }
 }

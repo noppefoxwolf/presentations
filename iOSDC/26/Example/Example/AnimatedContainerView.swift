@@ -88,9 +88,9 @@ enum ContainerSizePreset {
 
         let multiplier: CGFloat
         switch (self, size) {
-        case (.standard, .compact), (.textAdaptation, .compact): multiplier = 0.55
-        case (.standard, .regular), (.textAdaptation, .regular): multiplier = 0.78
-        case (.standard, .expanded), (.textAdaptation, .expanded): multiplier = 1
+        case (.standard, .compact), (.textAdaptation, .compact): multiplier = 0.5
+        case (.standard, .regular), (.textAdaptation, .regular): multiplier = 0.7
+        case (.standard, .expanded), (.textAdaptation, .expanded): multiplier = 0.88
         case (.viewThatFits, _): multiplier = 1
         }
         return availableWidth * multiplier
