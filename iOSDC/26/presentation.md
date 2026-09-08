@@ -32,7 +32,7 @@ code: SF Mono
 
 ![](2.png)
 
-^ 個人では、分散型のSNSであるMastodon向けに、DAWN for Mastodonというアプリも作っています。
+^ 個人では、分散型のSNSであるMastodon向けに、DAWN for Mastodonというクライアントアプリも作っています。
 
 ---
 
