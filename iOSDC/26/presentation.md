@@ -26,13 +26,13 @@ code: SF Mono
 ![right](Original.png)
 
 ^ まず自己紹介です。noppeといいます。キツネのアイコンで活動しています。
-^ 仕事では、DeNAでPocochaというアプリを開発しています。
+^ 仕事では、DeNAで、ライブ配信を通じてユーザー同士が交流するアプリ、Pocochaを開発しています。
 
 ---
 
 ![](2.png)
 
-^ 個人では、DAWN for MastodonというMastodon向けのアプリも作っています。
+^ 個人では、分散型のSNSであるMastodon向けに、DAWN for Mastodonというアプリも作っています。
 
 ---
 
